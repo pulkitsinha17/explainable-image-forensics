@@ -1,8 +1,23 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Upload, History, Settings, BarChart3, ArrowRight } from "lucide-react";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { UserButton } from "@clerk/nextjs";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const { userId } = await auth();
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
+  const user = await currentUser();
+  const displayName =
+    user?.firstName ||
+    user?.username ||
+    user?.emailAddresses?.[0]?.emailAddress?.split("@")[0] ||
+    "User";
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Dashboard navbar */}
@@ -18,16 +33,23 @@ export default function DashboardPage() {
         </Link>
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-500">Dashboard</span>
-          <div className="w-8 h-8 rounded-full bg-[#1a7fc4] flex items-center justify-center">
-            <span className="text-white text-xs font-bold">U</span>
-          </div>
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox:
+                  "w-8 h-8 ring-2 ring-[#1a7fc4]/20 hover:ring-[#1a7fc4] transition-all",
+              },
+            }}
+          />
         </div>
       </header>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Welcome */}
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to PIXENTRA</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Welcome back, {displayName}
+          </h1>
           <p className="text-gray-500">
             Analyze images for forensic evidence and explore explainable results.
           </p>
@@ -36,12 +58,36 @@ export default function DashboardPage() {
         {/* Quick actions */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
           {[
-            { icon: Upload, label: 'Analyze Image', desc: 'Upload and analyze a new image', color: '#1a7fc4', href: '/analyze' },
-            { icon: History, label: 'Analysis History', desc: 'Review past analyses', color: '#8b5cf6', href: '/history' },
-            { icon: BarChart3, label: 'Recent Results', desc: 'View recent forensic results', color: '#10b981', href: '/results' },
-            { icon: Settings, label: 'Settings', desc: 'Manage your account', color: '#f59e0b', href: '/settings' },
+            {
+              icon: Upload,
+              label: "Analyze Image",
+              desc: "Upload and analyze a new image",
+              color: "#1a7fc4",
+              href: "/analyze",
+            },
+            {
+              icon: History,
+              label: "Analysis History",
+              desc: "Review past analyses",
+              color: "#8b5cf6",
+              href: "/history",
+            },
+            {
+              icon: BarChart3,
+              label: "Recent Results",
+              desc: "View recent forensic results",
+              color: "#10b981",
+              href: "/results",
+            },
+            {
+              icon: Settings,
+              label: "Settings",
+              desc: "Manage your account",
+              color: "#f59e0b",
+              href: "/settings",
+            },
           ].map((action) => {
-            const Icon = action.icon
+            const Icon = action.icon;
             return (
               <Link
                 key={action.label}
@@ -56,11 +102,14 @@ export default function DashboardPage() {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-1">{action.label}</h3>
                 <p className="text-sm text-gray-500">{action.desc}</p>
-                <div className="flex items-center gap-1 mt-3 text-xs font-medium" style={{ color: action.color }}>
+                <div
+                  className="flex items-center gap-1 mt-3 text-xs font-medium"
+                  style={{ color: action.color }}
+                >
                   Open <ArrowRight className="w-3 h-3" />
                 </div>
               </Link>
-            )
+            );
           })}
         </div>
 
@@ -68,7 +117,7 @@ export default function DashboardPage() {
         <div className="bg-blue-50 rounded-2xl border border-blue-100 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">Backend Integration Pending</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            This dashboard is ready for Clerk authentication and FastAPI/PyTorch backend integration.
+            This dashboard is authenticated via Clerk and ready for FastAPI/PyTorch backend integration.
             Once connected, users can upload real images and receive live forensic analysis results
             with heatmaps, evidence breakdowns, and explainable AI summaries.
           </p>
@@ -83,3 +132,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

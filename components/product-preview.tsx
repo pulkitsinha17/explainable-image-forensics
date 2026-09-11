@@ -204,7 +204,7 @@ export function ProductPreview() {
               <span className="text-sm font-medium text-gray-600 ml-2">PIXENTRA Analysis Dashboard</span>
             </div>
             <Link
-              href="/sign-up"
+              href="/analyze"
               className="px-4 py-1.5 bg-[#1a7fc4] text-white text-xs font-semibold rounded-lg hover:bg-[#1565a8] transition-colors"
               id="product-preview-cta"
             >
