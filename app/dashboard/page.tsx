@@ -1,9 +1,17 @@
-import Link from "next/link";
-import Image from "next/image";
-import { Upload, History, Settings, BarChart3, ArrowRight } from "lucide-react";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
+import { connectToDatabase } from "@/lib/mongodb";
+import Analysis from "@/models/Analysis";
+
+import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { AnalysisCTA } from "@/components/dashboard/analysis-cta";
+import { StatsGrid, type DashboardStats } from "@/components/dashboard/stats-grid";
+import { RecentAnalyses, type RecentAnalysisItem } from "@/components/dashboard/recent-analyses";
+import { OnboardingSteps } from "@/components/dashboard/onboarding-steps";
+import { ForensicQuote } from "@/components/dashboard/forensic-quote";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const { userId } = await auth();
@@ -12,124 +20,141 @@ export default async function DashboardPage() {
   }
 
   const user = await currentUser();
-  const displayName =
+  const firstName =
     user?.firstName ||
     user?.username ||
     user?.emailAddresses?.[0]?.emailAddress?.split("@")[0] ||
     "User";
 
+  const displayName = user?.firstName
+    ? `${user.firstName}${user.lastName ? ` ${user.lastName}` : ""}`
+    : user?.username || firstName;
+
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress;
+  const userImageUrl = user?.imageUrl;
+
+  // Fetch real statistics & recent analyses from MongoDB if available
+  let stats: DashboardStats = {
+    totalAnalyses: 0,
+    analysesThisMonth: 0,
+    manipulatedDetected: 0,
+    averageRiskScore: null,
+  };
+
+  let recentAnalyses: RecentAnalysisItem[] = [];
+
+  try {
+    if (process.env.MONGODB_URI) {
+      await connectToDatabase();
+
+      const [totalCount, docs] = await Promise.all([
+        Analysis.countDocuments({ clerkUserId: userId }),
+        Analysis.find({ clerkUserId: userId })
+          .sort({ createdAt: -1 })
+          .limit(5)
+          .lean(),
+      ]);
+
+      if (totalCount > 0) {
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const [monthCount, manipulatedCount, scoredDocs] = await Promise.all([
+          Analysis.countDocuments({
+            clerkUserId: userId,
+            createdAt: { $gte: startOfMonth },
+          }),
+          Analysis.countDocuments({
+            clerkUserId: userId,
+            $or: [
+              { detectionResult: "forged" },
+              { forgeryRiskScore: { $gte: 0.65 } },
+            ],
+          }),
+          Analysis.find(
+            {
+              clerkUserId: userId,
+              forgeryRiskScore: { $exists: true, $ne: null },
+            },
+            { forgeryRiskScore: 1 }
+          ).lean(),
+        ]);
+
+        let avgRisk: number | null = null;
+        if (scoredDocs.length > 0) {
+          const totalScore = scoredDocs.reduce<number>(
+            (sum, item) =>
+              sum + (typeof item.forgeryRiskScore === "number" ? item.forgeryRiskScore : 0),
+            0
+          );
+          avgRisk = totalScore / scoredDocs.length;
+        }
+
+        stats = {
+          totalAnalyses: totalCount,
+          analysesThisMonth: monthCount,
+          manipulatedDetected: manipulatedCount,
+          averageRiskScore: avgRisk,
+        };
+
+        recentAnalyses = (docs as Array<{
+          _id: { toString(): string };
+          originalFilename: string;
+          detectionResult?: string;
+          forgeryRiskScore?: number;
+          createdAt: string | Date;
+        }>).map((doc) => ({
+          id: doc._id.toString(),
+          filename: doc.originalFilename || "Untitled scan",
+          verdict: doc.detectionResult,
+          riskScore: doc.forgeryRiskScore,
+          createdAt: doc.createdAt,
+        }));
+      }
+    }
+  } catch (error) {
+    // Fail gracefully with clean zero-state without crashing the dashboard
+    console.warn("Dashboard analysis data fetch fallback:", error);
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Dashboard navbar */}
-      <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
-        <Link href="/">
-          <Image
-            src="/pixentra-logo.svg"
-            alt="PIXENTRA"
-            width={120}
-            height={60}
-            className="h-8 w-auto"
-          />
-        </Link>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-500">Dashboard</span>
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox:
-                  "w-8 h-8 ring-2 ring-[#1a7fc4]/20 hover:ring-[#1a7fc4] transition-all",
-              },
-            }}
-          />
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#f8fafc] text-gray-900 flex flex-col lg:flex-row antialiased">
+      {/* Desktop & Mobile Responsive Sidebar */}
+      <DashboardSidebar
+        user={{
+          displayName,
+          email: userEmail,
+          imageUrl: userImageUrl,
+        }}
+      />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Welcome */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {displayName}
-          </h1>
-          <p className="text-gray-500">
-            Analyze images for forensic evidence and explore explainable results.
-          </p>
-        </div>
+      {/* Main Forensic Workspace */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        <main className="flex-1 p-4 sm:p-7 lg:p-8 max-w-7xl w-full mx-auto space-y-6 sm:space-y-8 animate-fade-in">
+          {/* Top Header */}
+          <DashboardHeader firstName={firstName} />
 
-        {/* Quick actions */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
-          {[
-            {
-              icon: Upload,
-              label: "Analyze Image",
-              desc: "Upload and analyze a new image",
-              color: "#1a7fc4",
-              href: "/analyze",
-            },
-            {
-              icon: History,
-              label: "Analysis History",
-              desc: "Review past analyses",
-              color: "#8b5cf6",
-              href: "/history",
-            },
-            {
-              icon: BarChart3,
-              label: "Recent Results",
-              desc: "View recent forensic results",
-              color: "#10b981",
-              href: "/results",
-            },
-            {
-              icon: Settings,
-              label: "Settings",
-              desc: "Manage your account",
-              color: "#f59e0b",
-              href: "/settings",
-            },
-          ].map((action) => {
-            const Icon = action.icon;
-            return (
-              <Link
-                key={action.label}
-                href={action.href}
-                className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all group"
-              >
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                  style={{ background: `${action.color}20` }}
-                >
-                  <Icon className="w-5 h-5" style={{ color: action.color }} />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-1">{action.label}</h3>
-                <p className="text-sm text-gray-500">{action.desc}</p>
-                <div
-                  className="flex items-center gap-1 mt-3 text-xs font-medium"
-                  style={{ color: action.color }}
-                >
-                  Open <ArrowRight className="w-3 h-3" />
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+          {/* Primary Analysis CTA */}
+          <AnalysisCTA />
 
-        {/* Integration note */}
-        <div className="bg-blue-50 rounded-2xl border border-blue-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Backend Integration Pending</h2>
-          <p className="text-sm text-gray-600 leading-relaxed">
-            This dashboard is authenticated via Clerk and ready for FastAPI/PyTorch backend integration.
-            Once connected, users can upload real images and receive live forensic analysis results
-            with heatmaps, evidence breakdowns, and explainable AI summaries.
-          </p>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-[#1a7fc4] hover:text-[#1565a8] transition-colors"
-          >
-            ← Back to landing page
-          </Link>
-        </div>
+          {/* Analytics Summary */}
+          <StatsGrid stats={stats} />
+
+          {/* Recent Analyses & Onboarding Side-by-Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            <div className="lg:col-span-7">
+              <RecentAnalyses analyses={recentAnalyses} />
+            </div>
+            <div className="lg:col-span-5">
+              <OnboardingSteps />
+            </div>
+          </div>
+
+          {/* Bottom Forensic Quote Banner */}
+          <ForensicQuote />
+        </main>
       </div>
     </div>
   );
 }
-
