@@ -9,6 +9,8 @@ import {
   Zap,
   Clock,
   FileText,
+  Layers,
+  ArrowLeftRight,
   Settings,
   LogOut,
   Menu,
@@ -29,7 +31,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
   const { signOut, openUserProfile } = useClerk();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const navItems = [
+  const primaryNavItems = [
     {
       name: "Dashboard",
       href: "/dashboard",
@@ -53,6 +55,21 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       href: "/history",
       icon: FileText,
       active: pathname.startsWith("/reports"),
+    },
+  ];
+
+  const middleNavItems = [
+    {
+      name: "Evidence Library",
+      href: "/history",
+      icon: Layers,
+      active: pathname.startsWith("/evidence-library"),
+    },
+    {
+      name: "Compare",
+      href: "/dashboard",
+      icon: ArrowLeftRight,
+      active: pathname.startsWith("/compare"),
     },
   ];
 
@@ -91,7 +108,38 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
         {/* Primary Navigation */}
         <div className="px-4 py-5 space-y-1">
-          {navItems.map((item) => {
+          {primaryNavItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  item.active
+                    ? "bg-[#eef6fc] text-[#1a7fc4] font-semibold shadow-xs"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                <Icon
+                  className={`w-4 h-4 ${
+                    item.active ? "text-[#1a7fc4]" : "text-gray-500"
+                  }`}
+                />
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Separator */}
+        <div className="px-6 my-2">
+          <div className="border-t border-gray-100" />
+        </div>
+
+        {/* Middle Forensic Tools Navigation */}
+        <div className="px-4 py-2 space-y-1">
+          {middleNavItems.map((item) => {
             const Icon = item.icon;
             return (
               <Link
