@@ -6,11 +6,10 @@ import { ArrowLeft } from "lucide-react";
 import { TopNavBar } from "./top-nav-bar";
 import { ImageUpload } from "./image-upload";
 import { AnalysisProgress } from "./analysis-progress";
-import { AnalysisResults } from "./analysis-results";
-import { FeedbackCard } from "./feedback-card";
+import { UploadSuccessCard } from "./upload-success-card";
 import { HowItWorks } from "./how-it-works";
 import { PrivacyCard } from "./privacy-card";
-import type { SelectedImageData, ForensicAnalysisResult } from "./types";
+import type { SelectedImageData, S3UploadState } from "./types";
 
 interface AnalyzeWorkspaceProps {
   userInitial?: string;
@@ -22,84 +21,128 @@ export function AnalyzeWorkspace({
   userDisplayName = "Pulkit Sinha",
 }: AnalyzeWorkspaceProps) {
   const [selectedImage, setSelectedImage] = useState<SelectedImageData | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [currentStage, setCurrentStage] = useState<
-    "uploading" | "analyzing" | "generating" | "finishing"
-  >("uploading");
-  const [results, setResults] = useState<ForensicAnalysisResult | null>(null);
 
-  // Set default sample image on initial load matching the reference screenshot
-  useEffect(() => {
-    setSelectedImage({
-      previewUrl: "/images/mountain.png",
-      name: "mountain-lake.jpg",
-      sizeFormatted: "2.4 MB",
-      dimensions: "4032 × 3024",
-      format: "JPEG",
-    });
-  }, []);
+  /** Upload phase state — tracks presign request + actual S3 PUT progress */
+  const [uploadState, setUploadState] = useState<S3UploadState>({
+    status: "idle",
+    progress: 0,
+    s3Key: null,
+    errorMessage: null,
+  });
 
-  const handleStartAnalysis = () => {
-    if (!selectedImage) return;
+  /** Convenience derived booleans */
+  const isUploading =
+    uploadState.status === "requesting" || uploadState.status === "uploading";
+  const uploadDone = uploadState.status === "complete";
+  const uploadError = uploadState.status === "error";
 
-    setIsAnalyzing(true);
-    setProgress(0);
-    setCurrentStage("uploading");
-    setResults(null);
+  /**
+   * Map the S3 upload status to the progress-bar stage labels.
+   * Phase 3 will add "analyzing" / "generating" / "finishing" stages
+   * once the FastAPI pipeline is wired up.
+   */
+  const currentStage: "uploading" | "analyzing" | "generating" | "finishing" =
+    uploadState.status === "requesting" ? "uploading" : "uploading";
 
-    // Simulated multi-stage forensic analysis progression (UI demo state)
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        const next = prev + 4;
-        if (next >= 100) {
-          clearInterval(interval);
-          setIsAnalyzing(false);
-
-          // Render UI results matching the reference design
-          setResults({
-            verdict: "likely_manipulated",
-            verdictLabel: "Likely Manipulated",
-            verdictDescription: "This image shows strong signs of digital manipulation.",
-            forgeryRiskScore: 82,
-            evidence: {
-              spatial: 87,
-              noise: 71,
-              frequency: 79,
-              ela: 83,
-              statistics: 68,
-              metadata: 32,
-            },
-            aiExplanation:
-              "The image shows inconsistencies in noise patterns and frequency components, particularly in the sky and mountain regions. The error level analysis (ELA) also highlights regions that are likely to have been manipulated. These findings suggest a high probability of digital manipulation.",
-            originalImageUrl: selectedImage.previewUrl,
-            localizationMapUrl: "", // Uses the procedural thermal heatmap shader in slider
-            elapsedSeconds: 24,
-          });
-
-          return 100;
-        }
-
-        if (next < 25) {
-          setCurrentStage("uploading");
-        } else if (next < 65) {
-          setCurrentStage("analyzing");
-        } else if (next < 90) {
-          setCurrentStage("generating");
-        } else {
-          setCurrentStage("finishing");
-        }
-
-        return next;
+  const handleStartAnalysis = async () => {
+    if (!selectedImage?.file) {
+      setUploadState({
+        status: "error",
+        progress: 0,
+        s3Key: null,
+        errorMessage:
+          "No image file selected. Please select a real image from your device.",
       });
-    }, 100);
+      return;
+    }
+
+    const file = selectedImage.file;
+
+    // ── Step 1: Request a presigned URL from the server ───────────────────────
+    setUploadState({ status: "requesting", progress: 0, s3Key: null, errorMessage: null });
+
+    let uploadUrl: string;
+    let s3Key: string;
+
+    try {
+      const res = await fetch("/api/analyze/presign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: file.name,
+          contentType: file.type,
+          fileSizeBytes: file.size,
+        }),
+      });
+
+      if (!res.ok) {
+        let msg = "Failed to prepare the upload. Please try again.";
+        try {
+          const json = await res.json();
+          if (typeof json?.error === "string") msg = json.error;
+        } catch {
+          /* ignore parse error */
+        }
+        setUploadState({ status: "error", progress: 0, s3Key: null, errorMessage: msg });
+        return;
+      }
+
+      const json = await res.json();
+      uploadUrl = json.uploadUrl;
+      s3Key = json.s3Key;
+    } catch {
+      setUploadState({
+        status: "error",
+        progress: 0,
+        s3Key: null,
+        errorMessage:
+          "Network error while preparing the upload. Check your connection and try again.",
+      });
+      return;
+    }
+
+    // ── Step 2: Upload directly from the browser to S3 ───────────────────────
+    setUploadState({ status: "uploading", progress: 5, s3Key: null, errorMessage: null });
+
+    try {
+      await uploadToS3WithProgress(file, uploadUrl, (pct) => {
+        setUploadState((prev) => ({ ...prev, progress: pct }));
+      });
+    } catch (err: unknown) {
+      const detail = err instanceof Error ? err.message : String(err);
+      console.error("[S3 upload] Failed:", detail);
+      setUploadState({
+        status: "error",
+        progress: 0,
+        s3Key: null,
+        errorMessage:
+          detail.includes("CORS") || detail.includes("Network error")
+            ? "Upload failed. Please ensure S3 bucket CORS permissions are configured to allow uploads from your browser."
+            : `Upload to secure storage failed: ${detail}`,
+      });
+      return;
+    }
+
+    // ── Step 3: Mark upload complete ─────────────────────────────────────────
+    setUploadState({ status: "complete", progress: 100, s3Key, errorMessage: null });
+
+    // ── Phase 3 hook ──────────────────────────────────────────────────────────
+    // When the FastAPI / MPC pipeline is ready, trigger forensic analysis here:
+    //
+    //   const analysisRes = await fetch("/api/analyze/run", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ s3Key }),
+    //   });
+    //   const analysisResult = await analysisRes.json();
+    //   setResults(analysisResult);
+    //
+    // ─────────────────────────────────────────────────────────────────────────
   };
 
   const handleClearImage = () => {
     setSelectedImage(null);
-    setIsAnalyzing(false);
-    setProgress(0);
-    setResults(null);
+    setUploadState({ status: "idle", progress: 0, s3Key: null, errorMessage: null });
   };
 
   return (
@@ -129,30 +172,41 @@ export function AnalyzeWorkspace({
       <ImageUpload
         onImageSelected={(img) => {
           setSelectedImage(img);
-          setResults(null);
+          setUploadState({ status: "idle", progress: 0, s3Key: null, errorMessage: null });
         }}
         selectedImage={selectedImage}
         onClearImage={handleClearImage}
         onStartAnalysis={handleStartAnalysis}
-        isAnalyzing={isAnalyzing}
+        isAnalyzing={isUploading}
+        uploadState={uploadState}
       />
 
-      {/* 2. Analysis Progress State */}
-      {isAnalyzing && (
+      {/* 2. Upload Progress State (while uploading to S3) */}
+      {isUploading && (
         <AnalysisProgress
-          progress={progress}
+          progress={uploadState.progress}
           currentStage={currentStage}
+          label="Uploading your image..."
+          subtitle="Securely transferring your image to PIXENTRA's private vault."
         />
       )}
 
-      {/* 3. Analysis Results State */}
-      {results && !isAnalyzing && (
-        <AnalysisResults results={results} />
+      {/* 3. Upload Error State */}
+      {uploadError && uploadState.errorMessage && (
+        <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200/80 rounded-xl text-xs sm:text-sm text-red-800 animate-fade-in">
+          <svg className="w-4 h-4 text-red-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <p className="font-medium flex-1">{uploadState.errorMessage}</p>
+        </div>
       )}
 
-      {/* 4. Feedback Section (Visible when results are shown) */}
-      {results && !isAnalyzing && (
-        <FeedbackCard />
+      {/* 4. Upload Success State — clearly NOT forensic analysis results */}
+      {uploadDone && uploadState.s3Key && selectedImage && (
+        <UploadSuccessCard
+          s3Key={uploadState.s3Key}
+          filename={selectedImage.name}
+        />
       )}
 
       {/* 5. How PIXENTRA Works */}
@@ -162,4 +216,52 @@ export function AnalyzeWorkspace({
       <PrivacyCard />
     </div>
   );
+}
+
+/**
+ * Uploads a file to the given presigned S3 PUT URL using XMLHttpRequest
+ * so we get real byte-level upload progress.
+ *
+ * Returns a Promise that resolves on HTTP 200 from S3 or rejects on any error.
+ */
+function uploadToS3WithProgress(
+  file: File,
+  presignedUrl: string,
+  onProgress: (pct: number) => void
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener("progress", (evt) => {
+      if (evt.lengthComputable) {
+        const pct = Math.round((evt.loaded / evt.total) * 100);
+        onProgress(Math.min(pct, 99)); // hold at 99 until response confirmed
+      }
+    });
+
+    xhr.addEventListener("load", () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress(100);
+        resolve();
+      } else {
+        reject(
+          new Error(
+            `S3 PUT failed with status ${xhr.status}. Response: ${xhr.responseText.slice(0, 200)}`
+          )
+        );
+      }
+    });
+
+    xhr.addEventListener("error", () => {
+      reject(new Error("Network error during S3 upload."));
+    });
+
+    xhr.addEventListener("abort", () => {
+      reject(new Error("S3 upload was aborted."));
+    });
+
+    xhr.open("PUT", presignedUrl, true);
+    xhr.setRequestHeader("Content-Type", file.type);
+    xhr.send(file);
+  });
 }

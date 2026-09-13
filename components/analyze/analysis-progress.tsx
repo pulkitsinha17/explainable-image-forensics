@@ -5,11 +5,17 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 interface AnalysisProgressProps {
   progress: number; // 0 to 100
   currentStage: "uploading" | "analyzing" | "generating" | "finishing";
+  /** Override the main heading (defaults to "Analyzing your image...") */
+  label?: string;
+  /** Override the subtitle copy */
+  subtitle?: string;
 }
 
 export function AnalysisProgress({
   progress,
   currentStage,
+  label = "Analyzing your image...",
+  subtitle = "This may take a few moments. Please don't close the page.",
 }: AnalysisProgressProps) {
   const stages = [
     { id: "uploading", label: "Uploading" },
@@ -32,10 +38,10 @@ export function AnalysisProgress({
 
       {/* Heading & Subtitle */}
       <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">
-        Analyzing your image...
+        {label}
       </h3>
       <p className="text-xs sm:text-sm text-gray-500 mb-6">
-        This may take a few moments. Please don&apos;t close the page.
+        {subtitle}
       </p>
 
       {/* Progress Bar & Percentage */}

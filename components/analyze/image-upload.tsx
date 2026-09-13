@@ -2,8 +2,8 @@
 
 import { useState, useRef, DragEvent, ChangeEvent } from "react";
 import Image from "next/image";
-import { Upload, X, Play, AlertCircle } from "lucide-react";
-import type { SelectedImageData } from "./types";
+import { Upload, X, Play, AlertCircle, Info } from "lucide-react";
+import type { SelectedImageData, S3UploadState } from "./types";
 
 interface ImageUploadProps {
   onImageSelected: (data: SelectedImageData) => void;
@@ -11,6 +11,8 @@ interface ImageUploadProps {
   onClearImage: () => void;
   onStartAnalysis: () => void;
   isAnalyzing: boolean;
+  /** Upload state from parent, used for disabling buttons during S3 upload */
+  uploadState?: S3UploadState;
 }
 
 const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "tiff", "tif"];
@@ -22,7 +24,11 @@ export function ImageUpload({
   onClearImage,
   onStartAnalysis,
   isAnalyzing,
+  uploadState,
 }: ImageUploadProps) {
+  // A sample/demo image has no File object — the user must select a real file.
+  const isSampleImage = selectedImage !== null && !selectedImage.file;
+  const isDisabled = isAnalyzing || uploadState?.status === "complete";
   const [isDragging, setIsDragging] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -131,7 +137,7 @@ export function ImageUpload({
           accept=".jpg,.jpeg,.png,.webp,.tiff,.tif,image/jpeg,image/png,image/webp,image/tiff"
           onChange={handleFileChange}
           className="hidden"
-          disabled={isAnalyzing}
+          disabled={isDisabled}
         />
 
         {/* Upload Icon & Text Prompts */}
@@ -150,8 +156,8 @@ export function ImageUpload({
           <button
             type="button"
             onClick={triggerFileInput}
-            disabled={isAnalyzing}
-            className="px-6 py-2.5 bg-[#1a7fc4] hover:bg-[#1565a8] active:scale-[0.98] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-sm hover:shadow"
+            disabled={isDisabled}
+            className="px-6 py-2.5 bg-[#1a7fc4] hover:bg-[#1565a8] active:scale-[0.98] disabled:opacity-60 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-sm hover:shadow"
           >
             Select Image
           </button>
@@ -180,7 +186,7 @@ export function ImageUpload({
                   <button
                     type="button"
                     onClick={onClearImage}
-                    disabled={isAnalyzing}
+                    disabled={isDisabled}
                     className="p-0.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                     title="Remove image"
                     aria-label="Remove image"
@@ -196,6 +202,14 @@ export function ImageUpload({
                   <span className="text-gray-300">•</span>
                   <span className="uppercase">{selectedImage.format}</span>
                 </p>
+
+                {/* Hint: sample images can't be uploaded — user must pick real file */}
+                {isSampleImage && (
+                  <p className="flex items-center gap-1 mt-1 text-[11px] text-amber-700 font-medium">
+                    <Info className="w-3 h-3 shrink-0" />
+                    Select an image from your device to enable upload.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -204,8 +218,9 @@ export function ImageUpload({
               <button
                 type="button"
                 onClick={onStartAnalysis}
-                disabled={isAnalyzing}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-[#1a7fc4] hover:bg-[#1565a8] active:scale-[0.98] disabled:opacity-50 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-sm hover:shadow"
+                disabled={isDisabled || isSampleImage}
+                title={isSampleImage ? "Select a real image from your device first" : undefined}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-[#1a7fc4] hover:bg-[#1565a8] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-sm hover:shadow"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>Start Analysis</span>

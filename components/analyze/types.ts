@@ -27,3 +27,21 @@ export interface ForensicAnalysisResult {
   localizationMapUrl: string;
   elapsedSeconds: number;
 }
+
+/**
+ * Tracks the state of the S3 upload phase.
+ * This is SEPARATE from the forensic analysis phase (Phase 3 / FastAPI).
+ */
+export type S3UploadStatus =
+  | "idle"           // No upload in progress
+  | "requesting"     // Requesting presigned URL from server
+  | "uploading"      // Browser is PUT-ing the file to S3
+  | "complete"       // S3 upload succeeded; s3Key is available
+  | "error";         // Upload failed; see errorMessage
+
+export interface S3UploadState {
+  status: S3UploadStatus;
+  progress: number;  // 0–100, upload byte progress
+  s3Key: string | null;
+  errorMessage: string | null;
+}
