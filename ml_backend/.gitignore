@@ -1,0 +1,28 @@
+# ── Python virtual environment ─────────────────────────────────────────────
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Model checkpoints (large binary files; track elsewhere) ───────────────
+# DO NOT commit: these files must be downloaded separately
+# models/*.pth
+# If you use Git LFS, remove the above comment and let LFS manage *.pth
+
+# ── Output artefacts ──────────────────────────────────────────────────────
+outputs/masks/
+outputs/overlays/
+
+# ── Secrets / environment ─────────────────────────────────────────────────
+.env
+.env.local
+
+# ── IDE / OS ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log

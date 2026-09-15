@@ -1,0 +1,27 @@
+# PIXENTRA ML Backend — Python dependencies
+# Pin to ranges that are compatible with the Kaggle notebook environment
+# (Python 3.10+, CUDA 12.x optional)
+
+# ── Web framework ──────────────────────────────────────────────────────────────
+fastapi>=0.115.0,<1.0.0
+uvicorn[standard]>=0.30.0,<1.0.0
+python-multipart>=0.0.12         # required for FastAPI File/Form uploads
+
+# ── ML ─────────────────────────────────────────────────────────────────────────
+# Install the correct variant of torch for your hardware:
+#   CPU-only:  pip install torch torchvision
+#   CUDA 12.x: pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+# This file lists CPU as the baseline; override with the CUDA wheels if available.
+torch>=2.2.0
+torchvision>=0.17.0
+
+# ── Image processing ───────────────────────────────────────────────────────────
+opencv-python-headless>=4.9.0
+Pillow>=10.0.0
+numpy>=1.26.0,<3.0.0
+
+# ── Pydantic (bundled with FastAPI but listed explicitly for clarity) ──────────
+pydantic>=2.7.0,<3.0.0
+
+# ── Utilities ──────────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0             # optional: load .env for local dev

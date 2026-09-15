@@ -40,3 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .clerk/
+
+# ML model checkpoints
+*.pth
+*.pt
+*.ckpt
+ml_backend/models/
