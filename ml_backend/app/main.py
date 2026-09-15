@@ -162,6 +162,7 @@ async def analyze(
             img_rgb=img_rgb,
             models=_models,
             analysis_id=analysis_id,
+            raw_bytes=raw,
         )
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc

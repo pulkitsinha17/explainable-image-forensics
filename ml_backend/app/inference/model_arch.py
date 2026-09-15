@@ -1,81 +1,282 @@
 """
 PIXENTRA — model architecture definitions.
 
-Architecture extracted verbatim from the authoritative Kaggle notebook:
-  MPC_MultiEvidence_Corrected_STRONG_FINAL.ipynb
+Authoritative architecture reconstructed verbatim from the training notebook
+`final_completed_major_project(1)`.
 
-Two model classes are defined:
-
-1. MPCModel  — the released MPC backbone (HRFormer encoder + decoder)
-               loaded from MPC_CASIAv2_stage2_weights.pth.
-               Used as a frozen evidence prior.
-
-2. StrongMultiEvidenceNet — the trained PIXENTRA model that accepts
-               (rgb, evidence_tensor) and produces a forgery logit map.
-               Loaded from best_multi_evidence_stage1.pth.
-
-DO NOT modify these classes — they must match the checkpoint weights exactly.
+Hierarchy:
+StrongMultiEvidenceNet (MultiEvidenceModel)
+  ├── mpc_rgb: MPCPlusRGBFeatureExtractor
+  │     └── mpc_rgb_model: MultiScaleRGBMPC
+  │           ├── rgb_encoder: RGBEncoder (ResNet34 stem + layer1..4)
+  │           ├── mpc: MyModel (CATNet / HRFormer backbone)
+  │           ├── fuse128, fuse64, fuse32, fuse16: MPCGuidedFusion
+  │           ├── dec32, dec64, dec128, dec256: DecoderBlock
+  │           └── final: nn.Sequential(ConvBlock, nn.Conv2d)
+  ├── compression_encoder: CompressionEvidenceEncoder (1 -> 32)
+  ├── freqnoise_encoder: FrequencyNoiseEvidenceEncoder (2 -> 32)
+  ├── statistical_encoder: StatisticalEvidenceEncoder (2 -> 32)
+  ├── ela_encoder: ELAEncoder (1 -> 32)
+  ├── metadata_encoder: MetadataEncoder (10+1 -> 32 -> film 128*2)
+  ├── fusion: EvidenceFusion (64 + 1 + 32*4 -> 128)
+  ├── localization_head: LocalizationHead (128 -> 64 -> 32 -> 1)
+  └── risk_head: RiskAssessmentHead (128 + 2 -> 64 -> 1)
 """
+from __future__ import annotations
 import sys
 from pathlib import Path
+from typing import Optional, Dict, Any, Tuple
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torchvision.models import resnet34, ResNet34_Weights
 
 # ── Make the MPC source code importable ───────────────────────────────────────
-# The MPC HRFormer backbone lives in ml_backend/HRFormer/ (copied from MPC-main)
 _ML_BACKEND_ROOT = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(_ML_BACKEND_ROOT))   # so "from HRFormer..." works
+if str(_ML_BACKEND_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ML_BACKEND_ROOT))
+
+# Import MPC MyModel (CATNet stage2 model)
+try:
+    from model import MyModel
+except ImportError:
+    from HRFormer.hrt_backbone import get_hrformer  # type: ignore
+    from decoder_head import Decoder  # type: ignore
+
+    class MyModel(nn.Module):  # type: ignore
+        def __init__(self):
+            super().__init__()
+            self.encoder = get_hrformer()
+            self.decoder = Decoder()
+
+        def forward(self, inputs):
+            x = self.encoder(inputs)
+            return self.decoder(x)
+
+MPCModel = MyModel
 
 
 def _import_mpc_model():
     """
-    Import the MPC backbone MyModel.
-    The HRFormer source must be present in ml_backend/HRFormer/.
-    Returns the MyModel class, or raises ImportError with a clear message.
+    Import or return the MPC backbone MyModel class.
+    Used by model_loader._load_mpc().
     """
-    try:
-        from HRFormer.hrt_backbone import get_hrformer  # type: ignore
-
-        class MyModel(nn.Module):
-            """Exact MPC architecture used by the released checkpoint."""
-            def __init__(self):
-                super().__init__()
-                self.encoder = get_hrformer()
-                # Decoder is imported from the copied MPC source tree
-                from decoder_head import Decoder  # type: ignore
-                self.decoder = Decoder()
-
-            def forward(self, inputs):
-                x = self.encoder(inputs)
-                return self.decoder(x)
-
-        return MyModel
-    except ImportError as exc:
-        raise ImportError(
-            f"Cannot import MPC backbone: {exc}.\n"
-            "Expected HRFormer/ and decoder_head.py to be present in ml_backend/.\n"
-            "These files are copied from the MPC-main repository.\n"
-            "Check that the copy step ran correctly and the files are present."
-        ) from exc
+    return MyModel
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  StrongMultiEvidenceNet — verbatim from notebook cell 13
-# ─────────────────────────────────────────────────────────────────────────────
+IMG_SIZE = 512
+METADATA_DIM = 10
+FUSED_CH = 128
+EVIDENCE_CH = 32
 
-try:
-    from torchvision.models import resnet34, ResNet34_Weights
-except ImportError as e:
-    raise ImportError("torchvision is required. Install with: pip install torchvision") from e
+IMAGENET_MEAN = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1)
+IMAGENET_STD = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1)
 
 
-class ConvBNAct(nn.Module):
-    def __init__(self, cin, cout, k=3, p=1):
+# ================================================================
+# RESNET34 ENCODER
+# ================================================================
+
+class RGBEncoder(nn.Module):
+    def __init__(self):
+        super().__init__()
+        backbone = resnet34(weights=None)
+        self.stem = nn.Sequential(
+            backbone.conv1,
+            backbone.bn1,
+            backbone.relu,
+        )
+        self.pool = backbone.maxpool
+        self.layer1 = backbone.layer1
+        self.layer2 = backbone.layer2
+        self.layer3 = backbone.layer3
+        self.layer4 = backbone.layer4
+
+    def forward(self, x):
+        # 512 -> 256
+        x0 = self.stem(x)
+        # 256 -> 128
+        x1 = self.layer1(self.pool(x0))
+        # 128 -> 64
+        x2 = self.layer2(x1)
+        # 64 -> 32
+        x3 = self.layer3(x2)
+        # 32 -> 16
+        x4 = self.layer4(x3)
+        return x0, x1, x2, x3, x4
+
+
+# ================================================================
+# CONV BLOCK
+# ================================================================
+
+class ConvBlock(nn.Module):
+    def __init__(self, in_channels: int, out_channels: int):
+        super().__init__()
+        self.block = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, 3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, 3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        return self.block(x)
+
+
+# ================================================================
+# MPC GUIDED FUSION
+# ================================================================
+
+class MPCGuidedFusion(nn.Module):
+    def __init__(self, rgb_channels: int, out_channels: int):
+        super().__init__()
+        self.conv = nn.Sequential(
+            nn.Conv2d(rgb_channels + 1, out_channels, 3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, 3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+        )
+        self.gate = nn.Sequential(
+            nn.Conv2d(rgb_channels + 1, out_channels, 1),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, rgb, mpc):
+        mpc = F.interpolate(
+            mpc,
+            size=rgb.shape[-2:],
+            mode="bilinear",
+            align_corners=False,
+        )
+        combined = torch.cat([rgb, mpc], dim=1)
+        features = self.conv(combined)
+        gate = self.gate(combined)
+        return features * gate + features
+
+
+# ================================================================
+# DECODER BLOCK
+# ================================================================
+
+class DecoderBlock(nn.Module):
+    def __init__(self, in_channels: int, skip_channels: int, out_channels: int):
+        super().__init__()
+        self.conv = ConvBlock(in_channels + skip_channels, out_channels)
+
+    def forward(self, x, skip):
+        x = F.interpolate(
+            x,
+            size=skip.shape[-2:],
+            mode="bilinear",
+            align_corners=False,
+        )
+        x = torch.cat([x, skip], dim=1)
+        return self.conv(x)
+
+
+# ================================================================
+# MULTI-SCALE RGB + MPC
+# ================================================================
+
+class MultiScaleRGBMPC(nn.Module):
+    def __init__(self, mpc_model: Optional[nn.Module] = None):
+        super().__init__()
+        self.rgb_encoder = RGBEncoder()
+        self.mpc = mpc_model if mpc_model is not None else MyModel()
+        self.fuse128 = MPCGuidedFusion(64, 64)
+        self.fuse64 = MPCGuidedFusion(128, 128)
+        self.fuse32 = MPCGuidedFusion(256, 256)
+        self.fuse16 = MPCGuidedFusion(512, 512)
+
+        self.dec32 = DecoderBlock(512, 256, 256)
+        self.dec64 = DecoderBlock(256, 128, 128)
+        self.dec128 = DecoderBlock(128, 64, 64)
+        self.dec256 = DecoderBlock(64, 64, 32)
+
+        self.final = nn.Sequential(
+            ConvBlock(32, 32),
+            nn.Conv2d(32, 1, 1),
+        )
+
+    def forward(self, image):
+        mean = IMAGENET_MEAN.to(image.device)
+        std = IMAGENET_STD.to(image.device)
+        rgb = (image - mean) / std
+
+        x0, x1, x2, x3, x4 = self.rgb_encoder(rgb)
+
+        with torch.no_grad():
+            mpc_logits = self.mpc(image)
+            mpc = torch.sigmoid(mpc_logits)
+
+        f128 = self.fuse128(x1, mpc)
+        f64 = self.fuse64(x2, mpc)
+        f32 = self.fuse32(x3, mpc)
+        f16 = self.fuse16(x4, mpc)
+
+        x = self.dec32(f16, f32)
+        x = self.dec64(x, f64)
+        x = self.dec128(x, f128)
+        x = self.dec256(x, x0)
+
+        x = F.interpolate(
+            x,
+            size=(IMG_SIZE, IMG_SIZE),
+            mode="bilinear",
+            align_corners=False,
+        )
+        return self.final(x)
+
+
+# ================================================================
+# MPC+RGB FEATURE EXTRACTOR
+# ================================================================
+
+class MPCPlusRGBFeatureExtractor(nn.Module):
+    def __init__(self, mpc_rgb_model: nn.Module):
+        super().__init__()
+        self.mpc_rgb_model = mpc_rgb_model
+        self._features: Dict[str, torch.Tensor] = {}
+        self.mpc_rgb_model.dec128.register_forward_hook(self._hook_deep)
+        self.mpc_rgb_model.mpc.register_forward_hook(self._hook_mpc)
+
+    def _hook_deep(self, module, inp, out):
+        self._features["deep128"] = out
+
+    def _hook_mpc(self, module, inp, out):
+        self._features["mpc_logits"] = out
+
+    def forward(self, image):
+        final_logits = self.mpc_rgb_model(image)
+        deep_features = self._features.get("deep128", None)
+        mpc_prob = torch.sigmoid(self._features.get("mpc_logits", final_logits))
+        return {
+            "final_logits": final_logits,
+            "final_prob": torch.sigmoid(final_logits),
+            "deep_features": deep_features,
+            "mpc_prob": mpc_prob,
+        }
+
+
+# ================================================================
+# EVIDENCE ENCODERS
+# ================================================================
+
+class SpatialEvidenceEncoder(nn.Module):
+    def __init__(self, in_channels: int, out_channels: int = 32):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Conv2d(cin, cout, k, p, bias=False),
-            nn.BatchNorm2d(cout),
+            nn.Conv2d(in_channels, out_channels, 3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, 3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
         )
 
@@ -83,135 +284,253 @@ class ConvBNAct(nn.Module):
         return self.net(x)
 
 
-class EvidenceEncoder(nn.Module):
-    """
-    Encodes the 5-channel evidence tensor [MPC_prior, noise, freq/DCT, ELA, local_stats]
-    into multi-scale feature maps that are fused with the RGB ResNet34 backbone.
-    """
-    def __init__(self):
+class CompressionEvidenceEncoder(SpatialEvidenceEncoder):
+    def __init__(self, out_channels: int = 32):
+        super().__init__(in_channels=1, out_channels=out_channels)
+
+
+class FrequencyNoiseEvidenceEncoder(SpatialEvidenceEncoder):
+    def __init__(self, out_channels: int = 32):
+        super().__init__(in_channels=2, out_channels=out_channels)
+
+
+class StatisticalEvidenceEncoder(SpatialEvidenceEncoder):
+    def __init__(self, out_channels: int = 32):
+        super().__init__(in_channels=2, out_channels=out_channels)
+
+
+class ELAEncoder(SpatialEvidenceEncoder):
+    def __init__(self, out_channels: int = 32):
+        super().__init__(in_channels=1, out_channels=out_channels)
+
+
+class MetadataEncoder(nn.Module):
+    def __init__(self, in_dim: int = METADATA_DIM, embed_dim: int = 32, film_channels: int = 128):
         super().__init__()
-        self.e1 = nn.Sequential(ConvBNAct(5, 32), ConvBNAct(32, 32))
-        self.e2 = nn.Sequential(nn.MaxPool2d(2), ConvBNAct(32, 64), ConvBNAct(64, 64))
-        self.e3 = nn.Sequential(nn.MaxPool2d(2), ConvBNAct(64, 128), ConvBNAct(128, 128))
-        self.e4 = nn.Sequential(nn.MaxPool2d(2), ConvBNAct(128, 256), ConvBNAct(256, 256))
-
-    def forward(self, x):
-        a = self.e1(x)
-        b = self.e2(a)
-        c = self.e3(b)
-        d = self.e4(c)
-        return a, b, c, d
-
-
-class FPNBlock(nn.Module):
-    def __init__(self, cin, cout):
-        super().__init__()
-        self.lat = nn.Conv2d(cin, cout, 1)
-        self.ref = nn.Sequential(ConvBNAct(cout, cout), ConvBNAct(cout, cout))
-
-    def forward(self, x):
-        return self.ref(self.lat(x))
-
-
-class StrongMultiEvidenceNet(nn.Module):
-    """
-    PIXENTRA proposed model: ResNet34 multi-scale FPN + 5-channel evidence + residual MPC prior.
-
-    Inputs:
-        rgb      : (B, 3, H, W)   float32, values in [0, 1]
-        evidence : (B, 5, H, W)   float32, channels:
-                       0 = MPC probability map (from frozen MPC backbone)
-                       1 = noise residual map
-                       2 = frequency/DCT map
-                       3 = ELA map
-                       4 = local statistics map
-
-    Output:
-        logits   : (B, 1, H, W)   raw logits (apply sigmoid for probability)
-    """
-    def __init__(self):
-        super().__init__()
-        r = resnet34(weights=ResNet34_Weights.DEFAULT)
-        self.stem = nn.Sequential(r.conv1, r.bn1, r.relu)
-        self.pool = r.maxpool
-        self.l1 = r.layer1
-        self.l2 = r.layer2
-        self.l3 = r.layer3
-        self.l4 = r.layer4
-
-        self.evidence = EvidenceEncoder()
-
-        # FPN fusion: RGB channels 64, 64, 128, 256, 512  |  Evidence: 32, 64, 128, 256
-        self.f4 = FPNBlock(512 + 256, 256)
-        self.f3 = FPNBlock(256 + 128, 192)
-        self.f2 = FPNBlock(128 + 64, 128)
-        self.f1 = FPNBlock(64 + 32, 96)
-
-        self.fuse4 = ConvBNAct(256, 256)
-        self.fuse3 = ConvBNAct(192, 192)
-        self.fuse2 = ConvBNAct(128, 128)
-        self.fuse1 = ConvBNAct(96, 96)
-
-        self.gate = nn.Sequential(
-            nn.Conv2d(256 + 192 + 128 + 96, 128, 1),
+        self.embed = nn.Sequential(
+            nn.Linear(in_dim + 1, embed_dim),
             nn.ReLU(inplace=True),
-            nn.Conv2d(128, 4, 1),
+            nn.Linear(embed_dim, embed_dim),
+            nn.ReLU(inplace=True),
         )
-        self.head = nn.Sequential(
-            ConvBNAct(256 + 192 + 128 + 96, 128),
-            ConvBNAct(128, 64),
-            nn.Conv2d(64, 1, 1),
-        )
+        self.film = nn.Linear(embed_dim, film_channels * 2)
+        self.film_channels = film_channels
 
-        # Residual branch — initialised to preserve MPC prior at startup
-        self.residual_scale = nn.Parameter(torch.tensor(0.35))
-        self.prior_scale = nn.Parameter(torch.tensor(2.0))
+    def forward(self, meta_vec, meta_avail):
+        x = torch.cat([meta_vec, meta_avail.unsqueeze(1)], dim=1)
+        embedding = self.embed(x)
+        gamma_beta = self.film(embedding)
+        gamma, beta = gamma_beta.chunk(2, dim=1)
+        gamma = gamma.unsqueeze(-1).unsqueeze(-1)
+        beta = beta.unsqueeze(-1).unsqueeze(-1)
+        return embedding, gamma, beta
 
-    def forward(self, rgb, evidence, return_aux=False):
-        # RGB backbone
-        x = self.stem(rgb)
-        x = self.pool(x)
-        r1 = self.l1(x)
-        r2 = self.l2(r1)
-        r3 = self.l3(r2)
-        r4 = self.l4(r3)
 
-        # Evidence encoder
-        e1, e2, e3, e4 = self.evidence(evidence)
+# ================================================================
+# ATTENTION & FUSION
+# ================================================================
 
-        # FPN fusion
-        q4 = self.f4(torch.cat([r4, e4], 1))
-        q3 = self.f3(torch.cat([r3, e3], 1))
-        q2 = self.f2(torch.cat([r2, e2], 1))
-        q1 = self.f1(torch.cat([r1, e1], 1))
-
-        q4 = self.fuse4(q4)
-        q3 = self.fuse3(q3)
-        q2 = self.fuse2(q2)
-        q1 = self.fuse1(q1)
-
-        target = q1.shape[-2:]
-        u4 = F.interpolate(q4, size=target, mode="bilinear", align_corners=False)
-        u3 = F.interpolate(q3, size=target, mode="bilinear", align_corners=False)
-        u2 = F.interpolate(q2, size=target, mode="bilinear", align_corners=False)
-
-        multi = torch.cat([q1, u2, u3, u4], 1)
-        g = torch.softmax(self.gate(multi), dim=1)
-        weighted = torch.cat(
-            [q1 * g[:, 0:1], u2 * g[:, 1:2], u3 * g[:, 2:3], u4 * g[:, 3:4]], 1
+class ChannelAttention(nn.Module):
+    def __init__(self, channels: int, reduction: int = 8):
+        super().__init__()
+        hidden = max(channels // reduction, 8)
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.fc = nn.Sequential(
+            nn.Linear(channels, hidden),
+            nn.ReLU(inplace=True),
+            nn.Linear(hidden, channels),
+            nn.Sigmoid(),
         )
 
-        residual = self.head(weighted)
-        prior = evidence[:, 0:1]  # MPC probability map
+    def forward(self, x):
+        b, c, _, _ = x.shape
+        w = self.pool(x).view(b, c)
+        w = self.fc(w).view(b, c, 1, 1)
+        return x * w, w.view(b, c)
 
-        out = F.interpolate(
-            self.prior_scale * torch.logit(prior.clamp(1e-4, 1 - 1e-4))
-            + self.residual_scale * residual,
-            size=rgb.shape[-2:],
-            mode="bilinear",
-            align_corners=False,
+
+class EvidenceFusion(nn.Module):
+    def __init__(self, deep_ch: int = 64, mpc_ch: int = 1, evidence_ch: int = 32, fused_ch: int = 128):
+        super().__init__()
+        in_ch = deep_ch + mpc_ch + evidence_ch * 4
+        self.attn = ChannelAttention(in_ch)
+        self.reduce = nn.Sequential(
+            nn.Conv2d(in_ch, fused_ch, 3, padding=1, bias=False),
+            nn.BatchNorm2d(fused_ch),
+            nn.ReLU(inplace=True),
+        )
+        self.refine = nn.Sequential(
+            nn.Conv2d(fused_ch, fused_ch, 3, padding=1, bias=False),
+            nn.BatchNorm2d(fused_ch),
+            nn.ReLU(inplace=True),
+        )
+        base = deep_ch + mpc_ch
+        self.branch_slices = {
+            "deep_learning_mpc": slice(0, base),
+            "compression": slice(base, base + evidence_ch),
+            "frequency_noise": slice(base + evidence_ch, base + 2 * evidence_ch),
+            "statistical": slice(base + 2 * evidence_ch, base + 3 * evidence_ch),
+            "ela": slice(base + 3 * evidence_ch, base + 4 * evidence_ch),
+        }
+        self.fused_ch = fused_ch
+
+    def forward(self, deep_features, mpc_prob, comp_feat, freq_feat, stat_feat, ela_feat, gamma, beta):
+        concat = torch.cat(
+            [deep_features, mpc_prob, comp_feat, freq_feat, stat_feat, ela_feat],
+            dim=1,
+        )
+        gated, channel_weights = self.attn(concat)
+        fused = self.reduce(gated)
+        fused = self.refine(fused)
+        fused = fused * (1 + torch.tanh(gamma)) + beta
+        branch_contribution = {
+            name: channel_weights[:, sl].mean(dim=1)
+            for name, sl in self.branch_slices.items()
+        }
+        return fused, branch_contribution
+
+
+# ================================================================
+# HEADS
+# ================================================================
+
+class ConvBlockNew(nn.Module):
+    def __init__(self, in_ch: int, out_ch: int):
+        super().__init__()
+        self.block = nn.Sequential(
+            nn.Conv2d(in_ch, out_ch, 3, padding=1, bias=False),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
         )
 
-        if return_aux:
-            return out, (q2, q3, q4, g)
-        return out
+    def forward(self, x):
+        return self.block(x)
+
+
+class LocalizationHead(nn.Module):
+    def __init__(self, in_channels: int = 128, img_size: int = IMG_SIZE):
+        super().__init__()
+        self.img_size = img_size
+        self.block1 = ConvBlockNew(in_channels, 64)
+        self.block2 = ConvBlockNew(64, 32)
+        self.out_conv = nn.Conv2d(32, 1, 1)
+
+    def forward(self, fused):
+        x = self.block1(fused)
+        x = F.interpolate(x, scale_factor=2, mode="bilinear", align_corners=False)
+        x = self.block2(x)
+        x = F.interpolate(x, size=(self.img_size, self.img_size), mode="bilinear", align_corners=False)
+        return self.out_conv(x)
+
+
+class RiskAssessmentHead(nn.Module):
+    def __init__(self, in_channels: int = 128, hidden: int = 64):
+        super().__init__()
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.mlp = nn.Sequential(
+            nn.Linear(in_channels + 2, hidden),
+            nn.ReLU(inplace=True),
+            nn.Linear(hidden, 1),
+        )
+
+    def forward(self, fused, pred_prob):
+        pooled = self.pool(fused).flatten(1)
+        mean_prob = pred_prob.mean(dim=(1, 2, 3)).unsqueeze(1)
+        area_frac = (pred_prob > 0.5).float().mean(dim=(1, 2, 3)).unsqueeze(1)
+        x = torch.cat([pooled, mean_prob, area_frac], dim=1)
+        return torch.sigmoid(self.mlp(x)).squeeze(1)
+
+
+# ================================================================
+# MULTI-EVIDENCE MODEL (STRONG PROPOSED MODEL)
+# ================================================================
+
+class MultiEvidenceModel(nn.Module):
+    def __init__(
+        self,
+        mpc_rgb_model: Optional[nn.Module] = None,
+        metadata_dim: int = METADATA_DIM,
+        fused_ch: int = FUSED_CH,
+        evidence_ch: int = EVIDENCE_CH,
+    ):
+        super().__init__()
+        if mpc_rgb_model is None:
+            mpc_rgb_model = MultiScaleRGBMPC()
+        self.mpc_rgb = MPCPlusRGBFeatureExtractor(mpc_rgb_model)
+        self.compression_encoder = CompressionEvidenceEncoder(out_channels=evidence_ch)
+        self.freqnoise_encoder = FrequencyNoiseEvidenceEncoder(out_channels=evidence_ch)
+        self.statistical_encoder = StatisticalEvidenceEncoder(out_channels=evidence_ch)
+        self.ela_encoder = ELAEncoder(out_channels=evidence_ch)
+        self.metadata_encoder = MetadataEncoder(in_dim=metadata_dim, embed_dim=32, film_channels=fused_ch)
+        self.fusion = EvidenceFusion(deep_ch=64, mpc_ch=1, evidence_ch=evidence_ch, fused_ch=fused_ch)
+        self.localization_head = LocalizationHead(in_channels=fused_ch, img_size=IMG_SIZE)
+        self.risk_head = RiskAssessmentHead(in_channels=fused_ch, hidden=64)
+
+    def forward(
+        self,
+        image: torch.Tensor,
+        comp_map: Optional[torch.Tensor] = None,
+        freq_map: Optional[torch.Tensor] = None,
+        stat_map: Optional[torch.Tensor] = None,
+        ela_map: Optional[torch.Tensor] = None,
+        meta_vec: Optional[torch.Tensor] = None,
+        meta_avail: Optional[torch.Tensor] = None,
+    ) -> Dict[str, Any]:
+        batch_size = image.shape[0]
+        device = image.device
+
+        # Fallbacks for optional inputs if passed during single-tensor inference
+        if comp_map is None:
+            comp_map = torch.zeros((batch_size, 1, 128, 128), device=device)
+        if freq_map is None:
+            freq_map = torch.zeros((batch_size, 2, 128, 128), device=device)
+        if stat_map is None:
+            stat_map = torch.zeros((batch_size, 2, 128, 128), device=device)
+        if ela_map is None:
+            ela_map = torch.zeros((batch_size, 1, 128, 128), device=device)
+        if meta_vec is None:
+            meta_vec = torch.zeros((batch_size, METADATA_DIM), device=device)
+        if meta_avail is None:
+            meta_avail = torch.zeros((batch_size,), device=device)
+
+        with torch.no_grad():
+            backbone_out = self.mpc_rgb(image)
+
+        deep_features = backbone_out["deep_features"]
+        mpc_prob = backbone_out["mpc_prob"]
+
+        comp_feat = self.compression_encoder(comp_map)
+        freq_feat = self.freqnoise_encoder(freq_map)
+        stat_feat = self.statistical_encoder(stat_map)
+        ela_feat = self.ela_encoder(ela_map)
+
+        metadata_embedding, gamma, beta = self.metadata_encoder(meta_vec, meta_avail)
+
+        fused, branch_contribution = self.fusion(
+            deep_features, mpc_prob, comp_feat, freq_feat, stat_feat, ela_feat, gamma, beta
+        )
+
+        localization_logits = self.localization_head(fused)
+        localization_prob = torch.sigmoid(localization_logits)
+
+        with torch.no_grad():
+            risk_score = self.risk_head(fused, localization_prob)
+
+        return {
+            "logits": localization_logits,
+            "prob": localization_prob,
+            "fused_features": fused,
+            "deep_features": deep_features,
+            "mpc_prob": mpc_prob,
+            "comp_feat": comp_feat,
+            "freq_feat": freq_feat,
+            "stat_feat": stat_feat,
+            "ela_feat": ela_feat,
+            "metadata_embedding": metadata_embedding,
+            "branch_contribution": branch_contribution,
+            "risk_score": risk_score,
+        }
+
+
+# Alias for compatibility
+StrongMultiEvidenceNet = MultiEvidenceModel

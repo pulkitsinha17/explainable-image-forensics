@@ -1,50 +1,33 @@
 """
 PIXENTRA — preprocessing pipeline.
 
-Implements the exact preprocessing used by the training notebook:
+Implements the exact preprocessing and forensic evidence extraction used by
+the authoritative training notebook `final_completed_major_project(1)`.
 
-1. RGB preprocessing for the ResNet34 backbone:
-   - Resize to 512×512 (INTER_LINEAR)
-   - Divide by 255 → float32 in [0, 1]
-   - Transpose to (C, H, W) and add batch dim
-
-2. Evidence extraction — verbatim from notebook cell 12 (evidence_from_image):
-   - Noise residual  : |gray - GaussianBlur(gray, 5, 0)|
-   - Frequency/DCT   : mean high-frequency energy of 8×8 DCT blocks
-   - ELA             : |original - JPEG-recompressed (quality=90)| → grayscale
-   - Local stats     : local std in 11×11 window
-
-3. MPC probability map — forward pass through frozen MPC backbone on the
-   512×512 RGB tensor, with flip-TTA (original, H-flip, V-flip, HV-flip).
-
-All evidence channels are normalised to [0, 1] with norm01 (1st–99th percentile).
+Evidence extractors:
+  1. Compression Evidence (JPEG recompression discrepancy) -> (1, 128, 128)
+  2. Frequency / Noise Evidence (Gaussian blur residual + Laplacian) -> (2, 128, 128)
+  3. Statistical Evidence (local mean + std) -> (2, 128, 128)
+  4. ELA Evidence (Error Level Analysis) -> (1, 128, 128)
+  5. Metadata Vector (EXIF tags availability & flags) -> (10,) + available flag
 """
 from __future__ import annotations
+import io
 import logging
-from io import BytesIO
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Tuple, Union
 
 import cv2
 import numpy as np
 import torch
-from PIL import Image
+from PIL import Image, ExifTags
 
 from app.config import INPUT_SIZE
 
 logger = logging.getLogger(__name__)
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-#  Normalisation helper — exact copy from notebook cell 12
-# ─────────────────────────────────────────────────────────────────────────────
-
-def norm01(x: np.ndarray) -> np.ndarray:
-    x = x.astype(np.float32)
-    lo = np.percentile(x, 1)
-    hi = np.percentile(x, 99)
-    if hi - lo < 1e-6:
-        return np.zeros_like(x, dtype=np.float32)
-    return np.clip((x - lo) / (hi - lo), 0.0, 1.0).astype(np.float32)
+EVIDENCE_SIZE = 128
+METADATA_DIM = 10
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -57,160 +40,210 @@ def load_image_bytes(data: bytes) -> np.ndarray:
     Raises ValueError on failure.
     """
     try:
-        img_pil = Image.open(BytesIO(data)).convert("RGB")
+        img_pil = Image.open(io.BytesIO(data)).convert("RGB")
         return np.array(img_pil, dtype=np.uint8)
     except Exception as exc:
         raise ValueError(f"Cannot decode image: {exc}") from exc
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Evidence computation — verbatim from notebook cell 12
+#  Forensic Evidence Extraction — verbatim from notebook cells 2 & 7
 # ─────────────────────────────────────────────────────────────────────────────
 
-def evidence_from_image(img_rgb: np.ndarray) -> np.ndarray:
+def compute_compression_evidence(
+    image_rgb_uint8: np.ndarray, quality: int = 90, target_size: int = EVIDENCE_SIZE
+) -> np.ndarray:
     """
-    Compute the 4-channel hand-crafted evidence array from an RGB image.
-
-    Returns: float32 ndarray of shape (4, H, W)
-        channel 0 — noise residual
-        channel 1 — frequency / DCT high-frequency energy
-        channel 2 — ELA (error level analysis)
-        channel 3 — local statistical inconsistency
+    Compression discrepancy map. Returns (1, target_size, target_size) float32 in [0, 1].
     """
-    gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
-
-    # ── Noise / residual ───────────────────────────────────────────────────────
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
-    noise = norm01(np.abs(gray - blur))
-
-    # ── Frequency / DCT ───────────────────────────────────────────────────────
-    h, w = gray.shape
-    freq = np.zeros_like(gray, np.float32)
-    weight = np.zeros_like(gray, np.float32)
-    for y in range(0, h - 7, 8):
-        for x in range(0, w - 7, 8):
-            block = gray[y : y + 8, x : x + 8]
-            d = cv2.dct(block)
-            e = np.abs(d)
-            e[0:2, 0:2] = 0  # suppress DC and near-DC
-            val = float(np.mean(e))
-            freq[y : y + 8, x : x + 8] += val
-            weight[y : y + 8, x : x + 8] += 1
-    freq = np.divide(freq, np.maximum(weight, 1), where=weight > 0)
-    freq = norm01(freq)
-
-    # ── ELA — recompression discrepancy ──────────────────────────────────────
-    bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
-    ok, enc = cv2.imencode(".jpg", bgr, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
-    if ok:
-        rec = cv2.imdecode(enc, cv2.IMREAD_COLOR)
-        rec = cv2.cvtColor(rec, cv2.COLOR_BGR2RGB)
-        ela = norm01(
-            cv2.cvtColor(cv2.absdiff(img_rgb, rec), cv2.COLOR_RGB2GRAY).astype(np.float32)
-        )
-    else:
-        ela = np.zeros_like(gray, dtype=np.float32)
-
-    # ── Local statistical inconsistency ───────────────────────────────────────
-    mean = cv2.blur(gray, (11, 11))
-    sq = cv2.blur(gray * gray, (11, 11))
-    var = np.maximum(sq - mean * mean, 0)
-    stats = norm01(np.sqrt(var + 1e-6))
-
-    return np.stack([noise, freq, ela, stats], axis=0).astype(np.float32)
+    try:
+        bgr = cv2.cvtColor(image_rgb_uint8, cv2.COLOR_RGB2BGR)
+        ok, enc = cv2.imencode(".jpg", bgr, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
+        if not ok:
+            raise RuntimeError("JPEG re-encode failed")
+        recompressed = cv2.imdecode(enc, cv2.IMREAD_COLOR)
+        diff = cv2.absdiff(bgr, recompressed).astype(np.float32)
+        ela = diff.mean(axis=2)
+        ela = cv2.resize(ela, (target_size, target_size), interpolation=cv2.INTER_AREA)
+        lo, hi = ela.min(), ela.max()
+        ela = (ela - lo) / (hi - lo + 1e-6)
+        return ela.astype(np.float32)[None, ...]
+    except Exception:
+        return np.zeros((1, target_size, target_size), dtype=np.float32)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  MPC inference (frozen backbone, flip-TTA)
-# ─────────────────────────────────────────────────────────────────────────────
-
-@torch.no_grad()
-def mpc_prob_tta(img_rgb: np.ndarray, mpc_model, device: torch.device) -> np.ndarray:
+def compute_frequency_noise_evidence(
+    image_rgb_uint8: np.ndarray, target_size: int = EVIDENCE_SIZE
+) -> np.ndarray:
     """
-    Run MPC backbone with 4-way flip TTA.
-    Matches notebook cell for mpc_prob_tta.
-
-    img_rgb: (H, W, 3) uint8 or float32 — will be resized to 512×512
-    Returns: float32 (128, 128) probability map in [0, 1]
+    Frequency and noise residuals. Returns (2, target_size, target_size) float32 in [0, 1].
+    channel 0: high-frequency noise residual
+    channel 1: Laplacian edge response
     """
-    rgb = img_rgb.astype(np.float32) / 255.0 if img_rgb.dtype != np.float32 else img_rgb
-    rgb = cv2.resize(rgb, (512, 512), interpolation=cv2.INTER_LINEAR)
+    try:
+        gray = cv2.cvtColor(image_rgb_uint8, cv2.COLOR_RGB2GRAY).astype(np.float32)
+        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+        residual = np.abs(gray - blurred)
+        laplacian = np.abs(cv2.Laplacian(gray, cv2.CV_32F, ksize=3))
 
-    variants = [
-        rgb,
-        np.flip(rgb, 1).copy(),       # horizontal
-        np.flip(rgb, 0).copy(),       # vertical
-        np.flip(np.flip(rgb, 1), 0).copy(),  # HV
-    ]
-    preds = []
-    for j, v in enumerate(variants):
-        t = torch.from_numpy(v).permute(2, 0, 1).unsqueeze(0).to(device)
-        y = mpc_model(t)
-        if isinstance(y, (tuple, list)):
-            y = y[0]
-        p = torch.sigmoid(y).squeeze().float().cpu().numpy()
-        # flip back
-        if j == 1:
-            p = np.flip(p, 1).copy()
-        elif j == 2:
-            p = np.flip(p, 0).copy()
-        elif j == 3:
-            p = np.flip(np.flip(p, 1), 0).copy()
-        preds.append(p)
+        def resize_norm(x: np.ndarray) -> np.ndarray:
+            x_res = cv2.resize(x, (target_size, target_size), interpolation=cv2.INTER_AREA)
+            lo, hi = x_res.min(), x_res.max()
+            return (x_res - lo) / (hi - lo + 1e-6)
 
-    return np.mean(preds, axis=0).astype(np.float32)
+        return np.stack([resize_norm(residual), resize_norm(laplacian)], axis=0).astype(np.float32)
+    except Exception:
+        return np.zeros((2, target_size, target_size), dtype=np.float32)
+
+
+def compute_statistical_evidence(
+    image_rgb_uint8: np.ndarray, target_size: int = EVIDENCE_SIZE, win: int = 8
+) -> np.ndarray:
+    """
+    Statistical inconsistency maps. Returns (2, target_size, target_size) float32 in [0, 1].
+    channel 0: local mean map
+    channel 1: local std map
+    """
+    try:
+        gray = cv2.cvtColor(image_rgb_uint8, cv2.COLOR_RGB2GRAY).astype(np.float32)
+        mean_map = cv2.boxFilter(gray, ddepth=-1, ksize=(win, win))
+        sq_mean_map = cv2.boxFilter(gray * gray, ddepth=-1, ksize=(win, win))
+        var_map = np.clip(sq_mean_map - mean_map ** 2, 0, None)
+        std_map = np.sqrt(var_map)
+
+        def resize_norm(x: np.ndarray) -> np.ndarray:
+            x_res = cv2.resize(x, (target_size, target_size), interpolation=cv2.INTER_AREA)
+            lo, hi = x_res.min(), x_res.max()
+            return (x_res - lo) / (hi - lo + 1e-6)
+
+        return np.stack([resize_norm(mean_map), resize_norm(std_map)], axis=0).astype(np.float32)
+    except Exception:
+        return np.zeros((2, target_size, target_size), dtype=np.float32)
+
+
+def compute_ela_evidence(
+    image_rgb_uint8: np.ndarray, quality: int = 90, target_size: int = EVIDENCE_SIZE
+) -> np.ndarray:
+    """
+    Error Level Analysis (PIL recompression). Returns (1, target_size, target_size) float32 in [0, 1].
+    """
+    try:
+        image_rgb = np.asarray(image_rgb_uint8).astype(np.uint8)
+        original = Image.fromarray(image_rgb).convert("RGB")
+        buffer = io.BytesIO()
+        original.save(buffer, format="JPEG", quality=quality)
+        buffer.seek(0)
+        recompressed = Image.open(buffer).convert("RGB")
+        recompressed = np.asarray(recompressed).astype(np.float32)
+        original_float = image_rgb.astype(np.float32)
+        ela = np.abs(original_float - recompressed).mean(axis=2)
+        max_value = ela.max()
+        if max_value > 0:
+            ela = ela / max_value
+        if target_size is not None:
+            ela = cv2.resize(ela, (target_size, target_size), interpolation=cv2.INTER_LINEAR)
+        return ela.astype(np.float32)[None, ...]
+    except Exception:
+        return np.zeros((1, target_size, target_size), dtype=np.float32)
+
+
+def extract_metadata_vector(
+    image_input: Union[str, Path, bytes, Image.Image, None]
+) -> Tuple[np.ndarray, float]:
+    """
+    Extract 10-dimensional metadata embedding flags + available flag (1.0 or 0.0).
+    """
+    vec = np.zeros(METADATA_DIM, dtype=np.float32)
+    available = 0.0
+    try:
+        img: Optional[Image.Image] = None
+        if isinstance(image_input, (str, Path)):
+            img = Image.open(image_input)
+        elif isinstance(image_input, bytes):
+            img = Image.open(io.BytesIO(image_input))
+        elif isinstance(image_input, Image.Image):
+            img = image_input
+
+        if img is not None:
+            exif = img.getexif()
+            if exif is not None and len(exif) > 0:
+                tags = {ExifTags.TAGS.get(k, k): v for k, v in exif.items()}
+                available = 1.0
+                vec[0] = 1.0 if "Make" in tags else 0.0
+                vec[1] = 1.0 if "Model" in tags else 0.0
+                vec[2] = 1.0 if "Software" in tags else 0.0
+                vec[3] = 1.0 if "DateTime" in tags else 0.0
+                vec[4] = 1.0 if "Orientation" in tags else 0.0
+                vec[5] = 1.0 if ("ExifImageWidth" in tags or "ExifImageHeight" in tags) else 0.0
+                vec[6] = 1.0 if any(str(k).lower().startswith("gps") for k in tags) else 0.0
+                vec[7] = 1.0 if ("ColorSpace" in tags or "FlashPixVersion" in tags) else 0.0
+                vec[8] = float(min(len(tags) / 20.0, 1.0))
+                vec[9] = 1.0 if "Compression" in tags else 0.0
+    except Exception:
+        available = 0.0
+        vec = np.zeros(METADATA_DIM, dtype=np.float32)
+    return vec, float(available)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Full preprocessing pipeline
 # ─────────────────────────────────────────────────────────────────────────────
 
-def build_inference_tensors(
+def prepare_inference_inputs(
     img_rgb: np.ndarray,
-    mpc_model: Optional[object],
     device: torch.device,
+    raw_bytes: Optional[bytes] = None,
+    img_path: Optional[Union[str, Path]] = None,
     input_size: int = INPUT_SIZE,
-) -> tuple[torch.Tensor, torch.Tensor, np.ndarray]:
+    evidence_size: int = EVIDENCE_SIZE,
+) -> dict:
     """
-    Build the (rgb_tensor, evidence_tensor) pair expected by StrongMultiEvidenceNet.forward().
+    Prepare all exact input tensors required by StrongMultiEvidenceNet.forward().
 
-    Returns
-    -------
-    rgb_t      : (1, 3, input_size, input_size) float32 tensor in [0, 1]
-    ev_t       : (1, 5, input_size, input_size) float32 tensor
-                 channel 0 = MPC prior (zeros if MPC unavailable)
-                 channels 1-4 = hand-crafted evidence
-    mpc_map    : (input_size, input_size) float32 numpy array (for reporting)
+    Returns a dict containing:
+      - 'image': (1, 3, 512, 512)
+      - 'comp': (1, 1, 128, 128)
+      - 'freq': (1, 2, 128, 128)
+      - 'stat': (1, 2, 128, 128)
+      - 'ela': (1, 1, 128, 128)
+      - 'meta': (1, 10)
+      - 'meta_avail': (1,)
+      - 'raw_evidence': dict of raw numpy maps for reporting
     """
-    # ── Resize for model input ────────────────────────────────────────────────
+    # ── 1. Resize RGB image for model input ────────────────────────────────────
     img_resized = cv2.resize(img_rgb, (input_size, input_size), interpolation=cv2.INTER_LINEAR)
-
-    # ── RGB tensor ────────────────────────────────────────────────────────────
     rgb_f = img_resized.astype(np.float32) / 255.0
-    rgb_t = torch.from_numpy(rgb_f).permute(2, 0, 1).unsqueeze(0).to(device)  # (1, 3, H, W)
+    img_tensor = torch.from_numpy(rgb_f).permute(2, 0, 1).unsqueeze(0).to(device)
 
-    # ── Evidence channels ─────────────────────────────────────────────────────
-    # Computed at native resolution then resized — consistent with notebook's
-    # train-time procedure: "resize first, then stack"
-    ev_raw = evidence_from_image(img_resized)  # (4, H, W) already at input_size
+    # ── 2. Compute evidence maps ──────────────────────────────────────────────
+    comp_map = compute_compression_evidence(img_rgb, target_size=evidence_size)
+    freq_map = compute_frequency_noise_evidence(img_rgb, target_size=evidence_size)
+    stat_map = compute_statistical_evidence(img_rgb, target_size=evidence_size)
+    ela_map = compute_ela_evidence(img_rgb, target_size=evidence_size)
 
-    # ── MPC prior (channel 0) ─────────────────────────────────────────────────
-    if mpc_model is not None:
-        try:
-            mpc_map = mpc_prob_tta(img_resized, mpc_model, device)
-            # MPC output is 128×128; resize to input_size
-            if mpc_map.shape != (input_size, input_size):
-                mpc_map = cv2.resize(
-                    mpc_map, (input_size, input_size), interpolation=cv2.INTER_LINEAR
-                )
-        except Exception as exc:
-            logger.warning("MPC forward pass failed: %s — using zero prior", exc)
-            mpc_map = np.zeros((input_size, input_size), dtype=np.float32)
-    else:
-        mpc_map = np.zeros((input_size, input_size), dtype=np.float32)
+    meta_source = raw_bytes if raw_bytes is not None else img_path
+    meta_vec, meta_avail = extract_metadata_vector(meta_source)
 
-    # Assemble 5-channel evidence: [mpc, noise, freq, ela, stats]
-    ev_full = np.concatenate([mpc_map[np.newaxis], ev_raw], axis=0)  # (5, H, W)
-    ev_t = torch.from_numpy(ev_full).unsqueeze(0).to(device)  # (1, 5, H, W)
+    # ── 3. Convert to device tensors ──────────────────────────────────────────
+    comp_tensor = torch.from_numpy(comp_map).unsqueeze(0).to(device)
+    freq_tensor = torch.from_numpy(freq_map).unsqueeze(0).to(device)
+    stat_tensor = torch.from_numpy(stat_map).unsqueeze(0).to(device)
+    ela_tensor = torch.from_numpy(ela_map).unsqueeze(0).to(device)
+    meta_tensor = torch.from_numpy(meta_vec).unsqueeze(0).to(device)
+    meta_avail_tensor = torch.tensor([meta_avail], dtype=torch.float32, device=device)
 
-    return rgb_t, ev_t, mpc_map
+    return {
+        "image": img_tensor,
+        "comp": comp_tensor,
+        "freq": freq_tensor,
+        "stat": stat_tensor,
+        "ela": ela_tensor,
+        "meta": meta_tensor,
+        "meta_avail": meta_avail_tensor,
+        "raw_evidence": {
+            "comp": comp_map,
+            "freq": freq_map,
+            "stat": stat_map,
+            "ela": ela_map,
+        },
+    }
