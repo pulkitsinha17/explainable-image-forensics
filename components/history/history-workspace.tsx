@@ -13,9 +13,8 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { TopNavBar } from "@/components/analyze/top-nav-bar";
-import { HistorySummaryCards } from "./history-summary-cards";
 import { AnalysisHistoryCard } from "./analysis-history-card";
-import type { CompletedAnalysisRecord, HistorySummaryStats } from "./types";
+import type { CompletedAnalysisRecord } from "./types";
 
 interface HistoryWorkspaceProps {
   userInitial?: string;
@@ -194,24 +193,6 @@ export function HistoryWorkspace({
   const [sortBy, setSortBy] = useState("Newest First");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Summary KPI statistics matching design
-  const summaryStats: HistorySummaryStats = useMemo(() => {
-    const total = DEMO_COMPLETED_ANALYSES.length;
-    const forged = DEMO_COMPLETED_ANALYSES.filter(
-      (a) => a.verdict === "forged"
-    ).length;
-    const avgRisk = Math.round(
-      DEMO_COMPLETED_ANALYSES.reduce((acc, a) => acc + a.riskScore, 0) /
-        (total || 1)
-    );
-    return {
-      totalAnalyses: total,
-      completedCount: total,
-      potentiallyForgedCount: forged,
-      averageRiskPercentage: avgRisk,
-    };
-  }, []);
-
   // Filter and sort the completed records
   const filteredAnalyses = useMemo(() => {
     return DEMO_COMPLETED_ANALYSES.filter((item) => {
@@ -285,7 +266,7 @@ export function HistoryWorkspace({
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="space-y-5 sm:space-y-6">
       {/* Top Application Header */}
       <TopNavBar
         userInitial={userInitial}
@@ -321,11 +302,8 @@ export function HistoryWorkspace({
         </div>
       </div>
 
-      {/* Summary KPI Cards */}
-      <HistorySummaryCards stats={summaryStats} />
-
-      {/* Search, Filter & Sort Controls */}
-      <div className="bg-transparent flex flex-col md:flex-row items-stretch md:items-center gap-3">
+      {/* Search, Filter & Sort Controls (moved directly below heading) */}
+      <div className="bg-transparent flex flex-col md:flex-row items-stretch md:items-center gap-3 pt-1">
         {/* Search input */}
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
