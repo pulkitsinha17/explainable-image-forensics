@@ -210,11 +210,16 @@ def run_inference(
 
     # ── 7. Evidence channel scores (spatial means of extracted maps) ──────────
     raw_ev = inputs["raw_evidence"]
+    meta_avail = float(inputs["meta_avail"][0].item())
+    meta_score = float(np.mean(inputs["meta"][0].cpu().numpy())) if meta_avail > 0 else 0.0
+
     evidence = EvidenceScores(
+        compression=float(np.mean(raw_ev["comp"][0])),
         noise_residual=float(np.mean(raw_ev["freq"][0])),
         frequency_dct=float(np.mean(raw_ev["freq"][1])),
         ela=float(np.mean(raw_ev["ela"][0])),
         local_statistics=float(np.mean(raw_ev["stat"][1])),
+        metadata=meta_score,
     )
 
     localization = LocalizationOutput(

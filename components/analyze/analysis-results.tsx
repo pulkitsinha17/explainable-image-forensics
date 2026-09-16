@@ -48,7 +48,7 @@ export function AnalysisResults({
       onDownloadReport();
     } else {
       // Generate a formatted summary download
-      const reportContent = `PIXENTRA IMAGE FORENSIC REPORT\n===============================\nVerdict: ${results.verdictLabel}\nForgery Risk Score: ${results.forgeryRiskScore}%\nCompleted in: ${results.elapsedSeconds} seconds\n\nEVIDENCE BREAKDOWN:\n- Spatial / Pixel: ${results.evidence.spatial}%\n- Noise: ${results.evidence.noise}%\n- Frequency: ${results.evidence.frequency}%\n- ELA: ${results.evidence.ela}%\n- Statistics: ${results.evidence.statistics}%\n- Metadata: ${results.evidence.metadata}%\n\nAI EXPLANATION:\n${results.aiExplanation}\n\nGenerated with PIXENTRA — See Beyond the Pixels\n`;
+      const reportContent = `PIXENTRA IMAGE FORENSIC REPORT\n===============================\nVerdict: ${results.verdictLabel}\nForgery Risk Score: ${results.forgeryRiskScore}%\nCompleted in: ${results.elapsedSeconds} seconds\n\nEVIDENCE BREAKDOWN:\n- Compression: ${results.evidence.compression}%\n- Frequency / Noise: ${results.evidence.frequencyNoise}%\n- Local Statistics: ${results.evidence.statistics}%\n- Error Level Analysis (ELA): ${results.evidence.ela}%\n- Metadata: ${results.evidence.metadata}%\n\nAI EXPLANATION:\n${results.aiExplanation}\n\nGenerated with PIXENTRA — See Beyond the Pixels\n`;
       const blob = new Blob([reportContent], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -59,30 +59,34 @@ export function AnalysisResults({
     }
   };
 
-  // Only show evidence channels that the ML backend actually returns (non-zero).
-  // Spatial and Metadata are not produced by this model — omit them.
+  // Expose the five evidence channels used by the StrongMultiEvidenceNet model
   const evidenceItems = [
     {
-      name: "Noise Residual",
-      score: results.evidence.noise,
-      color: results.evidence.noise > 60 ? "bg-[#ef4444]" : results.evidence.noise > 30 ? "bg-[#f59e0b]" : "bg-[#10b981]",
+      name: "Compression",
+      score: results.evidence.compression,
+      color: results.evidence.compression > 60 ? "bg-[#ef4444]" : results.evidence.compression > 30 ? "bg-[#f59e0b]" : "bg-[#10b981]",
     },
     {
-      name: "Frequency / DCT",
-      score: results.evidence.frequency,
-      color: results.evidence.frequency > 60 ? "bg-[#ef4444]" : results.evidence.frequency > 30 ? "bg-[#f59e0b]" : "bg-[#10b981]",
-    },
-    {
-      name: "Error Level (ELA)",
-      score: results.evidence.ela,
-      color: results.evidence.ela > 60 ? "bg-[#ef4444]" : results.evidence.ela > 30 ? "bg-[#f59e0b]" : "bg-[#10b981]",
+      name: "Frequency / Noise",
+      score: results.evidence.frequencyNoise,
+      color: results.evidence.frequencyNoise > 60 ? "bg-[#ef4444]" : results.evidence.frequencyNoise > 30 ? "bg-[#f59e0b]" : "bg-[#10b981]",
     },
     {
       name: "Local Statistics",
       score: results.evidence.statistics,
       color: results.evidence.statistics > 60 ? "bg-[#ef4444]" : results.evidence.statistics > 30 ? "bg-[#f59e0b]" : "bg-[#10b981]",
     },
-  ].filter((item) => item.score > 0);
+    {
+      name: "Error Level Analysis (ELA)",
+      score: results.evidence.ela,
+      color: results.evidence.ela > 60 ? "bg-[#ef4444]" : results.evidence.ela > 30 ? "bg-[#f59e0b]" : "bg-[#10b981]",
+    },
+    {
+      name: "Metadata",
+      score: results.evidence.metadata,
+      color: results.evidence.metadata > 60 ? "bg-[#ef4444]" : results.evidence.metadata > 30 ? "bg-[#f59e0b]" : "bg-[#10b981]",
+    },
+  ];
 
   // Radial score gauge calculation
   const radius = 34;

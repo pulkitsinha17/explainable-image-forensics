@@ -41,10 +41,12 @@ interface MLAnalysis {
     forgery_pixel_fraction: number;
   };
   evidence: {
+    compression?: number;
     noise_residual: number;
     frequency_dct: number;
     ela: number;
     local_statistics: number;
+    metadata?: number;
   };
   mpc_risk_score: number;
   analysis_id: string;

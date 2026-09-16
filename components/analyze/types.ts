@@ -8,12 +8,14 @@ export interface SelectedImageData {
 }
 
 export interface ForensicEvidence {
-  spatial: number;     // e.g. 87%
-  noise: number;       // e.g. 71%
-  frequency: number;   // e.g. 79%
-  ela: number;         // e.g. 83%
-  statistics: number;  // e.g. 68%
-  metadata: number;    // e.g. 32%
+  compression: number;       // Compression evidence e.g. 75%
+  frequencyNoise: number;    // Frequency / Noise evidence e.g. 68%
+  statistics: number;        // Local Statistics evidence e.g. 68%
+  ela: number;               // Error Level Analysis (ELA) e.g. 83%
+  metadata: number;          // Metadata evidence e.g. 0%
+  spatial?: number;
+  noise?: number;
+  frequency?: number;
 }
 
 export interface ForensicAnalysisResult {
@@ -82,10 +84,12 @@ export interface MLRunResult {
   confidence: number;             // 0.0–1.0
   mpc_risk_score: number;         // 0.0–1.0
   evidence: {
+    compression?: number;
     noise_residual: number;
     frequency_dct: number;
     ela: number;
     local_statistics: number;
+    metadata?: number;
   };
   localization: {
     forgery_pixel_fraction: number;

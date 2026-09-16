@@ -64,18 +64,20 @@ function toForensicResult(
   const mapped = verdictMap[mlResult.verdict] ?? verdictMap.inconclusive;
 
   // Generate a brief AI explanation from the scores
-  const noiseScore = Math.round(ev.noise_residual * 100);
-  const elaScore = Math.round(ev.ela * 100);
-  const freqScore = Math.round(ev.frequency_dct * 100);
+  const compScore = Math.round((ev.compression ?? 0) * 100);
+  const freqNoiseScore = Math.round(((ev.noise_residual + ev.frequency_dct) / 2) * 100);
   const statsScore = Math.round(ev.local_statistics * 100);
+  const elaScore = Math.round(ev.ela * 100);
+  const metaScore = Math.round((ev.metadata ?? 0) * 100);
   const frac = (mlResult.localization.forgery_pixel_fraction * 100).toFixed(1);
   const conf = Math.round(mlResult.confidence * 100);
 
   const aiExplanation =
     `The forensic model computed an overall forgery risk score of ${riskPct}% ` +
     `with approximately ${frac}% of image area flagged as suspicious pixels. ` +
-    `Diagnostic forensic evidence channels recorded: noise residual (${noiseScore}%), ` +
-    `frequency/DCT (${freqScore}%), error-level analysis (${elaScore}%), and local statistics (${statsScore}%). ` +
+    `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
+    `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
+    `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
     `Model certainty: ${conf}%.`;
 
   return {
@@ -88,12 +90,13 @@ function toForensicResult(
     mpcRiskScore: Math.round(mlResult.mpc_risk_score * 100),
     forgeryPixelFraction: Math.round(mlResult.localization.forgery_pixel_fraction * 100),
     evidence: {
-      spatial: 0, // Not returned by the ML backend
-      noise: noiseScore,
-      frequency: freqScore,
-      ela: elaScore,
+      compression: compScore,
+      frequencyNoise: freqNoiseScore,
       statistics: statsScore,
-      metadata: 0, // Not returned by the ML backend
+      ela: elaScore,
+      metadata: metaScore,
+      noise: Math.round(ev.noise_residual * 100),
+      frequency: Math.round(ev.frequency_dct * 100),
     },
     aiExplanation,
     originalImageUrl,

@@ -30,10 +30,12 @@ class EvidenceScores(BaseModel):
     Per-channel evidence summary scores normalised to [0, 1].
     These are spatial means of the evidence maps, not arbitrary weights.
     """
-    noise_residual: float       # channel 1 in EvidenceEncoder input
-    frequency_dct: float        # channel 2
-    ela: float                  # channel 3
-    local_statistics: float     # channel 4
+    compression: float = 0.0    # channel 0 in comp evidence (compression artifact residual)
+    noise_residual: float       # channel 0 in freq evidence (Gaussian-blur residual)
+    frequency_dct: float        # channel 1 in freq evidence (Laplacian/frequency response)
+    ela: float                  # channel 0 in ela evidence (Error Level Analysis)
+    local_statistics: float     # channel 1 in stat evidence (local std dev)
+    metadata: float = 0.0       # metadata vector mean score (0.0 if metadata not available)
 
 
 class AnalysisResult(BaseModel):
