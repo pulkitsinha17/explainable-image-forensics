@@ -38,11 +38,12 @@ class EvidenceScores(BaseModel):
 
 class AnalysisResult(BaseModel):
     verdict: str                        # "forged" | "authentic" | "inconclusive"
-    risk_score: float                   # 0.0 – 1.0  (spatial mean of sigmoid probability)
+    risk_score: float                   # 0.0 – 1.0  (overall forgery risk derived from proposed model)
+    proposed_risk_score: float          # 0.0 – 1.0  (StrongMultiEvidenceNet proposed model risk score)
     confidence: float                   # 1 – entropy (higher = more certain)
     localization: LocalizationOutput
     evidence: EvidenceScores
-    mpc_risk_score: float              # raw MPC backbone output (before fusion)
+    mpc_risk_score: float              # raw MPC backbone baseline output (before fusion)
     analysis_id: str                   # UUID for this request
 
 

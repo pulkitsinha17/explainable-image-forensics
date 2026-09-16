@@ -9,7 +9,15 @@
  *   { analysisId: string, s3Key: string }
  *
  * The analysisId must correspond to an existing MongoDB Analysis document
- * (created by the frontend after the S3 upload).
+ * (created by /api/analyze/record before the S3 upload).
+ *
+ * Security:
+ *   - Clerk auth enforced.
+ *   - AWS credentials stay server-side.
+ *   - ML_BACKEND_URL stays server-side.
+ *   - MongoDB credentials stay server-side.
+ *   - Filesystem paths from FastAPI are stored in DB only — never returned to client.
+ *   - The overlay image is served via /api/analyze/mask/[analysisId].
  */
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -20,6 +28,27 @@ import Analysis from "@/models/Analysis";
 
 const ML_BACKEND_URL =
   process.env.ML_BACKEND_URL ?? "http://localhost:8001";
+
+/** Shape of the ML backend /analyze JSON response body */
+interface MLAnalysis {
+  verdict: string;
+  risk_score: number;
+  proposed_risk_score?: number;
+  confidence: number;
+  localization: {
+    mask_path: string | null;
+    overlay_path: string | null;
+    forgery_pixel_fraction: number;
+  };
+  evidence: {
+    noise_residual: number;
+    frequency_dct: number;
+    ela: number;
+    local_statistics: number;
+  };
+  mpc_risk_score: number;
+  analysis_id: string;
+}
 
 export async function POST(req: NextRequest) {
   // 1. Authentication
@@ -61,14 +90,12 @@ export async function POST(req: NextRequest) {
     );
   }
   if (record.clerkUserId !== userId) {
-    return NextResponse.json(
-      { error: "Forbidden." },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: "Forbidden." }, { status: 403 });
   }
 
-  // 4. Update status → processing
+  // 4. Update status → processing and store the s3Key
   record.status = "processing";
+  record.s3Key = s3Key;
   await record.save();
 
   // 5. Download image from S3
@@ -95,22 +122,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 6. Send to ML backend
-  let mlResult: Record<string, unknown>;
+  // 6. Send to ML backend via multipart/form-data
+  let mlAnalysis: MLAnalysis;
   try {
     const formData = new FormData();
-    const blob = new Blob([new Uint8Array(imageBuffer)], {
-      type: record.originalFilename?.match(/\.png$/i)
-        ? "image/png"
-        : "image/jpeg",
-    });
+    const mimeType = record.originalFilename?.match(/\.png$/i)
+      ? "image/png"
+      : "image/jpeg";
+    const blob = new Blob([new Uint8Array(imageBuffer)], { type: mimeType });
     formData.append("file", blob, record.originalFilename ?? "image.jpg");
     formData.append("analysis_id", analysisId);
 
     const mlResponse = await fetch(`${ML_BACKEND_URL}/analyze`, {
       method: "POST",
       body: formData,
-      signal: AbortSignal.timeout(120_000), // 2 minute timeout
+      signal: AbortSignal.timeout(120_000), // 2-minute timeout
     });
 
     if (!mlResponse.ok) {
@@ -118,53 +144,93 @@ export async function POST(req: NextRequest) {
       throw new Error(`ML backend returned ${mlResponse.status}: ${text}`);
     }
 
-    const mlBody = await mlResponse.json();
+    const mlBody = await mlResponse.json() as { success?: boolean; analysis?: MLAnalysis; error?: string };
+
     if (!mlBody.success || !mlBody.analysis) {
-      throw new Error(mlBody.error ?? "ML backend returned unexpected body.");
+      throw new Error(mlBody.error ?? "ML backend returned an unexpected response body.");
     }
-    mlResult = mlBody.analysis;
+
+    mlAnalysis = mlBody.analysis;
+
+    // Validate required fields are present
+    if (
+      typeof mlAnalysis.verdict !== "string" ||
+      typeof mlAnalysis.risk_score !== "number" ||
+      typeof mlAnalysis.confidence !== "number"
+    ) {
+      throw new Error("ML backend response is missing required fields.");
+    }
   } catch (err) {
-    console.error("[analyze/run] ML backend call failed:", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[analyze/run] ML backend call failed:", msg);
     record.status = "failed";
     await record.save();
+
+    // Distinguish timeout from other failures
+    const isTimeout = msg.includes("TimeoutError") || msg.includes("timeout");
     return NextResponse.json(
       {
-        error:
-          "ML analysis service is unavailable. " +
-          "Ensure the FastAPI backend is running on port 8001.",
+        error: isTimeout
+          ? "ML analysis timed out. The model may be loading — please try again."
+          : `ML analysis service error: ${msg}`,
       },
       { status: 503 }
     );
   }
 
   // 7. Persist results in MongoDB
+  //    overlayPath and maskPath are stored server-side ONLY — never returned to client.
   try {
-    const analysis = mlResult as {
-      verdict: string;
-      risk_score: number;
-      evidence: Record<string, number>;
-      localization: { forgery_pixel_fraction: number };
-    };
+    const verdict = mlAnalysis.verdict;
 
     record.status = "completed";
     record.detectionResult =
-      analysis.verdict === "forged"
+      verdict === "forged"
         ? "forged"
-        : analysis.verdict === "authentic"
+        : verdict === "authentic"
           ? "authentic"
           : "inconclusive";
-    record.forgeryRiskScore = analysis.risk_score;
-    record.evidenceResults = analysis.evidence;
-    record.localizationResult = analysis.localization;
+    record.forgeryRiskScore = mlAnalysis.risk_score;
+    record.proposedRiskScore = mlAnalysis.proposed_risk_score ?? mlAnalysis.risk_score;
+    record.confidence = mlAnalysis.confidence;
+    record.mpcRiskScore = mlAnalysis.mpc_risk_score;
+    record.evidenceResults = mlAnalysis.evidence;
+    record.localizationResult = {
+      forgery_pixel_fraction: mlAnalysis.localization.forgery_pixel_fraction,
+    };
+    // Store filesystem paths server-side — used by /api/analyze/mask/[id]
+    record.overlayPath = mlAnalysis.localization.overlay_path ?? undefined;
+    record.maskPath = mlAnalysis.localization.mask_path ?? undefined;
+    record.mlRawResult = mlAnalysis;
     await record.save();
   } catch (err) {
     console.error("[analyze/run] MongoDB update failed:", err);
-    // Don't fail the whole request — results are still returned
+    // Don't fail the whole request — return results even if DB update fails
   }
+
+  // 8. Build a sanitised client response — NO filesystem paths
+  //    The overlay image is served via /api/analyze/mask/[analysisId]
+  const hasOverlay = Boolean(
+    mlAnalysis.localization.overlay_path && record.overlayPath
+  );
 
   return NextResponse.json({
     success: true,
     analysisId,
-    result: mlResult,
+    result: {
+      verdict: mlAnalysis.verdict,
+      risk_score: mlAnalysis.risk_score,
+      proposed_risk_score: mlAnalysis.proposed_risk_score ?? mlAnalysis.risk_score,
+      confidence: mlAnalysis.confidence,
+      mpc_risk_score: mlAnalysis.mpc_risk_score,
+      evidence: mlAnalysis.evidence,
+      localization: {
+        forgery_pixel_fraction: mlAnalysis.localization.forgery_pixel_fraction,
+        // Safe URL — no filesystem path exposed
+        overlay_url: hasOverlay
+          ? `/api/analyze/mask/${analysisId}`
+          : null,
+      },
+    },
   });
 }

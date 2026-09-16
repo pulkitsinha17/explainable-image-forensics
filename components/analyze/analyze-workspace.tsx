@@ -1,20 +1,112 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { TopNavBar } from "./top-nav-bar";
 import { ImageUpload } from "./image-upload";
 import { AnalysisProgress } from "./analysis-progress";
-import { UploadSuccessCard } from "./upload-success-card";
+import { AnalysisResults } from "./analysis-results";
 import { HowItWorks } from "./how-it-works";
 import { PrivacyCard } from "./privacy-card";
-import type { SelectedImageData, S3UploadState } from "./types";
+import type {
+  SelectedImageData,
+  S3UploadState,
+  AnalysisState,
+  MLRunResult,
+  ForensicAnalysisResult,
+} from "./types";
 
 interface AnalyzeWorkspaceProps {
   userInitial?: string;
   userDisplayName?: string;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Adapter: maps the ML backend response to the UI ForensicAnalysisResult shape
+// ─────────────────────────────────────────────────────────────────────────────
+
+function toForensicResult(
+  mlResult: MLRunResult,
+  analysisId: string,
+  originalImageUrl: string,
+  elapsedSeconds: number
+): ForensicAnalysisResult {
+  const riskPct = Math.round(mlResult.risk_score * 100);
+  const ev = mlResult.evidence;
+
+  // Map ML verdict → UI labels
+  const verdictMap: Record<
+    string,
+    { label: string; description: string; verdict: ForensicAnalysisResult["verdict"] }
+  > = {
+    forged: {
+      verdict: "likely_manipulated",
+      label: "Likely Manipulated",
+      description:
+        "Strong evidence of digital manipulation detected across multiple forensic channels. " +
+        "The model identified suspicious pixel patterns inconsistent with an authentic image.",
+    },
+    authentic: {
+      verdict: "authentic",
+      label: "Appears Authentic",
+      description:
+        "No significant evidence of manipulation found. The image is consistent with " +
+        "an unmodified photograph across all forensic channels.",
+    },
+    inconclusive: {
+      verdict: "suspicious",
+      label: "Inconclusive",
+      description:
+        "Mixed signals detected. Some forensic channels indicate possible manipulation " +
+        "but evidence is not strong enough for a definitive verdict.",
+    },
+  };
+
+  const mapped = verdictMap[mlResult.verdict] ?? verdictMap.inconclusive;
+
+  // Generate a brief AI explanation from the scores
+  const noiseScore = Math.round(ev.noise_residual * 100);
+  const elaScore = Math.round(ev.ela * 100);
+  const freqScore = Math.round(ev.frequency_dct * 100);
+  const statsScore = Math.round(ev.local_statistics * 100);
+  const frac = (mlResult.localization.forgery_pixel_fraction * 100).toFixed(1);
+  const conf = Math.round(mlResult.confidence * 100);
+
+  const aiExplanation =
+    `The forensic model computed an overall forgery risk score of ${riskPct}% ` +
+    `with approximately ${frac}% of image area flagged as suspicious pixels. ` +
+    `Diagnostic forensic evidence channels recorded: noise residual (${noiseScore}%), ` +
+    `frequency/DCT (${freqScore}%), error-level analysis (${elaScore}%), and local statistics (${statsScore}%). ` +
+    `Model certainty: ${conf}%.`;
+
+  return {
+    verdict: mapped.verdict,
+    verdictLabel: mapped.label,
+    verdictDescription: mapped.description,
+    forgeryRiskScore: riskPct,
+    proposedRiskScore: riskPct,
+    confidence: conf,
+    mpcRiskScore: Math.round(mlResult.mpc_risk_score * 100),
+    forgeryPixelFraction: Math.round(mlResult.localization.forgery_pixel_fraction * 100),
+    evidence: {
+      spatial: 0, // Not returned by the ML backend
+      noise: noiseScore,
+      frequency: freqScore,
+      ela: elaScore,
+      statistics: statsScore,
+      metadata: 0, // Not returned by the ML backend
+    },
+    aiExplanation,
+    originalImageUrl,
+    localizationMapUrl: mlResult.localization.overlay_url ?? "",
+    elapsedSeconds,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main workspace component
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function AnalyzeWorkspace({
   userInitial = "P",
@@ -30,20 +122,51 @@ export function AnalyzeWorkspace({
     errorMessage: null,
   });
 
-  /** Convenience derived booleans */
+  /** Analysis pipeline phase state (after upload is done) */
+  const [analysisState, setAnalysisState] = useState<AnalysisState>({
+    phase: "idle",
+    analysisId: null,
+    errorMessage: null,
+  });
+
+  /** Final forensic result once the ML pipeline completes */
+  const [forensicResult, setForensicResult] =
+    useState<ForensicAnalysisResult | null>(null);
+
+  // ── Derived booleans ──────────────────────────────────────────────────────
   const isUploading =
     uploadState.status === "requesting" || uploadState.status === "uploading";
-  const uploadDone = uploadState.status === "complete";
+  const isAnalyzing =
+    analysisState.phase === "creating_record" ||
+    analysisState.phase === "analyzing";
   const uploadError = uploadState.status === "error";
+  const analysisError = analysisState.phase === "error";
 
   /**
-   * Map the S3 upload status to the progress-bar stage labels.
-   * Phase 3 will add "analyzing" / "generating" / "finishing" stages
-   * once the FastAPI pipeline is wired up.
+   * Map the current pipeline state to the AnalysisProgress stage label.
+   * "uploading"  → during S3 upload
+   * "analyzing"  → record created / FastAPI running
+   * "generating" → FastAPI returned, saving to DB
+   * "finishing"  → done
    */
   const currentStage: "uploading" | "analyzing" | "generating" | "finishing" =
-    uploadState.status === "requesting" ? "uploading" : "uploading";
+    isUploading
+      ? "uploading"
+      : analysisState.phase === "creating_record"
+        ? "analyzing"
+        : analysisState.phase === "analyzing"
+          ? "generating"
+          : "finishing";
 
+  // ── Progress value to show for the analysis phase (25–99) ─────────────────
+  const analysisProgress =
+    analysisState.phase === "creating_record"
+      ? 30
+      : analysisState.phase === "analyzing"
+        ? 65
+        : 100;
+
+  // ── Main handler ─────────────────────────────────────────────────────────
   const handleStartAnalysis = async () => {
     if (!selectedImage?.file) {
       setUploadState({
@@ -57,8 +180,13 @@ export function AnalyzeWorkspace({
     }
 
     const file = selectedImage.file;
+    const startTime = Date.now();
 
-    // ── Step 1: Request a presigned URL from the server ───────────────────────
+    // Reset any previous analysis
+    setForensicResult(null);
+    setAnalysisState({ phase: "idle", analysisId: null, errorMessage: null });
+
+    // ── Step 1: Request a presigned URL ────────────────────────────────────
     setUploadState({ status: "requesting", progress: 0, s3Key: null, errorMessage: null });
 
     let uploadUrl: string;
@@ -80,9 +208,7 @@ export function AnalyzeWorkspace({
         try {
           const json = await res.json();
           if (typeof json?.error === "string") msg = json.error;
-        } catch {
-          /* ignore parse error */
-        }
+        } catch { /* ignore */ }
         setUploadState({ status: "error", progress: 0, s3Key: null, errorMessage: msg });
         return;
       }
@@ -101,7 +227,7 @@ export function AnalyzeWorkspace({
       return;
     }
 
-    // ── Step 2: Upload directly from the browser to S3 ───────────────────────
+    // ── Step 2: Upload directly from browser to S3 ─────────────────────────
     setUploadState({ status: "uploading", progress: 5, s3Key: null, errorMessage: null });
 
     try {
@@ -117,33 +243,108 @@ export function AnalyzeWorkspace({
         s3Key: null,
         errorMessage:
           detail.includes("CORS") || detail.includes("Network error")
-            ? "Upload failed. Please ensure S3 bucket CORS permissions are configured to allow uploads from your browser."
+            ? "Upload failed. Please ensure S3 bucket CORS permissions are configured."
             : `Upload to secure storage failed: ${detail}`,
       });
       return;
     }
 
-    // ── Step 3: Mark upload complete ─────────────────────────────────────────
     setUploadState({ status: "complete", progress: 100, s3Key, errorMessage: null });
 
-    // ── Phase 3 hook ──────────────────────────────────────────────────────────
-    // When the FastAPI / MPC pipeline is ready, trigger forensic analysis here:
-    //
-    //   const analysisRes = await fetch("/api/analyze/run", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ s3Key }),
-    //   });
-    //   const analysisResult = await analysisRes.json();
-    //   setResults(analysisResult);
-    //
-    // ─────────────────────────────────────────────────────────────────────────
+    // ── Step 3: Create MongoDB record ──────────────────────────────────────
+    setAnalysisState({ phase: "creating_record", analysisId: null, errorMessage: null });
+
+    let analysisId: string;
+
+    try {
+      const res = await fetch("/api/analyze/record", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name }),
+      });
+
+      if (!res.ok) {
+        let msg = "Failed to create analysis record. Please try again.";
+        try {
+          const json = await res.json();
+          if (typeof json?.error === "string") msg = json.error;
+        } catch { /* ignore */ }
+        setAnalysisState({ phase: "error", analysisId: null, errorMessage: msg });
+        return;
+      }
+
+      const json = await res.json();
+      analysisId = json.analysisId;
+    } catch {
+      setAnalysisState({
+        phase: "error",
+        analysisId: null,
+        errorMessage: "Network error while initialising the analysis. Please try again.",
+      });
+      return;
+    }
+
+    // ── Step 4: Call /api/analyze/run → FastAPI → MongoDB ─────────────────
+    setAnalysisState({ phase: "analyzing", analysisId, errorMessage: null });
+
+    try {
+      const res = await fetch("/api/analyze/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ analysisId, s3Key }),
+      });
+
+      if (!res.ok) {
+        let msg = "ML analysis failed. Please try again.";
+        try {
+          const json = await res.json();
+          if (typeof json?.error === "string") msg = json.error;
+        } catch { /* ignore */ }
+        setAnalysisState({ phase: "error", analysisId, errorMessage: msg });
+        return;
+      }
+
+      const json = await res.json() as { success: boolean; result: MLRunResult };
+
+      if (!json.success || !json.result) {
+        setAnalysisState({
+          phase: "error",
+          analysisId,
+          errorMessage: "ML backend returned an unexpected response.",
+        });
+        return;
+      }
+
+      const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+      const result = toForensicResult(
+        json.result,
+        analysisId,
+        selectedImage.previewUrl,
+        elapsedSeconds
+      );
+
+      setForensicResult(result);
+      setAnalysisState({ phase: "complete", analysisId, errorMessage: null });
+    } catch {
+      setAnalysisState({
+        phase: "error",
+        analysisId,
+        errorMessage:
+          "Network error while running the analysis. Ensure the ML backend is running on port 8001.",
+      });
+    }
   };
 
   const handleClearImage = () => {
     setSelectedImage(null);
     setUploadState({ status: "idle", progress: 0, s3Key: null, errorMessage: null });
+    setAnalysisState({ phase: "idle", analysisId: null, errorMessage: null });
+    setForensicResult(null);
   };
+
+  const anyError = uploadError || analysisError;
+  const errorMessage =
+    uploadState.errorMessage ?? analysisState.errorMessage ?? null;
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -169,61 +370,100 @@ export function AnalyzeWorkspace({
       </div>
 
       {/* 1. Upload Card & Selected Image Preview */}
-      <ImageUpload
-        onImageSelected={(img) => {
-          setSelectedImage(img);
-          setUploadState({ status: "idle", progress: 0, s3Key: null, errorMessage: null });
-        }}
-        selectedImage={selectedImage}
-        onClearImage={handleClearImage}
-        onStartAnalysis={handleStartAnalysis}
-        isAnalyzing={isUploading}
-        uploadState={uploadState}
-      />
+      {/* Hide the uploader once we have a result or are mid-analysis */}
+      {!forensicResult && !isAnalyzing && (
+        <ImageUpload
+          onImageSelected={(img) => {
+            setSelectedImage(img);
+            setUploadState({ status: "idle", progress: 0, s3Key: null, errorMessage: null });
+            setAnalysisState({ phase: "idle", analysisId: null, errorMessage: null });
+            setForensicResult(null);
+          }}
+          selectedImage={selectedImage}
+          onClearImage={handleClearImage}
+          onStartAnalysis={handleStartAnalysis}
+          isAnalyzing={isUploading}
+          uploadState={uploadState}
+        />
+      )}
 
-      {/* 2. Upload Progress State (while uploading to S3) */}
+      {/* 2. Upload Progress (while uploading to S3) */}
       {isUploading && (
         <AnalysisProgress
           progress={uploadState.progress}
-          currentStage={currentStage}
+          currentStage="uploading"
           label="Uploading your image..."
           subtitle="Securely transferring your image to PIXENTRA's private vault."
         />
       )}
 
-      {/* 3. Upload Error State */}
-      {uploadError && uploadState.errorMessage && (
+      {/* 3. Analysis Progress (after upload, while FastAPI is running) */}
+      {isAnalyzing && (
+        <AnalysisProgress
+          progress={analysisProgress}
+          currentStage={currentStage}
+          label="Analyzing your image..."
+          subtitle="The forensic AI model is examining pixel patterns, noise residuals, DCT frequencies, and ELA. This may take up to 60 seconds."
+        />
+      )}
+
+      {/* 4. Error State (upload or analysis) */}
+      {anyError && errorMessage && (
         <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200/80 rounded-xl text-xs sm:text-sm text-red-800 animate-fade-in">
           <svg className="w-4 h-4 text-red-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
-          <p className="font-medium flex-1">{uploadState.errorMessage}</p>
+          <div className="flex-1 space-y-2">
+            <p className="font-medium">{errorMessage}</p>
+            <button
+              type="button"
+              onClick={handleClearImage}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 hover:text-red-900 underline underline-offset-2"
+            >
+              Try again with a different image
+            </button>
+          </div>
         </div>
       )}
 
-      {/* 4. Upload Success State — clearly NOT forensic analysis results */}
-      {uploadDone && uploadState.s3Key && selectedImage && (
-        <UploadSuccessCard
-          s3Key={uploadState.s3Key}
-          filename={selectedImage.name}
+      {/* 5. Forensic Analysis Results */}
+      {forensicResult && (
+        <AnalysisResults
+          results={forensicResult}
         />
       )}
 
-      {/* 5. How PIXENTRA Works */}
-      <HowItWorks />
+      {/* 6. Start Over after results */}
+      {forensicResult && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={handleClearImage}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-semibold text-gray-700 transition-colors shadow-2xs"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Analyze another image
+          </button>
+        </div>
+      )}
 
-      {/* 6. Privacy Reassurance Banner */}
-      <PrivacyCard />
+      {/* 7. How PIXENTRA Works (hidden while analysis is running or result is shown) */}
+      {!isUploading && !isAnalyzing && !forensicResult && !anyError && (
+        <HowItWorks />
+      )}
+
+      {/* 8. Privacy Reassurance Banner */}
+      {!isUploading && !isAnalyzing && !forensicResult && (
+        <PrivacyCard />
+      )}
     </div>
   );
 }
 
-/**
- * Uploads a file to the given presigned S3 PUT URL using XMLHttpRequest
- * so we get real byte-level upload progress.
- *
- * Returns a Promise that resolves on HTTP 200 from S3 or rejects on any error.
- */
+// ─────────────────────────────────────────────────────────────────────────────
+// S3 upload helper — uses XHR for real byte-level progress reporting
+// ─────────────────────────────────────────────────────────────────────────────
+
 function uploadToS3WithProgress(
   file: File,
   presignedUrl: string,

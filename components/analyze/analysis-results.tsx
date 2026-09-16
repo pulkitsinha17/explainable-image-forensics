@@ -56,38 +56,30 @@ export function AnalysisResults({
     }
   };
 
+  // Only show evidence channels that the ML backend actually returns (non-zero).
+  // Spatial and Metadata are not produced by this model — omit them.
   const evidenceItems = [
     {
-      name: "Spatial / Pixel",
-      score: results.evidence.spatial,
-      color: "bg-[#ef4444]", // red
-    },
-    {
-      name: "Noise",
+      name: "Noise Residual",
       score: results.evidence.noise,
-      color: "bg-[#ef4444]", // red
+      color: results.evidence.noise > 60 ? "bg-[#ef4444]" : results.evidence.noise > 30 ? "bg-[#f59e0b]" : "bg-[#10b981]",
     },
     {
-      name: "Frequency",
+      name: "Frequency / DCT",
       score: results.evidence.frequency,
-      color: "bg-[#ef4444]", // red
+      color: results.evidence.frequency > 60 ? "bg-[#ef4444]" : results.evidence.frequency > 30 ? "bg-[#f59e0b]" : "bg-[#10b981]",
     },
     {
-      name: "ELA",
+      name: "Error Level (ELA)",
       score: results.evidence.ela,
-      color: "bg-[#ef4444]", // red
+      color: results.evidence.ela > 60 ? "bg-[#ef4444]" : results.evidence.ela > 30 ? "bg-[#f59e0b]" : "bg-[#10b981]",
     },
     {
-      name: "Statistics",
+      name: "Local Statistics",
       score: results.evidence.statistics,
-      color: "bg-[#f59e0b]", // amber / orange
+      color: results.evidence.statistics > 60 ? "bg-[#ef4444]" : results.evidence.statistics > 30 ? "bg-[#f59e0b]" : "bg-[#10b981]",
     },
-    {
-      name: "Metadata",
-      score: results.evidence.metadata,
-      color: "bg-[#10b981]", // emerald / green
-    },
-  ];
+  ].filter((item) => item.score > 0);
 
   // Radial score gauge calculation
   const radius = 34;
@@ -209,7 +201,7 @@ export function AnalysisResults({
             {/* Forgery Risk Circular Radial Meter */}
             <div className="sm:col-span-4 flex flex-col items-center justify-center pt-2 sm:pt-0 sm:border-l sm:border-gray-200/60">
               <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">
-                Forgery Risk
+                Forgery Risk Score
               </span>
               <div className="relative w-20 h-20 flex items-center justify-center">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
@@ -241,6 +233,25 @@ export function AnalysisResults({
                   </span>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* ML Metrics Row: Confidence + Detected Forged Area + Analysis Speed */}
+          <div className="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-blue-50/50 border border-blue-100/80">
+            <div className="flex flex-col items-center gap-1 text-center">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Confidence</span>
+              <span className="text-lg sm:text-xl font-black text-[#1a7fc4]">{results.confidence}%</span>
+              <span className="text-[10px] text-gray-500">Model certainty</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 text-center border-x border-blue-100">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Forged Area</span>
+              <span className="text-lg sm:text-xl font-black text-orange-500">{results.forgeryPixelFraction}%</span>
+              <span className="text-[10px] text-gray-500">Detected pixels</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 text-center">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Speed</span>
+              <span className="text-lg sm:text-xl font-black text-emerald-600">{results.elapsedSeconds}s</span>
+              <span className="text-[10px] text-gray-500">Analysis time</span>
             </div>
           </div>
 

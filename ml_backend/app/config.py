@@ -36,6 +36,9 @@ INPUT_SIZE: int = int(os.environ.get("INPUT_SIZE", "512"))
 # This is PROP_THR from the notebook; default 0.38 (typical after validation search)
 FORGERY_THRESHOLD: float = float(os.environ.get("FORGERY_THRESHOLD", "0.38"))
 
+# Image-level decision threshold derived from 400-image calibration experiment (p999 >= 0.995)
+CALIBRATED_IMAGE_THRESHOLD: float = float(os.environ.get("CALIBRATED_IMAGE_THRESHOLD", "0.995"))
+
 # ── Upload / file handling ─────────────────────────────────────────────────────
 MAX_UPLOAD_MB: int = int(os.environ.get("MAX_UPLOAD_MB", "10"))
 MAX_UPLOAD_BYTES: int = MAX_UPLOAD_MB * 1024 * 1024

@@ -20,7 +20,7 @@ import cv2
 import numpy as np
 import torch
 
-from app.config import FORGERY_THRESHOLD, MASKS_DIR, OVERLAYS_DIR
+from app.config import CALIBRATED_IMAGE_THRESHOLD, FORGERY_THRESHOLD, MASKS_DIR, OVERLAYS_DIR
 from app.inference.model_loader import LoadedModels
 from app.inference.preprocessor import prepare_inference_inputs
 from app.schemas import AnalysisResult, EvidenceScores, LocalizationOutput
@@ -92,17 +92,22 @@ def _binary_entropy_confidence(prob_map: np.ndarray) -> float:
 #  Verdict
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _compute_verdict(risk_score: float, confidence: float) -> str:
+def _compute_verdict(
+    risk_score: float,
+    confidence: float,
+    threshold: float = CALIBRATED_IMAGE_THRESHOLD,
+) -> str:
     """
-    Convert numeric scores to a verdict string.
+    Convert numeric scores to a verdict string based on the Kaggle 400-image calibration:
+      - 'inconclusive': if confidence is low (< 0.30)
+      - 'forged': if risk_score (p999) >= threshold (0.995)
+      - 'authentic': otherwise
     """
     if confidence < 0.30:
         return "inconclusive"
-    if risk_score >= 0.55:
+    if risk_score >= threshold:
         return "forged"
-    if risk_score <= 0.25:
-        return "authentic"
-    return "inconclusive"
+    return "authentic"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -150,7 +155,7 @@ def run_inference(
         inputs["meta_avail"],
     )
 
-    # ── 3. Extract probability map ────────────────────────────────────────────
+    # ── 3. Extract probability map from trained localization head ─────────────
     if isinstance(out, dict) and "prob" in out:
         prob_t = out["prob"]
     elif isinstance(out, dict) and "logits" in out:
@@ -162,7 +167,7 @@ def run_inference(
 
     prob_map = prob_t[0, 0].detach().float().cpu().numpy()  # (512, 512)
 
-    # ── 4. MPC probability & risk score ───────────────────────────────────────
+    # ── 4. MPC baseline probability & risk score ──────────────────────────────
     if isinstance(out, dict) and "mpc_prob" in out and out["mpc_prob"] is not None:
         mpc_prob_map = out["mpc_prob"][0, 0].detach().float().cpu().numpy()
         mpc_risk_score = float(np.mean(mpc_prob_map))
@@ -174,25 +179,8 @@ def run_inference(
     else:
         mpc_risk_score = 0.0
 
-    # ── 5. Overall risk score & confidence ────────────────────────────────────
-    if isinstance(out, dict) and "risk_score" in out and out["risk_score"] is not None:
-        risk_score = float(out["risk_score"].item())
-    else:
-        risk_score = float(np.mean(prob_map))
-
-    confidence = _binary_entropy_confidence(prob_map)
-    verdict = _compute_verdict(risk_score, confidence)
-
-    # ── 6. Evidence channel scores ────────────────────────────────────────────
-    raw_ev = inputs["raw_evidence"]
-    evidence = EvidenceScores(
-        noise_residual=float(np.mean(raw_ev["freq"][0])),
-        frequency_dct=float(np.mean(raw_ev["freq"][1])),
-        ela=float(np.mean(raw_ev["ela"][0])),
-        local_statistics=float(np.mean(raw_ev["stat"][1])),
-    )
-
-    # ── 7. Produce binary mask and overlay ────────────────────────────────────
+    # ── 5. Produce binary mask and calculate forged pixel fraction ────────────
+    # Pixel threshold = 0.38 (separate localization metric from notebook)
     mask_arr = _make_binary_mask(prob_map, original_shape, threshold)
     overlay_arr = _make_heatmap_overlay(img_rgb, prob_map)
 
@@ -202,8 +190,32 @@ def run_inference(
     cv2.imwrite(str(mask_path), mask_arr)
     cv2.imwrite(str(overlay_path), overlay_arr)
 
-    # ── 8. Pixel-fraction of predicted forgery ────────────────────────────────
+    # Pixel-fraction of predicted forgery (pixels >= threshold 0.38)
     forgery_pixel_fraction = float(np.mean(mask_arr > 0))
+
+    # ── 6. Derive p999 image-level risk score & verdict ───────────────────────
+    # From Kaggle 400-image calibration experiment:
+    # p999 is the 99.9th percentile of the 512x512 localization probability map.
+    # Calibrated operating threshold = 0.995 (AUC = 0.9063, F1 = 0.8654)
+    p999 = float(np.percentile(prob_map, 99.9))
+    risk_score = float(np.clip(p999, 0.0, 1.0))
+    proposed_risk_score = risk_score
+
+    confidence = _binary_entropy_confidence(prob_map)
+    verdict = _compute_verdict(
+        risk_score=risk_score,
+        confidence=confidence,
+        threshold=CALIBRATED_IMAGE_THRESHOLD,
+    )
+
+    # ── 7. Evidence channel scores (spatial means of extracted maps) ──────────
+    raw_ev = inputs["raw_evidence"]
+    evidence = EvidenceScores(
+        noise_residual=float(np.mean(raw_ev["freq"][0])),
+        frequency_dct=float(np.mean(raw_ev["freq"][1])),
+        ela=float(np.mean(raw_ev["ela"][0])),
+        local_statistics=float(np.mean(raw_ev["stat"][1])),
+    )
 
     localization = LocalizationOutput(
         mask_path=str(mask_path),
@@ -212,13 +224,14 @@ def run_inference(
     )
 
     logger.info(
-        "Inference complete — id=%s  risk=%.3f  conf=%.3f  verdict=%s  forgery_px=%.2f%%",
-        analysis_id, risk_score, confidence, verdict, forgery_pixel_fraction * 100,
+        "Inference complete — id=%s  p999=%.4f  risk=%.4f  conf=%.4f  verdict=%s  forgery_px=%.2f%%",
+        analysis_id, p999, risk_score, confidence, verdict, forgery_pixel_fraction * 100,
     )
 
     return AnalysisResult(
         verdict=verdict,
         risk_score=round(risk_score, 4),
+        proposed_risk_score=round(proposed_risk_score, 4),
         confidence=round(confidence, 4),
         localization=localization,
         evidence=evidence,
