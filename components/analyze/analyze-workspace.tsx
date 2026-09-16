@@ -73,7 +73,7 @@ function toForensicResult(
   const conf = Math.round(mlResult.confidence * 100);
 
   const aiExplanation =
-    `The forensic model computed an overall forgery risk score of ${riskPct}% ` +
+    `The forensic model computed an overall forgery anomaly score of ${riskPct}% ` +
     `with approximately ${frac}% of image area flagged as suspicious pixels. ` +
     `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
     `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +

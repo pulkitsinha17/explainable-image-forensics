@@ -48,7 +48,7 @@ export function AnalysisResults({
       onDownloadReport();
     } else {
       // Generate a formatted summary download
-      const reportContent = `PIXENTRA IMAGE FORENSIC REPORT\n===============================\nVerdict: ${results.verdictLabel}\nForgery Risk Score: ${results.forgeryRiskScore}%\nCompleted in: ${results.elapsedSeconds} seconds\n\nEVIDENCE BREAKDOWN:\n- Compression: ${results.evidence.compression}%\n- Frequency / Noise: ${results.evidence.frequencyNoise}%\n- Local Statistics: ${results.evidence.statistics}%\n- Error Level Analysis (ELA): ${results.evidence.ela}%\n- Metadata: ${results.evidence.metadata}%\n\nAI EXPLANATION:\n${results.aiExplanation}\n\nGenerated with PIXENTRA — See Beyond the Pixels\n`;
+      const reportContent = `PIXENTRA IMAGE FORENSIC REPORT\n===============================\nVerdict: ${results.verdictLabel}\nForgery Anomaly Score: ${results.forgeryRiskScore}%\nPrediction Certainty: ${results.confidence}%\nCompleted in: ${results.elapsedSeconds} seconds\n\nEVIDENCE BREAKDOWN:\n- Compression: ${results.evidence.compression}%\n- Frequency / Noise: ${results.evidence.frequencyNoise}%\n- Local Statistics: ${results.evidence.statistics}%\n- Error Level Analysis (ELA): ${results.evidence.ela}%\n- Metadata: ${results.evidence.metadata}%\n\nAI EXPLANATION:\n${results.aiExplanation}\n\nGenerated with PIXENTRA — See Beyond the Pixels\n`;
       const blob = new Blob([reportContent], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -187,15 +187,27 @@ export function AnalysisResults({
 
         {/* Right Column: Verdict, Forgery Risk, Evidence Breakdown & AI Explanation */}
         <div className="lg:col-span-6 space-y-3.5">
-          {/* Top Row: Verdict + Forgery Risk Gauge */}
+          {/* Top Row: Verdict + Forgery Anomaly Score Gauge */}
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-2xl bg-gray-50/70 border border-gray-100">
             {/* Verdict */}
-            <div className="sm:col-span-8 flex flex-col justify-center space-y-1">
+            <div className="sm:col-span-7 flex flex-col justify-center space-y-1 sm:pr-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
                 Verdict
               </span>
-              <div className="flex items-center gap-2 text-red-600">
-                <AlertTriangle className="w-5 h-5 shrink-0 stroke-[2.2]" />
+              <div
+                className={`flex items-center gap-2 ${
+                  results.verdict === "authentic"
+                    ? "text-[#16a34a]"
+                    : results.verdict === "suspicious"
+                    ? "text-[#2563eb]"
+                    : "text-[#dc2626]"
+                }`}
+              >
+                {results.verdict === "authentic" ? (
+                  <CheckCircle2 className="w-5 h-5 shrink-0 stroke-[2.2]" />
+                ) : (
+                  <AlertTriangle className="w-5 h-5 shrink-0 stroke-[2.2]" />
+                )}
                 <span className="text-base sm:text-lg font-bold">
                   {results.verdictLabel}
                 </span>
@@ -205,10 +217,10 @@ export function AnalysisResults({
               </p>
             </div>
 
-            {/* Forgery Risk Circular Radial Meter */}
-            <div className="sm:col-span-4 flex flex-col items-center justify-center pt-2 sm:pt-0 sm:border-l sm:border-gray-200/60">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">
-                Forgery Risk Score
+            {/* Forgery Anomaly Score Circular Radial Meter */}
+            <div className="sm:col-span-5 flex flex-col items-center justify-center pt-2 sm:pt-0 sm:pl-3 sm:border-l sm:border-gray-200/60">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1 whitespace-nowrap text-center">
+                Forgery Anomaly Score
               </span>
               <div className="relative w-18 h-18 flex items-center justify-center">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
@@ -243,10 +255,10 @@ export function AnalysisResults({
             </div>
           </div>
 
-          {/* ML Metrics Row: Confidence + Detected Forged Area + Analysis Speed */}
+          {/* ML Metrics Row: Prediction Certainty + Detected Forged Area + Analysis Speed */}
           <div className="grid grid-cols-3 gap-2.5 p-3 rounded-2xl bg-blue-50/50 border border-blue-100/80">
             <div className="flex flex-col items-center gap-0.5 text-center">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Confidence</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Prediction Certainty</span>
               <span className="text-base sm:text-lg font-black text-[#1a7fc4]">{results.confidence}%</span>
               <span className="text-[10px] text-gray-500">Model certainty</span>
             </div>
