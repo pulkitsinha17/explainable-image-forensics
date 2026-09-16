@@ -131,7 +131,7 @@ export default async function DashboardPage() {
 
       {/* Main Forensic Workspace */}
       <div className="flex-1 min-w-0 flex flex-col">
-        <main className="flex-1 p-4 sm:p-7 lg:p-8 max-w-7xl w-full mx-auto space-y-6 sm:space-y-8 animate-fade-in">
+        <main className="flex-1 p-4 sm:p-6 lg:p-7 max-w-7xl w-full mx-auto space-y-5 sm:space-y-6 animate-fade-in">
           {/* Top Header */}
           <DashboardHeader firstName={firstName} />
 

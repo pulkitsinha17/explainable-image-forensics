@@ -37,7 +37,7 @@ export default async function SettingsPage() {
             appearance={{
               elements: {
                 avatarBox:
-                  "w-8 h-8 ring-2 ring-[#1a7fc4]/20 hover:ring-[#1a7fc4] transition-all",
+                  "w-10 h-10 ring-2 ring-gray-200/80 hover:ring-[#1a7fc4]/50 transition-all",
               },
             }}
           />

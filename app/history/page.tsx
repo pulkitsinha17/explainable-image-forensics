@@ -39,7 +39,7 @@ export default async function HistoryPage() {
 
       {/* Main History Workspace */}
       <div className="flex-1 min-w-0 flex flex-col">
-        <main className="flex-1 p-4 sm:p-7 lg:p-8 max-w-7xl w-full mx-auto animate-fade-in">
+        <main className="flex-1 p-4 sm:p-6 lg:p-7 max-w-7xl w-full mx-auto animate-fade-in">
           <HistoryWorkspace
             userInitial={userInitial}
             userDisplayName={displayName}

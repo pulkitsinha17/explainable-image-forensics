@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { TopNavBar } from "./top-nav-bar";
 import { ImageUpload } from "./image-upload";
 import { AnalysisProgress } from "./analysis-progress";
@@ -139,15 +137,16 @@ export function AnalyzeWorkspace({
   const isAnalyzing =
     analysisState.phase === "creating_record" ||
     analysisState.phase === "analyzing";
+  const isProcessing = isUploading || isAnalyzing;
   const uploadError = uploadState.status === "error";
   const analysisError = analysisState.phase === "error";
 
   /**
    * Map the current pipeline state to the AnalysisProgress stage label.
    * "uploading"  → during S3 upload
-   * "analyzing"  → record created / FastAPI running
-   * "generating" → FastAPI returned, saving to DB
-   * "finishing"  → done
+   * "analyzing"  → record created / initializing
+   * "generating" → FastAPI running
+   * "finishing"  → complete
    */
   const currentStage: "uploading" | "analyzing" | "generating" | "finishing" =
     isUploading
@@ -158,12 +157,13 @@ export function AnalyzeWorkspace({
           ? "generating"
           : "finishing";
 
-  // ── Progress value to show for the analysis phase (25–99) ─────────────────
-  const analysisProgress =
-    analysisState.phase === "creating_record"
-      ? 30
+  // ── Overall progress value to show on the unified progress bar ────────────
+  const overallProgress = isUploading
+    ? Math.min(25, Math.max(5, Math.round(5 + (uploadState.progress / 100) * 20)))
+    : analysisState.phase === "creating_record"
+      ? 35
       : analysisState.phase === "analyzing"
-        ? 65
+        ? 70
         : 100;
 
   // ── Main handler ─────────────────────────────────────────────────────────
@@ -347,31 +347,30 @@ export function AnalyzeWorkspace({
     uploadState.errorMessage ?? analysisState.errorMessage ?? null;
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      {/* Top Utility Nav Bar */}
-      <TopNavBar userInitial={userInitial} userDisplayName={userDisplayName} />
+    <div className="space-y-4 sm:space-y-5">
+      {/* Top Utility Nav Bar with Back Link and Profile */}
+      <TopNavBar
+        userInitial={userInitial}
+        userDisplayName={userDisplayName}
+        backHref="/dashboard"
+        backLabel="Back to Dashboard"
+      />
 
-      {/* Page Header */}
-      <div className="space-y-1.5">
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#1a7fc4] transition-colors"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Dashboard</span>
-        </Link>
-
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
-          Analyze an Image
-        </h1>
-        <p className="text-xs sm:text-sm text-gray-500 max-w-3xl">
-          Upload an image to perform deep multi-evidence forensic analysis and uncover the truth behind its pixels.
-        </p>
-      </div>
+      {/* Page Header (hidden when results card is active to preserve viewport height) */}
+      {!forensicResult && (
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+            Analyze an Image
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 max-w-3xl">
+            Upload an image to perform deep multi-evidence forensic analysis and uncover the truth behind its pixels.
+          </p>
+        </div>
+      )}
 
       {/* 1. Upload Card & Selected Image Preview */}
-      {/* Hide the uploader once we have a result or are mid-analysis */}
-      {!forensicResult && !isAnalyzing && (
+      {/* Hide the uploader once we have a result or are mid-processing */}
+      {!forensicResult && !isProcessing && (
         <ImageUpload
           onImageSelected={(img) => {
             setSelectedImage(img);
@@ -382,32 +381,22 @@ export function AnalyzeWorkspace({
           selectedImage={selectedImage}
           onClearImage={handleClearImage}
           onStartAnalysis={handleStartAnalysis}
-          isAnalyzing={isUploading}
+          isAnalyzing={isProcessing}
           uploadState={uploadState}
         />
       )}
 
-      {/* 2. Upload Progress (while uploading to S3) */}
-      {isUploading && (
+      {/* 2. Unified Analysis Progress (Directly entered upon clicking Start Analysis) */}
+      {!forensicResult && isProcessing && (
         <AnalysisProgress
-          progress={uploadState.progress}
-          currentStage="uploading"
-          label="Uploading your image..."
-          subtitle="Securely transferring your image to PIXENTRA's private vault."
-        />
-      )}
-
-      {/* 3. Analysis Progress (after upload, while FastAPI is running) */}
-      {isAnalyzing && (
-        <AnalysisProgress
-          progress={analysisProgress}
+          progress={overallProgress}
           currentStage={currentStage}
           label="Analyzing your image..."
           subtitle="The forensic AI model is examining pixel patterns, noise residuals, DCT frequencies, and ELA. This may take up to 60 seconds."
         />
       )}
 
-      {/* 4. Error State (upload or analysis) */}
+      {/* 3. Error State (upload or analysis) */}
       {anyError && errorMessage && (
         <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200/80 rounded-xl text-xs sm:text-sm text-red-800 animate-fade-in">
           <svg className="w-4 h-4 text-red-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -426,34 +415,21 @@ export function AnalyzeWorkspace({
         </div>
       )}
 
-      {/* 5. Forensic Analysis Results */}
+      {/* 4. Forensic Analysis Results */}
       {forensicResult && (
         <AnalysisResults
           results={forensicResult}
+          onAnalyzeAnother={handleClearImage}
         />
       )}
 
-      {/* 6. Start Over after results */}
-      {forensicResult && (
-        <div className="flex justify-center">
-          <button
-            type="button"
-            onClick={handleClearImage}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-semibold text-gray-700 transition-colors shadow-2xs"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Analyze another image
-          </button>
-        </div>
-      )}
-
-      {/* 7. How PIXENTRA Works (hidden while analysis is running or result is shown) */}
-      {!isUploading && !isAnalyzing && !forensicResult && !anyError && (
+      {/* 5. How PIXENTRA Works (hidden while analysis is running or result is shown) */}
+      {!isProcessing && !forensicResult && !anyError && (
         <HowItWorks />
       )}
 
-      {/* 8. Privacy Reassurance Banner */}
-      {!isUploading && !isAnalyzing && !forensicResult && (
+      {/* 6. Privacy Reassurance Banner */}
+      {!isProcessing && !forensicResult && (
         <PrivacyCard />
       )}
     </div>

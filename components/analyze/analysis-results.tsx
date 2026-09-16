@@ -10,6 +10,7 @@ import {
   FileText,
   Copy,
   Check,
+  ArrowLeft,
 } from "lucide-react";
 import { ImageComparisonSlider } from "./image-comparison-slider";
 import type { ForensicAnalysisResult } from "./types";
@@ -18,12 +19,14 @@ interface AnalysisResultsProps {
   results: ForensicAnalysisResult;
   onDownloadReport?: () => void;
   onShare?: () => void;
+  onAnalyzeAnother?: () => void;
 }
 
 export function AnalysisResults({
   results,
   onDownloadReport,
   onShare,
+  onAnalyzeAnother,
 }: AnalysisResultsProps) {
   const [copied, setCopied] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -88,12 +91,12 @@ export function AnalysisResults({
     circumference - (results.forgeryRiskScore / 100) * circumference;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8 space-y-6 animate-fade-in">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 space-y-4 animate-fade-in">
       {/* Header Row: Title, Status, Completed Time, Action Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
         <div>
           <div className="flex items-center gap-2.5">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
               Analysis Results
             </h2>
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -101,7 +104,7 @@ export function AnalysisResults({
               Completed
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-0.5">
             Completed in {results.elapsedSeconds} seconds
           </p>
         </div>
@@ -111,7 +114,7 @@ export function AnalysisResults({
           <button
             type="button"
             onClick={handleDownloadClick}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs"
           >
             <Download className="w-3.5 h-3.5 text-gray-600" />
             <span>Download Report</span>
@@ -120,7 +123,7 @@ export function AnalysisResults({
           <button
             type="button"
             onClick={handleShareClick}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs"
           >
             {copied ? (
               <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -134,7 +137,7 @@ export function AnalysisResults({
             <button
               type="button"
               onClick={() => setShowMoreMenu(!showMoreMenu)}
-              className="p-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition-colors shadow-2xs"
+              className="p-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition-colors shadow-2xs"
               aria-label="More options"
             >
               <MoreHorizontal className="w-4 h-4 text-gray-600" />
@@ -169,9 +172,9 @@ export function AnalysisResults({
       </div>
 
       {/* Main 2-Column Results Body */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Visual Comparison Slider */}
-        <div className="lg:col-span-6 space-y-4">
+        <div className="lg:col-span-6 space-y-3">
           <ImageComparisonSlider
             originalImage={results.originalImageUrl}
             heatmapImage={results.localizationMapUrl}
@@ -179,9 +182,9 @@ export function AnalysisResults({
         </div>
 
         {/* Right Column: Verdict, Forgery Risk, Evidence Breakdown & AI Explanation */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-6 space-y-3.5">
           {/* Top Row: Verdict + Forgery Risk Gauge */}
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 p-4 rounded-2xl bg-gray-50/70 border border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-2xl bg-gray-50/70 border border-gray-100">
             {/* Verdict */}
             <div className="sm:col-span-8 flex flex-col justify-center space-y-1">
               <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
@@ -203,7 +206,7 @@ export function AnalysisResults({
               <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">
                 Forgery Risk Score
               </span>
-              <div className="relative w-20 h-20 flex items-center justify-center">
+              <div className="relative w-18 h-18 flex items-center justify-center">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
                   {/* Background Track */}
                   <circle
@@ -228,7 +231,7 @@ export function AnalysisResults({
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-lg font-black text-gray-900 tracking-tight">
+                  <span className="text-base font-black text-gray-900 tracking-tight">
                     {results.forgeryRiskScore}%
                   </span>
                 </div>
@@ -237,42 +240,42 @@ export function AnalysisResults({
           </div>
 
           {/* ML Metrics Row: Confidence + Detected Forged Area + Analysis Speed */}
-          <div className="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-blue-50/50 border border-blue-100/80">
-            <div className="flex flex-col items-center gap-1 text-center">
+          <div className="grid grid-cols-3 gap-2.5 p-3 rounded-2xl bg-blue-50/50 border border-blue-100/80">
+            <div className="flex flex-col items-center gap-0.5 text-center">
               <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Confidence</span>
-              <span className="text-lg sm:text-xl font-black text-[#1a7fc4]">{results.confidence}%</span>
+              <span className="text-base sm:text-lg font-black text-[#1a7fc4]">{results.confidence}%</span>
               <span className="text-[10px] text-gray-500">Model certainty</span>
             </div>
-            <div className="flex flex-col items-center gap-1 text-center border-x border-blue-100">
+            <div className="flex flex-col items-center gap-0.5 text-center border-x border-blue-100">
               <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Forged Area</span>
-              <span className="text-lg sm:text-xl font-black text-orange-500">{results.forgeryPixelFraction}%</span>
+              <span className="text-base sm:text-lg font-black text-orange-500">{results.forgeryPixelFraction}%</span>
               <span className="text-[10px] text-gray-500">Detected pixels</span>
             </div>
-            <div className="flex flex-col items-center gap-1 text-center">
+            <div className="flex flex-col items-center gap-0.5 text-center">
               <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Speed</span>
-              <span className="text-lg sm:text-xl font-black text-emerald-600">{results.elapsedSeconds}s</span>
+              <span className="text-base sm:text-lg font-black text-emerald-600">{results.elapsedSeconds}s</span>
               <span className="text-[10px] text-gray-500">Analysis time</span>
             </div>
           </div>
 
           {/* Bottom Row: Evidence Breakdown + AI Explanation */}
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-start">
             {/* Evidence Breakdown */}
-            <div className="sm:col-span-6 space-y-3">
-              <h4 className="text-xs sm:text-sm font-bold text-gray-900">
+            <div className="sm:col-span-6 space-y-2.5">
+              <h4 className="text-xs font-bold text-gray-900">
                 Evidence Breakdown
               </h4>
 
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {evidenceItems.map((item) => (
-                  <div key={item.name} className="space-y-1">
+                  <div key={item.name} className="space-y-0.5">
                     <div className="flex items-center justify-between text-xs font-medium text-gray-700">
-                      <span className="truncate pr-2">{item.name}</span>
-                      <span className="font-semibold text-gray-900 shrink-0">
+                      <span className="truncate pr-2 text-[11px]">{item.name}</span>
+                      <span className="font-semibold text-gray-900 shrink-0 text-[11px]">
                         {item.score}%
                       </span>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
                       <div
                         className={`${item.color} h-full rounded-full transition-all duration-700 ease-out`}
                         style={{ width: `${item.score}%` }}
@@ -284,16 +287,16 @@ export function AnalysisResults({
             </div>
 
             {/* AI Explanation */}
-            <div className="sm:col-span-6 space-y-3">
-              <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[#1a7fc4]" />
-                <h4 className="text-xs sm:text-sm font-bold text-gray-900">
+            <div className="sm:col-span-6 space-y-2.5">
+              <div className="flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-[#1a7fc4]" />
+                <h4 className="text-xs font-bold text-gray-900">
                   AI Explanation
                 </h4>
               </div>
 
-              <div className="p-3.5 bg-gray-50/80 rounded-xl border border-gray-100">
-                <p className="text-xs text-gray-600 leading-relaxed">
+              <div className="p-3 bg-gray-50/80 rounded-xl border border-gray-100">
+                <p className="text-[11px] sm:text-xs text-gray-600 leading-relaxed">
                   {results.aiExplanation}
                 </p>
               </div>
@@ -301,6 +304,20 @@ export function AnalysisResults({
           </div>
         </div>
       </div>
+
+      {/* Action: Analyze Another Image inside the Result Card directly below main content */}
+      {onAnalyzeAnother && (
+        <div className="pt-4 border-t border-gray-100 flex justify-center">
+          <button
+            type="button"
+            onClick={onAnalyzeAnother}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-xs sm:text-sm font-semibold text-gray-700 hover:text-gray-900 transition-all shadow-2xs hover:shadow-xs active:scale-[0.98]"
+          >
+            <ArrowLeft className="w-4 h-4 text-gray-500" />
+            <span>Analyze Another Image</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

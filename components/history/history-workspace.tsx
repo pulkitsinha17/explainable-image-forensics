@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft,
   PlusCircle,
   Search,
   ChevronDown,
@@ -266,23 +265,18 @@ export function HistoryWorkspace({
   };
 
   return (
-    <div className="space-y-5 sm:space-y-6">
-      {/* Top Application Header */}
+    <div className="space-y-4 sm:space-y-5">
+      {/* Top Utility Nav Bar with Back Link and Profile */}
       <TopNavBar
         userInitial={userInitial}
         userDisplayName={userDisplayName}
+        backHref="/dashboard"
+        backLabel="Back to Dashboard"
       />
 
-      {/* Breadcrumb & Main Heading Row */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Main Heading Row & Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#1a7fc4] transition-colors mb-2 group"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
-            <span>Back to Dashboard</span>
-          </Link>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
             Analysis History
           </h1>
