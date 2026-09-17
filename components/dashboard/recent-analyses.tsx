@@ -1,44 +1,74 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ImageIcon, CheckCircle2, AlertTriangle, HelpCircle } from "lucide-react";
+import type { CompletedAnalysisRecord } from "@/components/history/types";
 
-export interface RecentAnalysisItem {
-  id: string;
-  filename: string;
-  thumbnailUrl?: string;
-  verdict?: "authentic" | "forged" | "inconclusive" | string;
-  riskScore?: number;
-  createdAt: string | Date;
-}
+export type RecentAnalysisItem = CompletedAnalysisRecord;
 
 interface RecentAnalysesProps {
   analyses?: RecentAnalysisItem[];
 }
 
-function getVerdictBadge(verdict?: string, riskScore?: number) {
-  const score = riskScore ?? 0;
-  if (verdict === "authentic" || score < 0.35) {
+function getRelativeTime(timestamp?: number): string {
+  if (!timestamp) return "";
+  const now = Date.now();
+  const diffMs = now - timestamp;
+  if (diffMs < 0) return "Just now";
+
+  const diffSec = Math.floor(diffMs / 1000);
+  if (diffSec < 60) return "Just now";
+
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin} min${diffMin === 1 ? "" : "s"} ago`;
+
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
+
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 30) return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
+
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths < 12) return `${diffMonths} month${diffMonths === 1 ? "" : "s"} ago`;
+
+  const diffYears = Math.floor(diffDays / 365);
+  return `${diffYears} year${diffYears === 1 ? "" : "s"} ago`;
+}
+
+function getVerdictBadge(item: RecentAnalysisItem) {
+  const isForged =
+    item.verdict === "forged" ||
+    item.verdictLabel === "Likely Manipulated" ||
+    item.verdictLabel === "Potentially Forged" ||
+    item.verdictLabel === "Manipulated";
+
+  const isAuthentic =
+    item.verdict === "authentic" ||
+    item.verdictLabel === "Appears Authentic" ||
+    item.verdictLabel === "Authenticated" ||
+    item.verdictLabel === "Likely Authentic";
+
+  if (isForged) {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70">
-        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-        Likely Authentic
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200/70 whitespace-nowrap">
+        <AlertTriangle className="w-3 h-3 text-rose-600 shrink-0" />
+        {item.verdictLabel || "Likely Manipulated"}
       </span>
     );
   }
 
-  if (verdict === "forged" || score >= 0.65) {
+  if (isAuthentic) {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200/70">
-        <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-        Likely Manipulated
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/70 whitespace-nowrap">
+        <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+        {item.verdictLabel || "Appears Authentic"}
       </span>
     );
   }
 
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/70">
-      <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
-      Suspicious
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-[#1a7fc4] border border-blue-200/70 whitespace-nowrap">
+      <HelpCircle className="w-3 h-3 text-[#1a7fc4] shrink-0" />
+      {item.verdictLabel || "Inconclusive"}
     </span>
   );
 }
@@ -49,7 +79,7 @@ export function RecentAnalyses({ analyses = [] }: RecentAnalysesProps) {
   return (
     <div className="bg-white rounded-3xl border border-gray-100/90 p-6 sm:p-7 shadow-xs flex flex-col justify-between h-full">
       {/* Header */}
-      <div className="flex items-center justify-between pb-5 border-b border-gray-100">
+      <div className="flex items-center justify-between pb-4 border-b border-gray-100">
         <div>
           <h3 className="text-base sm:text-lg font-bold text-gray-900">
             Recent Analyses
@@ -65,7 +95,7 @@ export function RecentAnalyses({ analyses = [] }: RecentAnalysesProps) {
       </div>
 
       {/* Content */}
-      <div className="py-6 flex-1 flex flex-col justify-center">
+      <div className="pt-3 flex-1 flex flex-col justify-center">
         {!hasAnalyses ? (
           /* Empty State */
           <div className="py-8 sm:py-10 px-4 text-center flex flex-col items-center justify-center max-w-sm mx-auto">
@@ -91,62 +121,92 @@ export function RecentAnalyses({ analyses = [] }: RecentAnalysesProps) {
           </div>
         ) : (
           /* Table of recent items */
-          <div className="overflow-x-auto -mx-6 px-6">
-            <table className="w-full text-left text-xs sm:text-sm">
+          <div className="w-full">
+            <table className="w-full text-left text-xs sm:text-sm table-auto">
               <thead>
                 <tr className="border-b border-gray-100 text-gray-400 text-[11px] uppercase tracking-wider font-semibold">
-                  <th className="pb-3 pl-2">Evidence</th>
-                  <th className="pb-3">Verdict</th>
-                  <th className="pb-3">Risk Score</th>
-                  <th className="pb-3 pr-2 text-right">Date</th>
+                  <th className="pb-2.5 pl-1">Evidence</th>
+                  <th className="pb-2.5 text-left">Verdict</th>
+                  <th className="pb-2.5 text-center px-2">Score</th>
+                  <th className="pb-2.5 pr-1 text-right">Date</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {analyses.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="hover:bg-gray-50/60 transition-colors group cursor-pointer"
-                  >
-                    <td className="py-3.5 pl-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-gray-100 overflow-hidden relative shrink-0 border border-gray-200/60">
-                          {item.thumbnailUrl ? (
-                            <Image
-                              src={item.thumbnailUrl}
-                              alt={item.filename}
-                              fill
-                              unoptimized
-                              className="object-cover"
-                            />
+                {analyses.map((item) => {
+                  const scoreDisplay =
+                    item.forgeryAnomalyScore !== null && item.forgeryAnomalyScore !== undefined
+                      ? `${item.forgeryAnomalyScore}%`
+                      : typeof item.riskScore === "number" && item.riskScore >= 0
+                      ? `${item.riskScore}%`
+                      : "—";
+
+                  return (
+                    <tr
+                      key={item.id}
+                      className="hover:bg-gray-50/60 transition-colors group cursor-pointer"
+                    >
+                      <td className="py-2.5 pl-1">
+                        <Link
+                          href={`/report/${item.id}?from=dashboard`}
+                          className="flex items-center gap-2.5 min-w-0"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-gray-100 overflow-hidden relative shrink-0 border border-gray-200/60 shadow-2xs">
+                            {item.thumbnailUrl ? (
+                              <Image
+                                src={item.thumbnailUrl}
+                                alt={item.filename}
+                                fill
+                                unoptimized
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50">
+                                <ImageIcon className="w-3.5 h-3.5" />
+                              </div>
+                            )}
+                          </div>
+                          <span className="font-medium text-gray-900 group-hover:text-[#1a7fc4] transition-colors truncate max-w-[110px] sm:max-w-[150px]">
+                            {item.filename}
+                          </span>
+                        </Link>
+                      </td>
+                      <td className="py-2.5 text-left">
+                        <Link href={`/report/${item.id}?from=dashboard`}>
+                          {getVerdictBadge(item)}
+                        </Link>
+                      </td>
+                      <td className="py-2.5 text-center px-2">
+                        <Link href={`/report/${item.id}?from=dashboard`}>
+                          <span className="font-semibold text-gray-800 text-xs">
+                            {scoreDisplay}
+                          </span>
+                        </Link>
+                      </td>
+                      <td className="py-2.5 pr-1 text-right">
+                        <Link
+                          href={`/report/${item.id}?from=dashboard`}
+                          className="inline-block text-right"
+                        >
+                          {item.analyzedTimestamp ? (
+                            <>
+                              <span className="block font-medium text-gray-700 text-xs whitespace-nowrap">
+                                {new Date(item.analyzedTimestamp).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </span>
+                              <span className="block text-[10px] text-gray-400 font-normal whitespace-nowrap leading-none mt-0.5">
+                                {getRelativeTime(item.analyzedTimestamp)}
+                              </span>
+                            </>
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                              <ImageIcon className="w-4 h-4" />
-                            </div>
+                            <span className="text-xs text-gray-400">—</span>
                           )}
-                        </div>
-                        <span className="font-medium text-gray-900 group-hover:text-[#1a7fc4] transition-colors truncate max-w-[150px] sm:max-w-[200px]">
-                          {item.filename}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-3.5">
-                      {getVerdictBadge(item.verdict, item.riskScore)}
-                    </td>
-                    <td className="py-3.5">
-                      <span className="font-semibold text-gray-800">
-                        {item.riskScore !== undefined
-                          ? `${Math.round(item.riskScore * 100)}%`
-                          : "—"}
-                      </span>
-                    </td>
-                    <td className="py-3.5 pr-2 text-right text-xs text-gray-400">
-                      {new Date(item.createdAt).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </td>
-                  </tr>
-                ))}
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -155,3 +215,6 @@ export function RecentAnalyses({ analyses = [] }: RecentAnalysesProps) {
     </div>
   );
 }
+
+
+

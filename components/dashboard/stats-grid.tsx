@@ -40,15 +40,15 @@ export function StatsGrid({ stats }: StatsGridProps) {
       iconBg: "bg-rose-50/80 border border-rose-100/60",
     },
     {
-      label: "Average Risk Score",
+      label: "Average Forgery Anomaly Score",
       value:
         stats && stats.averageRiskScore !== null
-          ? `${Math.round(stats.averageRiskScore * 100)}%`
+          ? `${stats.averageRiskScore}%`
           : "—",
       subtext:
         stats && stats.averageRiskScore !== null
           ? "Across all investigations"
-          : "Not available yet",
+          : "No analyses yet",
       icon: Percent,
       iconColor: "text-purple-600",
       iconBg: "bg-purple-50/80 border border-purple-100/60",

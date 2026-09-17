@@ -1,7 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { connectToDatabase } from "@/lib/mongodb";
-import Analysis from "@/models/Analysis";
+import { getUserAnalysisHistory } from "@/lib/history";
 
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -33,7 +32,7 @@ export default async function DashboardPage() {
   const userEmail = user?.emailAddresses?.[0]?.emailAddress;
   const userImageUrl = user?.imageUrl;
 
-  // Fetch real statistics & recent analyses from MongoDB if available
+  // Fetch real statistics & recent analyses from canonical history source of truth
   let stats: DashboardStats = {
     totalAnalyses: 0,
     analysesThisMonth: 0,
@@ -44,79 +43,23 @@ export default async function DashboardPage() {
   let recentAnalyses: RecentAnalysisItem[] = [];
 
   try {
-    if (process.env.MONGODB_URI) {
-      await connectToDatabase();
+    const historyData = await getUserAnalysisHistory(userId);
+    stats = {
+      totalAnalyses: historyData.stats.totalAnalyses,
+      analysesThisMonth: historyData.analysesThisMonth,
+      manipulatedDetected: historyData.stats.potentiallyForgedCount,
+      averageRiskScore:
+        historyData.stats.completedCount > 0
+          ? historyData.stats.averageRiskPercentage
+          : null,
+    };
 
-      const [totalCount, docs] = await Promise.all([
-        Analysis.countDocuments({ clerkUserId: userId }),
-        Analysis.find({ clerkUserId: userId })
-          .sort({ createdAt: -1 })
-          .limit(5)
-          .lean(),
-      ]);
-
-      if (totalCount > 0) {
-        const startOfMonth = new Date();
-        startOfMonth.setDate(1);
-        startOfMonth.setHours(0, 0, 0, 0);
-
-        const [monthCount, manipulatedCount, scoredDocs] = await Promise.all([
-          Analysis.countDocuments({
-            clerkUserId: userId,
-            createdAt: { $gte: startOfMonth },
-          }),
-          Analysis.countDocuments({
-            clerkUserId: userId,
-            $or: [
-              { detectionResult: "forged" },
-              { forgeryRiskScore: { $gte: 0.65 } },
-            ],
-          }),
-          Analysis.find(
-            {
-              clerkUserId: userId,
-              forgeryRiskScore: { $exists: true, $ne: null },
-            },
-            { forgeryRiskScore: 1 }
-          ).lean(),
-        ]);
-
-        let avgRisk: number | null = null;
-        if (scoredDocs.length > 0) {
-          const totalScore = scoredDocs.reduce<number>(
-            (sum, item) =>
-              sum + (typeof item.forgeryRiskScore === "number" ? item.forgeryRiskScore : 0),
-            0
-          );
-          avgRisk = totalScore / scoredDocs.length;
-        }
-
-        stats = {
-          totalAnalyses: totalCount,
-          analysesThisMonth: monthCount,
-          manipulatedDetected: manipulatedCount,
-          averageRiskScore: avgRisk,
-        };
-
-        recentAnalyses = (docs as Array<{
-          _id: { toString(): string };
-          originalFilename: string;
-          detectionResult?: string;
-          forgeryRiskScore?: number;
-          createdAt: string | Date;
-        }>).map((doc) => ({
-          id: doc._id.toString(),
-          filename: doc.originalFilename || "Untitled scan",
-          verdict: doc.detectionResult,
-          riskScore: doc.forgeryRiskScore,
-          createdAt: doc.createdAt,
-        }));
-      }
-    }
+    recentAnalyses = historyData.records.slice(0, 5);
   } catch (error) {
     // Fail gracefully with clean zero-state without crashing the dashboard
     console.warn("Dashboard analysis data fetch fallback:", error);
   }
+
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-gray-900 flex flex-col lg:flex-row antialiased">
