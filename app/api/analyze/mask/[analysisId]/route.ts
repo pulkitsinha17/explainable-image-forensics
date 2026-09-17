@@ -48,7 +48,7 @@ export async function GET(
   // 3. Look up the record in MongoDB
   await connectToDatabase();
   const record = await Analysis.findById(analysisId).select(
-    "clerkUserId overlayPath status"
+    "clerkUserId overlayPath maskPath status"
   );
 
   if (!record) {
@@ -60,22 +60,28 @@ export async function GET(
     return new NextResponse("Forbidden", { status: 403 });
   }
 
-  // 5. Check that the overlay exists
-  const overlayPath: string | undefined | null = record.overlayPath as string | undefined | null;
-  if (!overlayPath) {
-    return new NextResponse("Overlay not available for this analysis", {
-      status: 404,
-    });
+  // 5. Check requested asset (default: overlay; ?type=mask: binary mask)
+  const { searchParams } = new URL(_req.url);
+  const isMask = searchParams.get("type") === "mask";
+  const targetPath: string | undefined | null = (
+    isMask ? record.maskPath : record.overlayPath
+  ) as string | undefined | null;
+
+  if (!targetPath) {
+    return new NextResponse(
+      `${isMask ? "Mask" : "Overlay"} not available for this analysis`,
+      { status: 404 }
+    );
   }
 
   // 6. Path traversal guard — resolve and confirm it is inside OUTPUTS_ROOT
-  const resolvedPath = path.resolve(overlayPath);
+  const resolvedPath = path.resolve(targetPath);
   if (!resolvedPath.startsWith(OUTPUTS_ROOT + path.sep) &&
       !resolvedPath.startsWith(OUTPUTS_ROOT + "/") &&
       resolvedPath !== OUTPUTS_ROOT) {
     console.error(
-      "[mask] Path traversal attempt blocked. overlayPath=%s resolvedPath=%s OUTPUTS_ROOT=%s",
-      overlayPath,
+      "[mask] Path traversal attempt blocked. targetPath=%s resolvedPath=%s OUTPUTS_ROOT=%s",
+      targetPath,
       resolvedPath,
       OUTPUTS_ROOT
     );

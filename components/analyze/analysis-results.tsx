@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { ImageComparisonSlider } from "./image-comparison-slider";
 import type { ForensicAnalysisResult } from "./types";
+import { downloadForensicPdfReport } from "@/lib/pdf/generate-forensic-report";
 
 interface AnalysisResultsProps {
   results: ForensicAnalysisResult;
@@ -30,6 +31,7 @@ export function AnalysisResults({
 }: AnalysisResultsProps) {
   const [copied, setCopied] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const handleShareClick = () => {
     if (onShare) {
@@ -43,11 +45,18 @@ export function AnalysisResults({
     }
   };
 
-  const handleDownloadClick = () => {
+  const handleDownloadClick = async () => {
     if (onDownloadReport) {
       onDownloadReport();
-    } else {
-      // Generate a formatted summary download
+      return;
+    }
+
+    try {
+      setIsGeneratingPdf(true);
+      await downloadForensicPdfReport(results);
+    } catch (err) {
+      console.error("Failed to generate forensic PDF report:", err);
+      // Graceful fallback download
       const reportContent = `PIXENTRA IMAGE FORENSIC REPORT\n===============================\nVerdict: ${results.verdictLabel}\nForgery Anomaly Score: ${results.forgeryRiskScore}%\nPrediction Certainty: ${results.confidence}%\nCompleted in: ${results.elapsedSeconds} seconds\n\nEVIDENCE BREAKDOWN:\n- Compression: ${results.evidence.compression}%\n- Frequency / Noise: ${results.evidence.frequencyNoise}%\n- Local Statistics: ${results.evidence.statistics}%\n- Error Level Analysis (ELA): ${results.evidence.ela}%\n- Metadata: ${results.evidence.metadata}%\n\nAI EXPLANATION:\n${results.aiExplanation}\n\nGenerated with PIXENTRA — See Beyond the Pixels\n`;
       const blob = new Blob([reportContent], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
@@ -56,6 +65,8 @@ export function AnalysisResults({
       link.download = `pixentra-forensic-report-${Date.now()}.txt`;
       link.click();
       URL.revokeObjectURL(url);
+    } finally {
+      setIsGeneratingPdf(false);
     }
   };
 
@@ -118,10 +129,11 @@ export function AnalysisResults({
           <button
             type="button"
             onClick={handleDownloadClick}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs"
+            disabled={isGeneratingPdf}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-60 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer disabled:cursor-not-allowed"
           >
-            <Download className="w-3.5 h-3.5 text-gray-600" />
-            <span>Download Report</span>
+            <Download className={`w-3.5 h-3.5 text-gray-600 ${isGeneratingPdf ? "animate-pulse" : ""}`} />
+            <span>{isGeneratingPdf ? "Generating PDF..." : "Download Report"}</span>
           </button>
 
           <button

@@ -211,9 +211,12 @@ export async function POST(req: NextRequest) {
   }
 
   // 8. Build a sanitised client response — NO filesystem paths
-  //    The overlay image is served via /api/analyze/mask/[analysisId]
+  //    The overlay image and binary mask are served via /api/analyze/mask/[analysisId]
   const hasOverlay = Boolean(
     mlAnalysis.localization.overlay_path && record.overlayPath
+  );
+  const hasMask = Boolean(
+    mlAnalysis.localization.mask_path && record.maskPath
   );
 
   return NextResponse.json({
@@ -228,9 +231,12 @@ export async function POST(req: NextRequest) {
       evidence: mlAnalysis.evidence,
       localization: {
         forgery_pixel_fraction: mlAnalysis.localization.forgery_pixel_fraction,
-        // Safe URL — no filesystem path exposed
+        // Safe URLs — no filesystem path exposed
         overlay_url: hasOverlay
           ? `/api/analyze/mask/${analysisId}`
+          : null,
+        mask_url: hasMask
+          ? `/api/analyze/mask/${analysisId}?type=mask`
           : null,
       },
     },

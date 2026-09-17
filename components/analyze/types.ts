@@ -35,6 +35,14 @@ export interface ForensicAnalysisResult {
   aiExplanation: string;
   originalImageUrl: string;
   localizationMapUrl: string;
+  maskMapUrl?: string;
+  analysisId?: string;
+  imageMetadata?: {
+    name?: string;
+    dimensions?: string;
+    sizeFormatted?: string;
+    format?: string;
+  };
   elapsedSeconds: number;
 }
 
@@ -94,5 +102,6 @@ export interface MLRunResult {
   localization: {
     forgery_pixel_fraction: number;
     overlay_url: string | null;  // /api/analyze/mask/{analysisId}
+    mask_url?: string | null;     // /api/analyze/mask/{analysisId}?type=mask
   };
 }

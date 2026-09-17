@@ -28,7 +28,8 @@ function toForensicResult(
   mlResult: MLRunResult,
   analysisId: string,
   originalImageUrl: string,
-  elapsedSeconds: number
+  elapsedSeconds: number,
+  selectedImageData?: SelectedImageData | null
 ): ForensicAnalysisResult {
   const riskPct = Math.round(mlResult.risk_score * 100);
   const ev = mlResult.evidence;
@@ -101,6 +102,18 @@ function toForensicResult(
     aiExplanation,
     originalImageUrl,
     localizationMapUrl: mlResult.localization.overlay_url ?? "",
+    maskMapUrl:
+      mlResult.localization.mask_url ??
+      (analysisId ? `/api/analyze/mask/${analysisId}?type=mask` : undefined),
+    analysisId,
+    imageMetadata: selectedImageData
+      ? {
+          name: selectedImageData.name,
+          dimensions: selectedImageData.dimensions,
+          sizeFormatted: selectedImageData.sizeFormatted,
+          format: selectedImageData.format,
+        }
+      : undefined,
     elapsedSeconds,
   };
 }
@@ -323,7 +336,8 @@ export function AnalyzeWorkspace({
         json.result,
         analysisId,
         selectedImage.previewUrl,
-        elapsedSeconds
+        elapsedSeconds,
+        selectedImage
       );
 
       setForensicResult(result);
