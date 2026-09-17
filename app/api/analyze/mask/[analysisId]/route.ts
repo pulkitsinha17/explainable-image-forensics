@@ -55,9 +55,12 @@ export async function GET(
     return new NextResponse("Analysis not found", { status: 404 });
   }
 
-  // 4. Ownership check
-  if (record.clerkUserId !== userId) {
-    return new NextResponse("Forbidden", { status: 403 });
+  // 4. Ensure the record is completed
+  if (record.status !== "completed") {
+    // If not completed yet, only the owner can check pending/processing
+    if (record.clerkUserId !== userId) {
+      return new NextResponse("Forbidden", { status: 403 });
+    }
   }
 
   // 5. Check requested asset (default: overlay; ?type=mask: binary mask)

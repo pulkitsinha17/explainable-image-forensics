@@ -1,11 +1,11 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { AnalysisDetailViewer } from "./analysis-detail-viewer";
+import { ReportViewer } from "./report-viewer";
 
 export const dynamic = "force-dynamic";
 
-export default async function AnalysisDetailPage({
+export default async function ViewReportPage({
   params,
 }: {
   params: Promise<{ analysisId: string }>;
@@ -42,10 +42,10 @@ export default async function AnalysisDetailPage({
         }}
       />
 
-      {/* Main Analysis Container */}
+      {/* Main Content Area */}
       <div className="flex-1 min-w-0 flex flex-col">
         <main className="flex-1 p-4 sm:p-6 lg:p-7 max-w-7xl w-full mx-auto animate-fade-in">
-          <AnalysisDetailViewer analysisId={analysisId} />
+          <ReportViewer analysisId={analysisId} />
         </main>
       </div>
     </div>

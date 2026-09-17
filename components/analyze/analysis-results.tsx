@@ -4,13 +4,13 @@ import { useState } from "react";
 import {
   Download,
   Share2,
-  MoreHorizontal,
   CheckCircle2,
   AlertTriangle,
   FileText,
-  Copy,
   Check,
   ArrowLeft,
+  ThumbsUp,
+  ThumbsDown,
 } from "lucide-react";
 import { ImageComparisonSlider } from "./image-comparison-slider";
 import type { ForensicAnalysisResult } from "./types";
@@ -18,6 +18,7 @@ import { downloadForensicPdfReport } from "@/lib/pdf/generate-forensic-report";
 
 interface AnalysisResultsProps {
   results: ForensicAnalysisResult;
+  onViewReport?: () => void;
   onDownloadReport?: () => void;
   onShare?: () => void;
   onAnalyzeAnother?: () => void;
@@ -25,22 +26,47 @@ interface AnalysisResultsProps {
 
 export function AnalysisResults({
   results,
+  onViewReport,
   onDownloadReport,
   onShare,
   onAnalyzeAnother,
 }: AnalysisResultsProps) {
   const [copied, setCopied] = useState(false);
-  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  const handleShareClick = () => {
+  // Feedback state
+  const [feedbackRating, setFeedbackRating] = useState<"useful" | "not_useful" | null>(null);
+  const [feedbackComment, setFeedbackComment] = useState("");
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+
+  const handleViewReport = () => {
+    if (onViewReport) {
+      onViewReport();
+    } else if (results.analysisId) {
+      window.open(`/report/${results.analysisId}`, "_blank");
+    }
+  };
+
+  const handleShareClick = async () => {
     if (onShare) {
       onShare();
-    } else {
-      if (typeof navigator !== "undefined" && navigator.clipboard) {
-        navigator.clipboard.writeText(window.location.href);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+      return;
+    }
+
+    if (typeof window !== "undefined") {
+      const origin =
+        window.location.origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+      const shareUrl = `${origin}/analysis/${results.analysisId || ""}`;
+
+      if (navigator.clipboard) {
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2500);
+        } catch (err) {
+          console.error("Failed to copy link:", err);
+        }
       }
     }
   };
@@ -67,6 +93,33 @@ export function AnalysisResults({
       URL.revokeObjectURL(url);
     } finally {
       setIsGeneratingPdf(false);
+    }
+  };
+
+  const handleFeedbackSubmit = async () => {
+    if (!feedbackRating || !results.analysisId) return;
+
+    try {
+      setIsSubmittingFeedback(true);
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          analysisId: results.analysisId,
+          rating: feedbackRating,
+          comment: feedbackComment.trim() || undefined,
+        }),
+      });
+
+      if (res.ok) {
+        setFeedbackSubmitted(true);
+      } else {
+        console.error("Failed to submit feedback:", await res.text());
+      }
+    } catch (err) {
+      console.error("Feedback submit error:", err);
+    } finally {
+      setIsSubmittingFeedback(false);
     }
   };
 
@@ -124,8 +177,17 @@ export function AnalysisResults({
           </p>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons: [ View Report ] [ Download Report ] [ Share ] */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={handleViewReport}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer"
+          >
+            <FileText className="w-3.5 h-3.5 text-gray-600" />
+            <span>View Report</span>
+          </button>
+
           <button
             type="button"
             onClick={handleDownloadClick}
@@ -139,51 +201,15 @@ export function AnalysisResults({
           <button
             type="button"
             onClick={handleShareClick}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer"
           >
             {copied ? (
               <Check className="w-3.5 h-3.5 text-emerald-600" />
             ) : (
               <Share2 className="w-3.5 h-3.5 text-gray-600" />
             )}
-            <span>{copied ? "Copied!" : "Share"}</span>
+            <span>{copied ? "Analysis link copied" : "Share"}</span>
           </button>
-
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowMoreMenu(!showMoreMenu)}
-              className="p-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition-colors shadow-2xs"
-              aria-label="More options"
-            >
-              <MoreHorizontal className="w-4 h-4 text-gray-600" />
-            </button>
-
-            {showMoreMenu && (
-              <div className="absolute right-0 top-full mt-1.5 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-30 text-xs text-gray-700">
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleShareClick();
-                    setShowMoreMenu(false);
-                  }}
-                  className="w-full px-3.5 py-2 text-left hover:bg-gray-50 flex items-center gap-2"
-                >
-                  <Copy className="w-3.5 h-3.5 text-gray-500" /> Copy Analysis Link
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.print();
-                    setShowMoreMenu(false);
-                  }}
-                  className="w-full px-3.5 py-2 text-left hover:bg-gray-50 flex items-center gap-2"
-                >
-                  <FileText className="w-3.5 h-3.5 text-gray-500" /> Print Summary
-                </button>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
@@ -331,6 +357,77 @@ export function AnalysisResults({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Feedback Section — Large rounded horizontal card */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gray-50/70 border border-gray-100 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h4 className="text-xs sm:text-sm font-bold text-gray-900">Was this analysis useful?</h4>
+            <p className="text-[11px] sm:text-xs text-gray-500">Your feedback helps us improve our system.</p>
+          </div>
+          {feedbackSubmitted && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100 animate-fade-in">
+              <CheckCircle2 className="w-4 h-4" />
+              Thanks for your feedback!
+            </span>
+          )}
+        </div>
+
+        {!feedbackSubmitted ? (
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            {/* Useful & Not Useful Buttons on the Left */}
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => setFeedbackRating("useful")}
+                className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+                  feedbackRating === "useful"
+                    ? "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-xs"
+                    : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                <ThumbsUp className={`w-3.5 h-3.5 ${feedbackRating === "useful" ? "text-emerald-600" : "text-gray-500"}`} />
+                <span>Useful</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFeedbackRating("not_useful")}
+                className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+                  feedbackRating === "not_useful"
+                    ? "bg-red-50 border-red-300 text-red-700 shadow-xs"
+                    : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                <ThumbsDown className={`w-3.5 h-3.5 ${feedbackRating === "not_useful" ? "text-red-600" : "text-gray-500"}`} />
+                <span>Not Useful</span>
+              </button>
+            </div>
+
+            {/* Wider Text Input Field */}
+            <div className="flex-1 min-w-0">
+              <input
+                type="text"
+                value={feedbackComment}
+                onChange={(e) => setFeedbackComment(e.target.value)}
+                placeholder="Tell us your feedback (optional)..."
+                maxLength={1000}
+                className="w-full px-4 py-2 text-xs rounded-xl border border-gray-200 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-2xs"
+              />
+            </div>
+
+            {/* Submit Button placed CLOSE right beside input */}
+            <button
+              type="button"
+              disabled={!feedbackRating || isSubmittingFeedback}
+              onClick={handleFeedbackSubmit}
+              className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-xs shrink-0 cursor-pointer"
+            >
+              {isSubmittingFeedback ? "Submitting..." : "Submit"}
+            </button>
+          </div>
+        ) : null}
       </div>
 
       {/* Action: Analyze Another Image inside the Result Card directly below main content */}

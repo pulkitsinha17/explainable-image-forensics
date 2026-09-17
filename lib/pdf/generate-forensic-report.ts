@@ -167,10 +167,10 @@ function drawVerdictIcon(doc: jsPDF, cx: number, cy: number, r: number, verdict:
   }
 }
 
-/** Generate and trigger download of the single-page A4 forensic report */
-export async function downloadForensicPdfReport(
+/** Build jsPDF instance for the single-page A4 forensic report (reusable across viewer & downloader) */
+export async function buildForensicPdfDoc(
   results: ForensicAnalysisResult
-): Promise<void> {
+): Promise<jsPDF> {
   const doc = new jsPDF({
     orientation: "portrait",
     unit: "mm",
@@ -754,6 +754,16 @@ export async function downloadForensicPdfReport(
   doc.setTextColor(COLORS.textMuted[0], COLORS.textMuted[1], COLORS.textMuted[2]);
   doc.text("Automated Image Forensics System", marginX + contentWidth, footerY + 8.5, { align: "right" });
 
-  // ── Save PDF (Strictly 1 Page) ────────────────────────────────────────────
+  // ── Return jsPDF Document ────────────────────────────────────────────────
+  return doc;
+}
+
+/** Generate and trigger download of the single-page A4 forensic report */
+export async function downloadForensicPdfReport(
+  results: ForensicAnalysisResult
+): Promise<void> {
+  const doc = await buildForensicPdfDoc(results);
+  const reportId = `PX-${(results.analysisId || Date.now().toString()).slice(-8).toUpperCase()}`;
   doc.save(`pixentra-forensic-report-${reportId}.pdf`);
 }
+
