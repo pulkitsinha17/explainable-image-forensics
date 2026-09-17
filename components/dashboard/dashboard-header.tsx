@@ -53,6 +53,8 @@ export function DashboardHeader({
         {/* Profile Avatar (w-10 h-10) */}
         <div className="flex items-center pl-1">
           <UserButton
+            userProfileMode="navigation"
+            userProfileUrl="/settings"
             appearance={{
               elements: {
                 avatarBox:

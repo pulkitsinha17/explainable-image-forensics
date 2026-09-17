@@ -35,6 +35,8 @@ export function TopNavBar({
       {/* Clerk User Avatar - Enlarged to 40px (w-10 h-10) */}
       <div className="flex items-center">
         <UserButton
+          userProfileMode="navigation"
+          userProfileUrl="/settings"
           appearance={{
             elements: {
               avatarBox:

@@ -25,7 +25,7 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ user }: DashboardSidebarProps) {
   const pathname = usePathname();
-  const { signOut, openUserProfile } = useClerk();
+  const { signOut } = useClerk();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const primaryNavItems = [
@@ -143,9 +143,9 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       {/* User Information & Sign Out */}
       <div className="p-4 border-t border-gray-100 space-y-2">
         {/* User profile card */}
-        <button
-          type="button"
-          onClick={() => openUserProfile()}
+        <Link
+          href="/settings"
+          onClick={() => setMobileOpen(false)}
           className="w-full flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 bg-gray-50/60 hover:bg-gray-100/80 transition-colors text-left group"
           title="Manage account settings"
         >
@@ -167,9 +167,9 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             <p className="text-xs font-semibold text-gray-900 truncate group-hover:text-[#1a7fc4] transition-colors">
               {user.displayName}
             </p>
-            <p className="text-[11px] text-gray-500 truncate">View profile</p>
+            <p className="text-[11px] text-gray-500 truncate">Account Settings</p>
           </div>
-        </button>
+        </Link>
 
         {/* Sign out button */}
         <button

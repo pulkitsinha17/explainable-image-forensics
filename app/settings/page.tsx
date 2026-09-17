@@ -34,6 +34,8 @@ export default async function SettingsPage() {
             Dashboard
           </Link>
           <UserButton
+            userProfileMode="navigation"
+            userProfileUrl="/settings"
             appearance={{
               elements: {
                 avatarBox:
