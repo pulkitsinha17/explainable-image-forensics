@@ -53,7 +53,7 @@ export function AnalysisCTA() {
           </h2>
 
           <p className="text-sm text-gray-600 leading-relaxed max-w-lg">
-            Upload an image to detect manipulation and reveal pixel-level forensic evidence using advanced AI analysis.
+            Upload an image to detect possible manipulation and uncover the evidence behind it.
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-3">
@@ -67,7 +67,7 @@ export function AnalysisCTA() {
             </Link>
 
             <span className="text-xs text-gray-400 sm:pl-2">
-              JPG · JPEG · PNG · Max size 10MB
+              JPG · JPEG · PNG · WEBP · Up to 10 MB
             </span>
           </div>
         </div>
@@ -82,13 +82,13 @@ export function AnalysisCTA() {
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
             className="relative w-full max-w-[340px] sm:max-w-[380px] aspect-[16/10] rounded-2xl overflow-hidden select-none cursor-ew-resize border border-gray-200/80 shadow-md bg-gray-900 group"
-            title="Drag slider to compare original vs forensic analysis"
+            title="Drag slider to compare original vs localization map"
           >
             {/* Base Image (Full) */}
             <div className="absolute inset-0">
               <Image
                 src="/images/mountain.png"
-                alt="Original photo"
+                alt="Original"
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 400px"
@@ -101,47 +101,23 @@ export function AnalysisCTA() {
               Original
             </div>
 
-            {/* Analysis Overlay with clipping */}
+            {/* Localization Map with clipping */}
             <div
               className="absolute inset-0 overflow-hidden"
               style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
             >
               <Image
-                src="/images/mountain.png"
-                alt="Analysis forensic view"
+                src="/images/mountain-heatmap.png"
+                alt="Localization Map"
                 fill
-                className="object-cover brightness-90"
+                className="object-cover"
                 sizes="(max-width: 768px) 100vw, 400px"
+                priority
               />
 
-              {/* Forensic Heatmap Overlays */}
-              <div className="absolute inset-0 bg-blue-950/20" />
-              <div
-                className="absolute rounded-full blur-xl"
-                style={{
-                  width: "120px",
-                  height: "90px",
-                  background:
-                    "radial-gradient(circle, rgba(239, 68, 68, 0.9) 0%, rgba(249, 115, 22, 0.7) 40%, rgba(234, 179, 8, 0.5) 70%, transparent 85%)",
-                  top: "22%",
-                  right: "18%",
-                }}
-              />
-              <div
-                className="absolute rounded-full blur-md"
-                style={{
-                  width: "60px",
-                  height: "50px",
-                  background:
-                    "radial-gradient(circle, rgba(239, 68, 68, 0.95) 0%, rgba(59, 130, 246, 0.6) 80%, transparent 90%)",
-                  top: "35%",
-                  right: "26%",
-                }}
-              />
-
-              {/* Analysis View Badge */}
+              {/* Localization Map Badge */}
               <div className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded-md bg-gray-900/80 backdrop-blur-xs text-[10px] font-medium text-blue-200 border border-blue-400/30 shadow-xs">
-                Analysis View
+                Localization Map
               </div>
             </div>
 
