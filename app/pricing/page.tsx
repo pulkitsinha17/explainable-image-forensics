@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Check, ArrowLeft, Zap, Star } from "lucide-react";
 import type { Metadata } from "next";
+import { PLAN_DEFINITIONS } from "@/lib/subscription";
 
 export const metadata: Metadata = {
   title: "Pricing — PIXENTRA | Simple Plans for Image Forensics",
@@ -11,71 +12,19 @@ export const metadata: Metadata = {
 
 const plans = [
   {
-    id: "free",
-    name: "Free",
-    price: "₹0",
-    period: "",
-    tagline: "For getting started",
-    badge: null,
-    highlighted: false,
-    features: [
-      "Create an account",
-      "Basic image analysis",
-      "Limited analysis history",
-      "Basic forensic indicators",
-      "Basic result visualization",
-      "Standard support",
-    ],
+    ...PLAN_DEFINITIONS.free,
     cta: "Get Started",
     ctaHref: "/sign-up",
-    ctaStyle: "secondary",
   },
   {
-    id: "monthly",
-    name: "Monthly",
-    price: "₹199",
-    period: "/ month",
-    tagline: "For regular analysis",
-    badge: "RECOMMENDED",
-    highlighted: true,
-    features: [
-      "Everything in Free",
-      "Increased analysis limits",
-      "Full multi-evidence analysis",
-      "Forgery localization heatmaps",
-      "Frequency analysis",
-      "Noise analysis",
-      "ELA / compression analysis",
-      "Statistical evidence",
-      "Detailed explanations",
-      "Extended analysis history",
-    ],
+    ...PLAN_DEFINITIONS.monthly,
     cta: "Choose Monthly",
     ctaHref: "/sign-up",
-    ctaStyle: "primary",
   },
   {
-    id: "yearly",
-    name: "Yearly",
-    price: "₹1,999",
-    period: "/ year",
-    tagline: "For long-term use",
-    badge: "BEST VALUE",
-    highlighted: false,
-    features: [
-      "Everything in Monthly",
-      "Full multi-evidence analysis",
-      "Forgery localization",
-      "Complete evidence breakdown",
-      "Detailed explainable results",
-      "Extended history",
-      "Priority feature access",
-      "Best overall value",
-    ],
-    savings: "Save ₹389 compared to monthly billing",
+    ...PLAN_DEFINITIONS.yearly,
     cta: "Choose Yearly",
     ctaHref: "/sign-up",
-    ctaStyle: "secondary",
   },
 ];
 

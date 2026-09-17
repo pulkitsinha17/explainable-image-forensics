@@ -9,6 +9,7 @@ import {
   ALLOWED_MIME_TYPES,
   MAX_UPLOAD_BYTES,
 } from "@/lib/s3";
+import { getUserUsageAndLimit } from "@/lib/subscription";
 
 /**
  * POST /api/analyze/presign
@@ -21,6 +22,7 @@ import {
  *
  * Security:
  *   - Clerk authentication is enforced — unauthenticated requests are rejected.
+ *   - Server-side usage quota/limit is verified before granting upload permissions.
  *   - Content-type and file size are validated server-side.
  *   - The S3 key is generated server-side from the authenticated userId;
  *     the client cannot influence which key is used.
@@ -37,7 +39,25 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 2. Parse and validate the request body
+  // 2. Check server-side analysis quota limit
+  try {
+    const usage = await getUserUsageAndLimit(userId);
+    if (usage.isLimitReached) {
+      return NextResponse.json(
+        {
+          error: `Analysis limit reached (${usage.used}/${usage.limit} analyses on ${usage.planName} plan). Please upgrade your plan to continue analyzing images.`,
+          limitReached: true,
+          usage,
+        },
+        { status: 403 }
+      );
+    }
+  } catch (err) {
+    console.error("[presign] Usage check error:", err);
+    // Don't block upload if db lookup fails unexpectedly
+  }
+
+  // 3. Parse and validate the request body
   let body: { filename?: unknown; contentType?: unknown; fileSizeBytes?: unknown };
   try {
     body = await req.json();

@@ -36,7 +36,7 @@ export function TopNavBar({
       <div className="flex items-center">
         <UserButton
           userProfileMode="navigation"
-          userProfileUrl="/settings"
+          userProfileUrl="/settings/profile"
           appearance={{
             elements: {
               avatarBox:

@@ -140,11 +140,11 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
         </div>
       </div>
 
-      {/* User Information & Sign Out */}
-      <div className="p-4 border-t border-gray-100 space-y-2">
+      {/* User Information */}
+      <div className="p-4 border-t border-gray-100">
         {/* User profile card */}
         <Link
-          href="/settings"
+          href="/settings/profile"
           onClick={() => setMobileOpen(false)}
           className="w-full flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 bg-gray-50/60 hover:bg-gray-100/80 transition-colors text-left group"
           title="Manage account settings"
@@ -170,16 +170,6 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             <p className="text-[11px] text-gray-500 truncate">Account Settings</p>
           </div>
         </Link>
-
-        {/* Sign out button */}
-        <button
-          type="button"
-          onClick={() => signOut({ redirectUrl: "/" })}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl border border-gray-200/80 bg-white hover:bg-red-50/60 hover:text-red-600 hover:border-red-100 text-gray-700 text-xs font-medium transition-colors shadow-2xs"
-        >
-          <LogOut className="w-3.5 h-3.5" />
-          <span>Sign out</span>
-        </button>
       </div>
     </div>
   );

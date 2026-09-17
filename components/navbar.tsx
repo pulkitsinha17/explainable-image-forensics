@@ -97,7 +97,7 @@ export function Navbar() {
                 </Link>
                 <UserButton
                   userProfileMode="navigation"
-                  userProfileUrl="/settings"
+                  userProfileUrl="/settings/profile"
                   appearance={{
                     elements: {
                       avatarBox: 'w-9 h-9 ring-2 ring-[#1a7fc4]/20 hover:ring-[#1a7fc4] transition-all',
@@ -175,7 +175,7 @@ export function Navbar() {
                 </Link>
                 <UserButton
                   userProfileMode="navigation"
-                  userProfileUrl="/settings"
+                  userProfileUrl="/settings/profile"
                   appearance={{
                     elements: {
                       avatarBox: 'w-9 h-9',
