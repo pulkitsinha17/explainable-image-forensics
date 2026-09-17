@@ -103,10 +103,10 @@ export function AnalysisHistoryCard({ analysis }: AnalysisHistoryCardProps) {
           </div>
         </div>
 
-        {/* View Analysis Button linking directly to /report/[analysisId] */}
+        {/* View Analysis Button linking directly to /report/[analysisId] with from=history param */}
         <div>
           <Link
-            href={`/report/${analysis.id}`}
+            href={`/report/${analysis.id}?from=history`}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-blue-200 bg-white hover:bg-[#eef6fc] hover:border-[#1a7fc4]/40 text-[#1a7fc4] text-xs sm:text-sm font-semibold transition-all shadow-2xs group whitespace-nowrap cursor-pointer"
           >
             <span>View Analysis</span>

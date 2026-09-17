@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   Download,
@@ -18,6 +19,12 @@ import {
 } from "@/lib/pdf/generate-forensic-report";
 
 export function ReportViewer({ analysisId }: { analysisId: string }) {
+  const searchParams = useSearchParams();
+  const fromHistory = searchParams?.get("from") === "history";
+  const backHref = fromHistory ? "/history" : `/analysis/${analysisId}`;
+  const backLabel = fromHistory ? "Back to History" : "Back to Analysis";
+  const errorBackLabel = fromHistory ? "Return to History" : "Return to Analysis";
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<ForensicAnalysisResult | null>(null);
@@ -115,11 +122,11 @@ export function ReportViewer({ analysisId }: { analysisId: string }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-gray-100">
         <div>
           <Link
-            href={`/analysis/${analysisId}`}
+            href={backHref}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors mb-1 cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Analysis</span>
+            <span>{backLabel}</span>
           </Link>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
             Forensic Report
@@ -170,10 +177,10 @@ export function ReportViewer({ analysisId }: { analysisId: string }) {
             <h3 className="text-base font-bold text-gray-900">Failed to load report</h3>
             <p className="text-xs text-red-600">{error}</p>
             <Link
-              href={`/analysis/${analysisId}`}
+              href={backHref}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-2xs"
             >
-              <ArrowLeft className="w-3.5 h-3.5" /> Return to Analysis
+              <ArrowLeft className="w-3.5 h-3.5" /> {errorBackLabel}
             </Link>
           </div>
         ) : pdfBlobUrl ? (

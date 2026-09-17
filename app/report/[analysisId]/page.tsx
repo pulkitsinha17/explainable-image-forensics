@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
@@ -45,7 +46,9 @@ export default async function ViewReportPage({
       {/* Main Content Area */}
       <div className="flex-1 min-w-0 flex flex-col">
         <main className="flex-1 p-4 sm:p-6 lg:p-7 max-w-7xl w-full mx-auto animate-fade-in">
-          <ReportViewer analysisId={analysisId} />
+          <Suspense fallback={<div className="p-8 text-center text-gray-500 text-sm">Loading forensic report...</div>}>
+            <ReportViewer analysisId={analysisId} />
+          </Suspense>
         </main>
       </div>
     </div>
