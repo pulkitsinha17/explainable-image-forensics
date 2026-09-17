@@ -8,9 +8,26 @@ interface AnalysisHistoryCardProps {
 }
 
 export function AnalysisHistoryCard({ analysis }: AnalysisHistoryCardProps) {
-  const isForged = analysis.verdict === "forged";
-  const isAuthentic = analysis.verdict === "authentic";
-  const isInconclusive = analysis.verdict === "inconclusive";
+  const isForged =
+    analysis.verdict === "forged" ||
+    analysis.verdictLabel === "Likely Manipulated" ||
+    analysis.verdictLabel === "Potentially Forged" ||
+    analysis.verdictLabel === "Manipulated";
+
+  const isAuthentic =
+    analysis.verdict === "authentic" ||
+    analysis.verdictLabel === "Appears Authentic" ||
+    analysis.verdictLabel === "Authenticated" ||
+    analysis.verdictLabel === "Likely Authentic";
+
+  const isInconclusive = !isForged && !isAuthentic;
+
+  const scoreText =
+    analysis.forgeryAnomalyScore !== null && analysis.forgeryAnomalyScore !== undefined
+      ? `${analysis.forgeryAnomalyScore}%`
+      : typeof analysis.riskScore === "number" && analysis.riskScore >= 0
+      ? `${analysis.riskScore}%`
+      : "Not available";
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100/90 p-4 sm:p-5 shadow-xs hover:border-gray-200/90 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
@@ -26,7 +43,7 @@ export function AnalysisHistoryCard({ analysis }: AnalysisHistoryCardProps) {
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
+            <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50">
               <ImageIcon className="w-6 h-6" />
             </div>
           )}
@@ -51,46 +68,46 @@ export function AnalysisHistoryCard({ analysis }: AnalysisHistoryCardProps) {
         </div>
       </div>
 
-      {/* Right side: Verdict badge + Risk score + View Analysis Action */}
+      {/* Right side: Verdict badge + Forgery Anomaly Score + View Analysis Action */}
       <div className="flex items-center justify-between md:justify-end gap-6 sm:gap-8 pt-3 md:pt-0 border-t md:border-t-0 border-gray-100 shrink-0">
-        {/* Verdict & Risk Score */}
+        {/* Verdict & Score */}
         <div className="text-left md:text-left min-w-[130px]">
           {/* Verdict Pill Badge */}
           {isForged && (
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200/70">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-              <span>Potentially Forged</span>
+              <span>{analysis.verdictLabel}</span>
             </div>
           )}
           {isAuthentic && (
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span>Likely Authentic</span>
+              <span>{analysis.verdictLabel}</span>
             </div>
           )}
           {isInconclusive && (
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-[#1a7fc4] border border-blue-200/70">
               <span className="w-1.5 h-1.5 rounded-full bg-[#1a7fc4]" />
-              <span>Inconclusive</span>
+              <span>{analysis.verdictLabel}</span>
             </div>
           )}
 
-          {/* Risk Percentage and Label */}
+          {/* Forgery Anomaly Score and Label */}
           <div className="mt-1">
             <span className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
-              {analysis.riskScore}%
+              {scoreText}
             </span>
             <span className="block text-[11px] font-medium text-gray-400 tracking-tight">
-              Risk Score
+              Forgery Anomaly Score
             </span>
           </div>
         </div>
 
-        {/* ONLY ONE ACTION: View Analysis Button */}
+        {/* View Analysis Button linking directly to /report/[analysisId] */}
         <div>
           <Link
-            href={`/analyze?id=${analysis.id}`}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-blue-200 bg-white hover:bg-[#eef6fc] hover:border-[#1a7fc4]/40 text-[#1a7fc4] text-xs sm:text-sm font-semibold transition-all shadow-2xs group whitespace-nowrap"
+            href={`/report/${analysis.id}`}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-blue-200 bg-white hover:bg-[#eef6fc] hover:border-[#1a7fc4]/40 text-[#1a7fc4] text-xs sm:text-sm font-semibold transition-all shadow-2xs group whitespace-nowrap cursor-pointer"
           >
             <span>View Analysis</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />

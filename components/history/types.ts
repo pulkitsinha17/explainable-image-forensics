@@ -9,9 +9,11 @@ export interface CompletedAnalysisRecord {
   analyzedAt: string; // e.g. "Sep 14, 2026 at 10:24 AM"
   analyzedTimestamp: number; // for sorting
   verdict: ForensicVerdict;
-  verdictLabel: "Potentially Forged" | "Likely Authentic" | "Inconclusive";
-  riskScore: number; // 0 to 100
+  verdictLabel: string; // e.g. "Appears Authentic", "Likely Manipulated", "Inconclusive"
+  forgeryAnomalyScore: number | null; // 0 to 100 or null if not available
+  riskScore: number; // 0 to 100 for backward compatibility and sorting
   thumbnailUrl: string;
+  status?: "completed" | "processing" | "failed" | "pending";
 }
 
 export interface HistorySummaryStats {
@@ -20,3 +22,4 @@ export interface HistorySummaryStats {
   potentiallyForgedCount: number;
   averageRiskPercentage: number;
 }
+
