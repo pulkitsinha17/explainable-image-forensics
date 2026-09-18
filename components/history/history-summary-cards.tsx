@@ -1,4 +1,4 @@
-import { FileText, CheckCircle2, AlertTriangle, BarChart2 } from "lucide-react";
+import { FileText, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
 import type { HistorySummaryStats } from "./types";
 
 interface HistorySummaryCardsProps {
@@ -6,43 +6,49 @@ interface HistorySummaryCardsProps {
 }
 
 export function HistorySummaryCards({ stats }: HistorySummaryCardsProps) {
-  const forgedPercentage =
-    stats.completedCount > 0
-      ? Math.round((stats.potentiallyForgedCount / stats.completedCount) * 100)
-      : 0;
+  const total = stats.completedCount > 0 ? stats.completedCount : stats.totalAnalyses;
+  const authenticated = stats.authenticatedCount ?? 0;
+  const manipulated = stats.manipulatedCount ?? stats.potentiallyForgedCount ?? 0;
+  const inconclusive =
+    stats.inconclusiveCount ??
+    (total >= authenticated + manipulated ? total - authenticated - manipulated : 0);
+
+  const authPercentage = total > 0 ? Math.round((authenticated / total) * 100) : 0;
+  const manipPercentage = total > 0 ? Math.round((manipulated / total) * 100) : 0;
+  const inconclusivePercentage = total > 0 ? Math.round((inconclusive / total) * 100) : 0;
 
   const cards = [
     {
       title: "Total Analyses",
-      value: stats.totalAnalyses.toString(),
+      value: total.toString(),
       subtext: "All time",
       icon: FileText,
       iconBg: "bg-blue-50 text-[#1a7fc4]",
       iconBorder: "border-blue-100/60",
     },
     {
-      title: "Completed",
-      value: stats.completedCount.toString(),
-      subtext: "100% success rate",
+      title: "Authenticated",
+      value: authenticated.toString(),
+      subtext: `${authPercentage}% of total`,
       icon: CheckCircle2,
       iconBg: "bg-emerald-50 text-emerald-600",
       iconBorder: "border-emerald-100/60",
     },
     {
-      title: "Potentially Forged",
-      value: stats.potentiallyForgedCount.toString(),
-      subtext: `${forgedPercentage}% of completed`,
+      title: "Manipulated",
+      value: manipulated.toString(),
+      subtext: `${manipPercentage}% of total`,
       icon: AlertTriangle,
       iconBg: "bg-rose-50 text-rose-600",
       iconBorder: "border-rose-100/60",
     },
     {
-      title: "Average Risk",
-      value: `${stats.averageRiskPercentage}%`,
-      subtext: "Across all analyses",
-      icon: BarChart2,
-      iconBg: "bg-purple-50 text-purple-600",
-      iconBorder: "border-purple-100/60",
+      title: "Inconclusive",
+      value: inconclusive.toString(),
+      subtext: `${inconclusivePercentage}% of total`,
+      icon: AlertCircle,
+      iconBg: "bg-slate-50 text-slate-600",
+      iconBorder: "border-slate-200/60",
     },
   ];
 
@@ -53,10 +59,10 @@ export function HistorySummaryCards({ stats }: HistorySummaryCardsProps) {
         return (
           <div
             key={card.title}
-            className="bg-white rounded-2xl border border-gray-100 p-5 shadow-xs flex items-center gap-4 hover:border-gray-200/80 transition-all"
+            className="group bg-white rounded-2xl border border-gray-100 p-5 shadow-xs hover:shadow-md hover:border-gray-200/90 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-default flex items-center gap-4"
           >
             <div
-              className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${card.iconBg} ${card.iconBorder}`}
+              className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${card.iconBg} ${card.iconBorder} group-hover:scale-105 transition-transform duration-200 ease-in-out`}
             >
               <Icon className="w-5 h-5 stroke-[2]" />
             </div>

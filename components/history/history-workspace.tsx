@@ -33,6 +33,9 @@ export function HistoryWorkspace({
   const [stats, setStats] = useState<HistorySummaryStats>({
     totalAnalyses: 0,
     completedCount: 0,
+    authenticatedCount: 0,
+    manipulatedCount: 0,
+    inconclusiveCount: 0,
     potentiallyForgedCount: 0,
     averageRiskPercentage: 0,
   });

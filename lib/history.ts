@@ -30,6 +30,9 @@ export async function getUserAnalysisHistory(clerkUserId: string): Promise<UserA
       stats: {
         totalAnalyses: 0,
         completedCount: 0,
+        authenticatedCount: 0,
+        manipulatedCount: 0,
+        inconclusiveCount: 0,
         potentiallyForgedCount: 0,
         averageRiskPercentage: 0,
       },
@@ -141,7 +144,10 @@ export async function getUserAnalysisHistory(clerkUserId: string): Promise<UserA
   const totalAnalyses = records.length;
   const completedRecords = records.filter((r) => r.status === "completed");
   const completedCount = completedRecords.length;
-  const potentiallyForgedCount = completedRecords.filter((r) => r.verdict === "forged").length;
+  const authenticatedCount = completedRecords.filter((r) => r.verdict === "authentic").length;
+  const manipulatedCount = completedRecords.filter((r) => r.verdict === "forged").length;
+  const inconclusiveCount = completedRecords.filter((r) => r.verdict === "inconclusive").length;
+  const potentiallyForgedCount = manipulatedCount;
 
   const totalRisk = completedRecords.reduce((acc, curr) => acc + curr.riskScore, 0);
   const averageRiskPercentage = completedCount > 0 ? Math.round(totalRisk / completedCount) : 0;
@@ -156,6 +162,9 @@ export async function getUserAnalysisHistory(clerkUserId: string): Promise<UserA
   const stats: HistorySummaryStats = {
     totalAnalyses,
     completedCount,
+    authenticatedCount,
+    manipulatedCount,
+    inconclusiveCount,
     potentiallyForgedCount,
     averageRiskPercentage,
   };

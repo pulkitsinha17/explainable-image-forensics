@@ -19,6 +19,9 @@ export interface CompletedAnalysisRecord {
 export interface HistorySummaryStats {
   totalAnalyses: number;
   completedCount: number;
+  authenticatedCount?: number;
+  manipulatedCount?: number;
+  inconclusiveCount?: number;
   potentiallyForgedCount: number;
   averageRiskPercentage: number;
 }
