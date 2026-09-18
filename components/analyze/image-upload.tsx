@@ -260,100 +260,137 @@ export function ImageUpload({
 
         {/* RIGHT — Organic forensic image collage (~50%), desktop only */}
         <div
-          className="hidden md:flex md:w-1/2 min-w-0 gap-2 sm:gap-2.5 overflow-hidden rounded-2xl"
+          className="hidden md:grid md:w-1/2 min-w-0 gap-2 sm:gap-2.5 overflow-hidden rounded-2xl h-full min-h-[300px]"
+          style={{
+            gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
+            gridTemplateRows: "repeat(12, minmax(0, 1fr))",
+          }}
           aria-hidden="true"
         >
-          {/* Column 1: Small + Large focal image + Small */}
-          <div className="flex-1 flex flex-col gap-2 sm:gap-2.5 min-w-0">
-            <div className="relative flex-[22] min-h-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
-              <Image
-                src="/images/pixentra_analysis_2.webp"
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 18vw"
-              />
-            </div>
-            <div className="relative flex-[56] min-h-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
-              <Image
-                src="/images/pixentra_analysis_1.webp"
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 18vw"
-              />
-            </div>
-            <div className="relative flex-[22] min-h-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
-              <Image
-                src="/images/pixentra_analysis_6.webp"
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 18vw"
-              />
-            </div>
+          {/* Card 1: Top-Left [ Small / Wide ] */}
+          <div
+            className="relative min-h-0 min-w-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300"
+            style={{ gridColumn: "1 / span 4", gridRow: "1 / span 3" }}
+          >
+            <Image
+              src="/images/pixentra_analysis_2.webp"
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 18vw"
+            />
           </div>
 
-          {/* Column 2: Varied portrait & square editorial cards */}
-          <div className="flex-[0.92] flex flex-col gap-2 sm:gap-2.5 min-w-0">
-            <div className="relative flex-[36] min-h-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
-              <Image
-                src="/images/pixentra_analysis_4.webp"
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 16vw"
-              />
-            </div>
-            <div className="relative flex-[28] min-h-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
-              <Image
-                src="/images/pixentra_analysis_7.webp"
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 16vw"
-              />
-            </div>
-            <div className="relative flex-[36] min-h-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
-              <Image
-                src="/images/pixentra_analysis_5.webp"
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 16vw"
-              />
-            </div>
+          {/* Card 2: Top-Center [ Small ] */}
+          <div
+            className="relative min-h-0 min-w-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300"
+            style={{ gridColumn: "5 / span 4", gridRow: "1 / span 3" }}
+          >
+            <Image
+              src="/images/pixentra_analysis_8.webp"
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 18vw"
+            />
           </div>
 
-          {/* Column 3: Mediums + Large/wide card at bottom */}
-          <div className="flex-[1.08] flex flex-col gap-2 sm:gap-2.5 min-w-0">
-            <div className="relative flex-[30] min-h-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
-              <Image
-                src="/images/pixentra_analysis_3.webp"
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 18vw"
-              />
-            </div>
-            <div className="relative flex-[24] min-h-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
-              <Image
-                src="/images/pixentra_analysis_8.webp"
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 18vw"
-              />
-            </div>
-            <div className="relative flex-[46] min-h-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
-              <Image
-                src="/images/pixentra_analysis_9.png"
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 18vw"
-              />
-            </div>
+          {/* Card 3: Top-Right [ Medium ] */}
+          <div
+            className="relative min-h-0 min-w-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300"
+            style={{ gridColumn: "9 / span 4", gridRow: "1 / span 4" }}
+          >
+            <Image
+              src="/images/pixentra_analysis_3.webp"
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 18vw"
+            />
+          </div>
+
+          {/* Card 4: Center-Left [ LARGE / WIDE Hero Image ] */}
+          <div
+            className="relative min-h-0 min-w-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300"
+            style={{ gridColumn: "1 / span 6", gridRow: "4 / span 5" }}
+          >
+            <Image
+              src="/images/pixentra_analysis_1.webp"
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 25vw"
+            />
+          </div>
+
+          {/* Card 5: Center-Right [ Tall Slim Portrait ] */}
+          <div
+            className="relative min-h-0 min-w-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300"
+            style={{ gridColumn: "7 / span 2", gridRow: "4 / span 5" }}
+          >
+            <Image
+              src="/images/pixentra_analysis_7.webp"
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 12vw"
+            />
+          </div>
+
+          {/* Card 6: Center-Right [ Medium Portrait / Square ] */}
+          <div
+            className="relative min-h-0 min-w-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300"
+            style={{ gridColumn: "9 / span 4", gridRow: "5 / span 4" }}
+          >
+            <Image
+              src="/images/pixentra_analysis_4.webp"
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 18vw"
+            />
+          </div>
+
+          {/* Card 7: Bottom-Left [ Small / Square ] */}
+          <div
+            className="relative min-h-0 min-w-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300"
+            style={{ gridColumn: "1 / span 3", gridRow: "9 / span 4" }}
+          >
+            <Image
+              src="/images/pixentra_analysis_6.webp"
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 14vw"
+            />
+          </div>
+
+          {/* Card 8: Bottom-Center [ Small / Square ] */}
+          <div
+            className="relative min-h-0 min-w-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300"
+            style={{ gridColumn: "4 / span 3", gridRow: "9 / span 4" }}
+          >
+            <Image
+              src="/images/pixentra_analysis_5.webp"
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 14vw"
+            />
+          </div>
+
+          {/* Card 9: Bottom-Right [ LARGE / WIDE Image ] */}
+          <div
+            className="relative min-h-0 min-w-0 rounded-xl overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300"
+            style={{ gridColumn: "7 / span 6", gridRow: "9 / span 4" }}
+          >
+            <Image
+              src="/images/pixentra_analysis_9.png"
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 25vw"
+            />
           </div>
         </div>
       </div>
