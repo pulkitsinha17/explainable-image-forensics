@@ -130,8 +130,9 @@ export async function getUserUsageAndLimit(clerkUserId: string): Promise<UserUsa
     });
   }
 
+  const isDev = process.env.NODE_ENV === "development";
   const remaining = Math.max(0, limit - used);
-  const isLimitReached = used >= limit;
+  const isLimitReached = isDev ? false : used >= limit;
   const percentage = Math.min(100, Math.round((used / limit) * 100));
 
   return {

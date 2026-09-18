@@ -39,10 +39,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 2. Check server-side analysis quota limit
+  // 2. Check server-side analysis quota limit (bypassed in development mode)
   try {
+    const isDev = process.env.NODE_ENV === "development";
     const usage = await getUserUsageAndLimit(userId);
-    if (usage.isLimitReached) {
+    if (!isDev && usage.isLimitReached) {
       return NextResponse.json(
         {
           error: `Analysis limit reached (${usage.used}/${usage.limit} analyses on ${usage.planName} plan). Please upgrade your plan to continue analyzing images.`,

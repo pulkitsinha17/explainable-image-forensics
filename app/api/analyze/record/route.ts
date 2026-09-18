@@ -23,10 +23,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  // Check usage limit server-side
+  // Check usage limit server-side (bypassed in development mode)
   try {
+    const isDev = process.env.NODE_ENV === "development";
     const usage = await getUserUsageAndLimit(userId);
-    if (usage.isLimitReached) {
+    if (!isDev && usage.isLimitReached) {
       return NextResponse.json(
         {
           error: `Analysis limit reached (${usage.used}/${usage.limit} on ${usage.planName} plan). Please upgrade your plan.`,
