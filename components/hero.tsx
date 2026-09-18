@@ -68,62 +68,16 @@ function ImageComparisonSlider() {
       {/* OVERLAY: Same mountain with forensic heatmap */}
       <div
         className="absolute inset-0 overflow-hidden"
-        style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+        style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
       >
         <Image
-          src="/images/mountain.png"
-          alt="Forensic heatmap overlay"
+          src="/images/mountain-heatmap.png"
+          alt="Forgery Heatmap"
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 50vw"
+          priority
         />
-        {/* Forensic heatmap overlay — localized suspicion regions */}
-        <div className="absolute inset-0 bg-gray-900/30" />
-        {/* Primary suspicious region — upper center */}
-        <div
-          className="absolute rounded-full blur-2xl"
-          style={{
-            width: '140px',
-            height: '110px',
-            background: 'radial-gradient(circle, rgba(220,38,38,0.82) 0%, rgba(220,38,38,0.45) 45%, transparent 70%)',
-            top: '12%',
-            left: '30%',
-          }}
-        />
-        {/* Secondary region */}
-        <div
-          className="absolute rounded-full blur-xl"
-          style={{
-            width: '90px',
-            height: '80px',
-            background: 'radial-gradient(circle, rgba(234,88,12,0.72) 0%, rgba(234,88,12,0.3) 50%, transparent 70%)',
-            top: '35%',
-            right: '22%',
-          }}
-        />
-        {/* Tertiary subtle region */}
-        <div
-          className="absolute rounded-full blur-lg"
-          style={{
-            width: '60px',
-            height: '55px',
-            background: 'radial-gradient(circle, rgba(202,138,4,0.6) 0%, transparent 70%)',
-            bottom: '30%',
-            left: '18%',
-          }}
-        />
-        {/* "Suspicious" badge */}
-        <div
-          className="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold"
-          style={{
-            background: 'rgba(220,38,38,0.18)',
-            border: '1px solid rgba(220,38,38,0.45)',
-            color: '#fca5a5',
-            backdropFilter: 'blur(4px)',
-          }}
-        >
-          Suspicious Region
-        </div>
       </div>
 
       {/* Slider divider line */}
@@ -295,7 +249,7 @@ export function Hero() {
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { label: 'Spatial', val: 78, color: '#dc2626' },
+                    { label: 'Compression', val: 78, color: '#dc2626' },
                     { label: 'Frequency', val: 62, color: '#ea580c' },
                     { label: 'Noise', val: 71, color: '#ca8a04' },
                   ].map((ev) => (

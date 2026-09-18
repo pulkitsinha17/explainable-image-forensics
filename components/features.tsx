@@ -25,7 +25,7 @@ const features = [
   {
     icon: BarChart2,
     title: 'Evidence Visualization',
-    description: 'Interactive charts and indicators show the relative strength of each forensic evidence stream.',
+    description: 'Visualize your analysis results with clear charts and summaries across all your analyses.',
   },
   {
     icon: FileText,

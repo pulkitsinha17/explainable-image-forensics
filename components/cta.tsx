@@ -24,7 +24,7 @@ export function CTA() {
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Eyebrow */}
         <p className="text-xs font-semibold text-[#1a7fc4] uppercase tracking-widest mb-6">
-          See Beyond the Pixels
+          TRUST EVIDENCE, NOT ASSUMPTIONS
         </p>
 
         {/* Headline */}

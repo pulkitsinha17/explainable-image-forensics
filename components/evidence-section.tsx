@@ -100,7 +100,7 @@ function CastleVisualization() {
         {/* Layer labels */}
         <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3">
           <div className="flex flex-wrap gap-1">
-            {['Spatial', 'Frequency', 'Noise', 'ELA', 'Statistical'].map((layer) => (
+            {['Compression', 'Frequency', 'Noise', 'ELA', 'Statistical'].map((layer) => (
               <span
                 key={layer}
                 className="text-[8px] font-semibold text-white/90 px-1.5 py-0.5 rounded"
