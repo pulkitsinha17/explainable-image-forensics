@@ -70,9 +70,9 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
               <Image
                 src="/pixentra-logo.svg"
                 alt="PIXENTRA"
-                width={128}
-                height={32}
-                className="h-7 w-auto transition-transform group-hover:scale-[1.02]"
+                width={180}
+                height={90}
+                className="h-11 w-auto transition-transform group-hover:scale-[1.02]"
                 priority
               />
             </div>
@@ -187,9 +187,9 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
           <Image
             src="/pixentra-logo.svg"
             alt="PIXENTRA"
-            width={110}
-            height={28}
-            className="h-6 w-auto"
+            width={160}
+            height={80}
+            className="h-10 w-auto"
           />
         </Link>
         <button

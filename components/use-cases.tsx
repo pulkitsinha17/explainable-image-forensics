@@ -1,27 +1,27 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { Newspaper, Search, GraduationCap, User } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 const useCases = [
   {
-    icon: Newspaper,
+    image: '/images/pixentra_media_journalism.png',
     title: 'Media & Journalism',
     description: 'Verify images before publication and investigate suspicious visual content with forensic evidence.',
   },
   {
-    icon: Search,
+    image: '/images/pixentra_digital_investigations_clean.png',
     title: 'Digital Investigations',
     description: 'Support image-based forensic analysis with localized and explainable evidence streams.',
   },
   {
-    icon: GraduationCap,
+    image: '/images/pixentra_academic_research_clean.png',
     title: 'Academic & Research',
     description: 'Explore image manipulation and digital forensics through interpretable AI-assisted analysis.',
   },
   {
-    icon: User,
+    image: '/images/pixentra_individuals_clean.png',
     title: 'Individuals',
     description: 'Understand whether an image contains suspicious signs of manipulation using evidence-based analysis.',
   },
@@ -72,25 +72,27 @@ export function UseCases() {
 
         {/* Cards */}
         <div ref={ref} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {useCases.map((uc, i) => {
-            const Icon = uc.icon
-            return (
-              <div
-                key={uc.title}
-                className="use-case-card opacity-0 translate-y-6 [&.in-view]:opacity-100 [&.in-view]:translate-y-0 transition-all duration-500 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-lg hover:border-blue-100 group"
-                style={{ transitionDelay: `${i * 80}ms` }}
-              >
-                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-5 group-hover:bg-[#1a7fc4] transition-colors duration-200">
-                  <Icon className="w-5 h-5 text-[#1a7fc4] group-hover:text-white transition-colors duration-200" />
-                </div>
-                <h3 className="text-base font-bold text-gray-900 mb-2">{uc.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{uc.description}</p>
+          {useCases.map((uc, i) => (
+            <div
+              key={uc.title}
+              className="use-case-card opacity-0 translate-y-6 [&.in-view]:opacity-100 [&.in-view]:translate-y-0 transition-all duration-500 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-lg hover:border-blue-100 group"
+              style={{ transitionDelay: `${i * 80}ms` }}
+            >
+              <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden mb-5 bg-gray-50">
+                <Image
+                  src={uc.image}
+                  alt={uc.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                />
               </div>
-            )
-          })}
+              <h3 className="text-base font-bold text-gray-900 mb-2">{uc.title}</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">{uc.description}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
   )
 }
-

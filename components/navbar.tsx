@@ -54,9 +54,9 @@ export function Navbar() {
             <Image
               src="/pixentra-logo.svg"
               alt="PIXENTRA"
-              width={180}
-              height={90}
-              className="h-14 w-auto"
+              width={200}
+              height={100}
+              className="h-16 w-auto"
               priority
             />
           </Link>
