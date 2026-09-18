@@ -1,11 +1,13 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getUserAnalysisHistory } from "@/lib/history";
+import { getUserAnalysisHistory, type ActivityDataPoint, type ActivityTimelines } from "@/lib/history";
+import type { HistorySummaryStats } from "@/components/history/types";
 
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { AnalysisCTA } from "@/components/dashboard/analysis-cta";
 import { StatsGrid, type DashboardStats } from "@/components/dashboard/stats-grid";
+import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
 import { RecentAnalyses, type RecentAnalysisItem } from "@/components/dashboard/recent-analyses";
 import { OnboardingSteps } from "@/components/dashboard/onboarding-steps";
 import { ForensicQuote } from "@/components/dashboard/forensic-quote";
@@ -38,12 +40,32 @@ export default async function DashboardPage() {
     analysesThisMonth: 0,
     manipulatedDetected: 0,
     averageRiskScore: null,
+    totalAnalysesChange: null,
+    analysesThisMonthChange: null,
+    manipulatedDetectedChange: null,
+    averageRiskScoreChange: null,
   };
 
+  let historyStats: HistorySummaryStats = {
+    totalAnalyses: 0,
+    completedCount: 0,
+    authenticatedCount: 0,
+    manipulatedCount: 0,
+    inconclusiveCount: 0,
+    potentiallyForgedCount: 0,
+    averageRiskPercentage: 0,
+  };
+
+  let timelines: ActivityTimelines | undefined;
+  let activityTimeline: ActivityDataPoint[] = [];
   let recentAnalyses: RecentAnalysisItem[] = [];
 
   try {
     const historyData = await getUserAnalysisHistory(userId);
+    historyStats = historyData.stats;
+    activityTimeline = historyData.activityTimeline;
+    timelines = historyData.timelines;
+
     stats = {
       totalAnalyses: historyData.stats.totalAnalyses,
       analysesThisMonth: historyData.analysesThisMonth,
@@ -52,6 +74,10 @@ export default async function DashboardPage() {
         historyData.stats.completedCount > 0
           ? historyData.stats.averageRiskPercentage
           : null,
+      totalAnalysesChange: historyData.deltas.totalAnalysesChange,
+      analysesThisMonthChange: historyData.deltas.analysesThisMonthChange,
+      manipulatedDetectedChange: historyData.deltas.manipulatedDetectedChange,
+      averageRiskScoreChange: historyData.deltas.averageRiskScoreChange,
     };
 
     recentAnalyses = historyData.records.slice(0, 5);
@@ -59,7 +85,6 @@ export default async function DashboardPage() {
     // Fail gracefully with clean zero-state without crashing the dashboard
     console.warn("Dashboard analysis data fetch fallback:", error);
   }
-
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-gray-900 flex flex-col lg:flex-row antialiased">
@@ -83,6 +108,13 @@ export default async function DashboardPage() {
 
           {/* Analytics Summary */}
           <StatsGrid stats={stats} />
+
+          {/* Forensic Overview & Analysis Activity Graphs */}
+          <DashboardCharts
+            stats={historyStats}
+            activityTimeline={activityTimeline}
+            timelines={timelines}
+          />
 
           {/* Recent Analyses & Onboarding Side-by-Side */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">

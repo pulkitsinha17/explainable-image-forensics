@@ -17,13 +17,61 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Analysis from "@/models/Analysis";
 import type { CompletedAnalysisRecord, HistorySummaryStats } from "@/components/history/types";
 
+export interface ActivityDataPoint {
+  date: string;
+  day: string;
+  fullDate: string;
+  count: number;
+}
+
+export interface ActivityTimelines {
+  last7Days: ActivityDataPoint[];
+  last30Days: ActivityDataPoint[];
+  allTime: ActivityDataPoint[];
+}
+
+export interface MetricDeltas {
+  totalAnalysesChange: number | null;
+  analysesThisMonthChange: number | null;
+  manipulatedDetectedChange: number | null;
+  averageRiskScoreChange: number | null;
+}
+
 export interface UserAnalysisData {
   records: CompletedAnalysisRecord[];
   stats: HistorySummaryStats;
   analysesThisMonth: number;
+  activityTimeline: ActivityDataPoint[];
+  timelines: ActivityTimelines;
+  deltas: MetricDeltas;
 }
 
 export async function getUserAnalysisHistory(clerkUserId: string): Promise<UserAnalysisData> {
+  const emptyActivity: ActivityDataPoint[] = [];
+  const now = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const dayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    emptyActivity.push({
+      date: dayDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      day: dayDate.toLocaleDateString("en-US", { weekday: "short" }),
+      fullDate: dayDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      count: 0,
+    });
+  }
+
+  const emptyTimelines: ActivityTimelines = {
+    last7Days: emptyActivity,
+    last30Days: [],
+    allTime: [],
+  };
+
+  const emptyDeltas: MetricDeltas = {
+    totalAnalysesChange: null,
+    analysesThisMonthChange: null,
+    manipulatedDetectedChange: null,
+    averageRiskScoreChange: null,
+  };
+
   if (!clerkUserId) {
     return {
       records: [],
@@ -37,6 +85,9 @@ export async function getUserAnalysisHistory(clerkUserId: string): Promise<UserA
         averageRiskPercentage: 0,
       },
       analysesThisMonth: 0,
+      activityTimeline: emptyActivity,
+      timelines: emptyTimelines,
+      deltas: emptyDeltas,
     };
   }
 
@@ -152,12 +203,142 @@ export async function getUserAnalysisHistory(clerkUserId: string): Promise<UserA
   const totalRisk = completedRecords.reduce((acc, curr) => acc + curr.riskScore, 0);
   const averageRiskPercentage = completedCount > 0 ? Math.round(totalRisk / completedCount) : 0;
 
-  // 4. Calculate analyses this calendar month based on real createdAt date
-  const now = new Date();
+  // 4. Calculate analyses this calendar month & comparison deltas
   const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0).getTime();
+  const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0).getTime();
+
   const analysesThisMonth = completedRecords.filter(
     (r) => r.analyzedTimestamp >= startOfCurrentMonth
   ).length;
+
+  const analysesLastMonth = completedRecords.filter(
+    (r) => r.analyzedTimestamp >= startOfPrevMonth && r.analyzedTimestamp < startOfCurrentMonth
+  ).length;
+
+  let analysesThisMonthChange: number | null = null;
+  if (analysesLastMonth > 0) {
+    analysesThisMonthChange = Math.round(((analysesThisMonth - analysesLastMonth) / analysesLastMonth) * 100);
+  } else if (analysesThisMonth > 0) {
+    analysesThisMonthChange = 100;
+  }
+
+  // 30-day period comparisons for Total Analyses & Manipulated
+  const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+  const currentPeriodStart = now.getTime() - thirtyDaysMs;
+  const priorPeriodStart = now.getTime() - 2 * thirtyDaysMs;
+
+  const currPeriodRecords = completedRecords.filter((r) => r.analyzedTimestamp >= currentPeriodStart);
+  const priorPeriodRecords = completedRecords.filter(
+    (r) => r.analyzedTimestamp >= priorPeriodStart && r.analyzedTimestamp < currentPeriodStart
+  );
+
+  let totalAnalysesChange: number | null = null;
+  if (priorPeriodRecords.length > 0) {
+    totalAnalysesChange = Math.round(
+      ((currPeriodRecords.length - priorPeriodRecords.length) / priorPeriodRecords.length) * 100
+    );
+  } else if (currPeriodRecords.length > 0) {
+    totalAnalysesChange = 100;
+  }
+
+  const currManipulated = currPeriodRecords.filter((r) => r.verdict === "forged").length;
+  const priorManipulated = priorPeriodRecords.filter((r) => r.verdict === "forged").length;
+
+  let manipulatedDetectedChange: number | null = null;
+  if (priorManipulated > 0) {
+    manipulatedDetectedChange = Math.round(((currManipulated - priorManipulated) / priorManipulated) * 100);
+  } else if (currManipulated > 0) {
+    manipulatedDetectedChange = 100;
+  }
+
+  const currAvgRisk =
+    currPeriodRecords.length > 0
+      ? Math.round(currPeriodRecords.reduce((acc, c) => acc + c.riskScore, 0) / currPeriodRecords.length)
+      : 0;
+  const priorAvgRisk =
+    priorPeriodRecords.length > 0
+      ? Math.round(priorPeriodRecords.reduce((acc, c) => acc + c.riskScore, 0) / priorPeriodRecords.length)
+      : 0;
+
+  let averageRiskScoreChange: number | null = null;
+  if (priorAvgRisk > 0) {
+    averageRiskScoreChange = Math.round(((currAvgRisk - priorAvgRisk) / priorAvgRisk) * 100);
+  } else if (currAvgRisk > 0) {
+    averageRiskScoreChange = 100;
+  }
+
+  const deltas: MetricDeltas = {
+    totalAnalysesChange,
+    analysesThisMonthChange,
+    manipulatedDetectedChange,
+    averageRiskScoreChange,
+  };
+
+  // 5. Build Timelines for Last 7 Days, Last 30 Days, and All Time from real DB records
+
+  // A. Last 7 Days
+  const last7Days: ActivityDataPoint[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const dayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    const dayStart = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), 0, 0, 0, 0).getTime();
+    const dayEnd = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), 23, 59, 59, 999).getTime();
+
+    const count = completedRecords.filter(
+      (r) => r.analyzedTimestamp >= dayStart && r.analyzedTimestamp <= dayEnd
+    ).length;
+
+    last7Days.push({
+      date: dayDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      day: dayDate.toLocaleDateString("en-US", { weekday: "short" }),
+      fullDate: dayDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      count,
+    });
+  }
+
+  // B. Last 30 Days (Daily resolution over the past 30 days)
+  const last30Days: ActivityDataPoint[] = [];
+  for (let i = 29; i >= 0; i--) {
+    const dayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    const dayStart = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), 0, 0, 0, 0).getTime();
+    const dayEnd = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), 23, 59, 59, 999).getTime();
+
+    const count = completedRecords.filter(
+      (r) => r.analyzedTimestamp >= dayStart && r.analyzedTimestamp <= dayEnd
+    ).length;
+
+    last30Days.push({
+      date: dayDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      day: String(dayDate.getDate()),
+      fullDate: dayDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      count,
+    });
+  }
+
+  // C. All Time (Grouped by past 6-12 calendar months)
+  const allTime: ActivityDataPoint[] = [];
+  const numMonths = 6;
+  for (let m = numMonths - 1; m >= 0; m--) {
+    const monthDate = new Date(now.getFullYear(), now.getMonth() - m, 1);
+    const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1, 0, 0, 0, 0).getTime();
+    const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0, 23, 59, 59, 999).getTime();
+
+    const count = completedRecords.filter(
+      (r) => r.analyzedTimestamp >= monthStart && r.analyzedTimestamp <= monthEnd
+    ).length;
+
+    allTime.push({
+      date: monthDate.toLocaleDateString("en-US", { month: "short", year: "2-digit" }),
+      day: monthDate.toLocaleDateString("en-US", { month: "short" }),
+      fullDate: monthDate.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+      count,
+    });
+  }
+
+  const timelines: ActivityTimelines = {
+    last7Days,
+    last30Days,
+    allTime,
+  };
 
   const stats: HistorySummaryStats = {
     totalAnalyses,
@@ -173,5 +354,8 @@ export async function getUserAnalysisHistory(clerkUserId: string): Promise<UserA
     records,
     stats,
     analysesThisMonth,
+    activityTimeline: last7Days,
+    timelines,
+    deltas,
   };
 }
