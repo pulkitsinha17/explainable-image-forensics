@@ -28,10 +28,13 @@ export function Navbar() {
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string, external: boolean) => {
     if (!external && href.startsWith('#')) {
-      e.preventDefault()
       const target = document.querySelector(href)
       if (target) {
+        e.preventDefault()
         target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      } else {
+        e.preventDefault()
+        window.location.href = `/${href}`
       }
       setMobileOpen(false)
     } else {

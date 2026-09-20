@@ -3,24 +3,24 @@ import Image from 'next/image'
 
 const footerLinks = {
   Product: [
-    { label: 'Features', href: '#features' },
-    { label: 'How It Works', href: '#how-it-works' },
+    { label: 'Features', href: '/#features' },
+    { label: 'How It Works', href: '/#how-it-works' },
     { label: 'Pricing', href: '/pricing' },
     { label: 'Analysis', href: '/sign-up' },
   ],
   Company: [
     { label: 'About', href: '/about' },
-    { label: 'Use Cases', href: '#use-cases' },
+    { label: 'Use Cases', href: '/#use-cases' },
     { label: 'Get Started', href: '/sign-up' },
   ],
   Resources: [
     { label: 'Documentation', href: '#' },
-    { label: 'FAQ', href: '#' },
+    { label: 'FAQ', href: '/faq' },
     { label: 'Research', href: '#' },
   ],
   Legal: [
-    { label: 'Privacy', href: '#' },
-    { label: 'Terms', href: '#' },
+    { label: 'Privacy', href: '/privacy' },
+    { label: 'Terms', href: '/terms' },
   ],
 }
 
@@ -74,11 +74,6 @@ export function Footer() {
           <p className="text-xs text-gray-400">
             © 2026 PIXENTRA. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
-            <Link href="#" className="text-xs text-gray-400 hover:text-[#1a7fc4] transition-colors">Privacy</Link>
-            <Link href="#" className="text-xs text-gray-400 hover:text-[#1a7fc4] transition-colors">Terms</Link>
-            <Link href="#" className="text-xs text-gray-400 hover:text-[#1a7fc4] transition-colors">FAQ</Link>
-          </div>
         </div>
       </div>
     </footer>
