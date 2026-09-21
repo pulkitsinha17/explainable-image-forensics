@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ScanSearch, BarChart3, FileText, Eye } from 'lucide-react'
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
+import { EASE_OUT, SPRING_LAYOUT } from './motion-utils'
 
 type Tab = 'overview' | 'heatmap' | 'evidence' | 'explanation'
 
@@ -22,6 +24,9 @@ const evidenceData = [
   { label: 'Metadata', value: 0, color: '#9ca3af', active: false },
 ]
 
+/* ------------------------------------------------------------------ */
+/* Tab content components                                              */
+/* ------------------------------------------------------------------ */
 function OverviewTab() {
   return (
     <div className="grid md:grid-cols-2 gap-6">
@@ -36,7 +41,6 @@ function OverviewTab() {
             sizes="(max-width: 768px) 100vw, 400px"
           />
         </div>
-
       </div>
       <div className="space-y-4">
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Summary</p>
@@ -80,18 +84,26 @@ function HeatmapTab() {
   )
 }
 
+/** Evidence bars animate their width from 0→target whenever this tab mounts */
 function EvidenceTab() {
   return (
     <div className="space-y-3">
       <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-4">Forensic Evidence Breakdown</p>
-      {evidenceData.map((item) => (
+      {evidenceData.map((item, i) => (
         <div key={item.label} className="flex items-center gap-3">
           <span className="text-sm text-gray-600 w-44 flex-shrink-0">{item.label}</span>
           <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
             {item.active ? (
-              <div
-                className="h-full rounded-full transition-all duration-700"
-                style={{ width: `${item.value}%`, background: item.color }}
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: item.color }}
+                initial={{ width: 0 }}
+                animate={{ width: `${item.value}%` }}
+                transition={{
+                  duration: 0.7,
+                  ease: EASE_OUT,
+                  delay: i * 0.07,
+                }}
               />
             ) : (
               <div className="h-full rounded-full bg-gray-200" style={{ width: '5%' }} />
@@ -142,21 +154,31 @@ function ExplanationTab() {
   )
 }
 
+/* ------------------------------------------------------------------ */
+/* Product Preview                                                     */
+/* ------------------------------------------------------------------ */
+const tabContent: Record<Tab, React.ReactNode> = {
+  overview: <OverviewTab />,
+  heatmap: <HeatmapTab />,
+  evidence: <EvidenceTab />,
+  explanation: <ExplanationTab />,
+}
+
 export function ProductPreview() {
   const [activeTab, setActiveTab] = useState<Tab>('overview')
-
-  const tabContent: Record<Tab, React.ReactNode> = {
-    overview: <OverviewTab />,
-    heatmap: <HeatmapTab />,
-    evidence: <EvidenceTab />,
-    explanation: <ExplanationTab />,
-  }
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <section className="py-24 bg-gradient-to-b from-white to-blue-50/40" aria-label="Interactive product preview">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5, ease: EASE_OUT }}
+        >
           <p className="text-xs font-semibold text-[#1a7fc4] uppercase tracking-widest mb-3">
             Product Preview
           </p>
@@ -166,10 +188,16 @@ export function ProductPreview() {
           <p className="text-gray-500 max-w-xl mx-auto text-sm">
             Explore forensic analysis capabilities including forgery localization, multi-evidence scoring, and explainable results.
           </p>
-        </div>
+        </motion.div>
 
         {/* Dashboard preview card */}
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden max-w-4xl mx-auto">
+        <motion.div
+          className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden max-w-4xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: EASE_OUT, delay: 0.1 }}
+        >
           {/* Dashboard header */}
           <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -189,35 +217,54 @@ export function ProductPreview() {
             </Link>
           </div>
 
-          {/* Tabs */}
+          {/* Tabs — shared-layout sliding indicator */}
           <div className="px-6 pt-4 flex gap-1 border-b border-gray-100 overflow-x-auto">
             {tabs.map((tab) => {
               const Icon = tab.icon
+              const isActive = activeTab === tab.id
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   id={`preview-tab-${tab.id}`}
-                  className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-lg border-b-2 transition-all duration-200 whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'border-[#1a7fc4] text-[#1a7fc4] bg-blue-50/60'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  className={`relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-lg whitespace-nowrap transition-colors duration-150 ${
+                    isActive
+                      ? 'text-[#1a7fc4]'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
                   {tab.label}
+                  {/* Shared-layout active underline */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="tab-active-line"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1a7fc4] rounded-t-full"
+                      transition={
+                        prefersReducedMotion ? { duration: 0 } : SPRING_LAYOUT
+                      }
+                    />
+                  )}
                 </button>
               )
             })}
           </div>
 
-          {/* Tab content */}
-          <div className="p-6">
-            <div key={activeTab} className="animate-fade-in">
-              {tabContent[activeTab]}
-            </div>
+          {/* Tab content — AnimatePresence for smooth transitions */}
+          <div className="p-6 min-h-[280px]">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={activeTab}
+                initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: -4 }}
+                transition={{ duration: 0.22, ease: EASE_OUT }}
+              >
+                {tabContent[activeTab]}
+              </motion.div>
+            </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )

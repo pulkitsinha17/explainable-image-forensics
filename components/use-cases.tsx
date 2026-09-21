@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { motion, useReducedMotion } from 'motion/react'
+import { containerVariants, fadeUpItem, SPRING_GENTLE, EASE_OUT } from './motion-utils'
 
 const useCases = [
   {
@@ -28,32 +29,19 @@ const useCases = [
 ]
 
 export function UseCases() {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const cards = el.querySelectorAll('.use-case-card')
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          cards.forEach((card, i) => {
-            setTimeout(() => card.classList.add('in-view'), i * 100)
-          })
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.1 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <section id="use-cases" className="py-24 bg-gradient-to-b from-blue-50/40 to-white" aria-label="Use cases">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
+        <motion.div
+          className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12"
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5, ease: EASE_OUT }}
+        >
           <div>
             <p className="text-xs font-semibold text-[#1a7fc4] uppercase tracking-widest mb-3">
               Built for a More Trustworthy Digital World
@@ -68,30 +56,53 @@ export function UseCases() {
           >
             Explore Use Cases →
           </Link>
-        </div>
+        </motion.div>
 
         {/* Cards */}
-        <div ref={ref} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {useCases.map((uc, i) => (
-            <div
+        <motion.div
+          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+        >
+          {useCases.map((uc) => (
+            <motion.div
               key={uc.title}
-              className="use-case-card opacity-0 translate-y-6 [&.in-view]:opacity-100 [&.in-view]:translate-y-0 transition-all duration-500 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-lg hover:border-blue-100 group"
-              style={{ transitionDelay: `${i * 80}ms` }}
+              variants={fadeUpItem}
+              whileHover={
+                prefersReducedMotion
+                  ? {}
+                  : {
+                      y: -4,
+                      boxShadow: '0 12px 32px -8px rgba(26,127,196,0.14)',
+                      borderColor: 'rgba(26,127,196,0.2)',
+                    }
+              }
+              transition={SPRING_GENTLE}
+              className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm cursor-default overflow-hidden"
             >
+              {/* Image with subtle zoom on card hover */}
               <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden mb-5 bg-gray-50">
-                <Image
-                  src={uc.image}
-                  alt={uc.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                />
+                <motion.div
+                  className="absolute inset-0"
+                  whileHover={prefersReducedMotion ? {} : { scale: 1.04 }}
+                  transition={{ duration: 0.35, ease: EASE_OUT }}
+                >
+                  <Image
+                    src={uc.image}
+                    alt={uc.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
+                </motion.div>
               </div>
               <h3 className="text-base font-bold text-gray-900 mb-2">{uc.title}</h3>
               <p className="text-sm text-gray-500 leading-relaxed">{uc.description}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   )

@@ -124,13 +124,14 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--color-border, var(--border));
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--color-background, var(--background));
+    color: var(--color-foreground, var(--foreground));
   }
   html {
-    @apply font-sans;
+    font-family: var(--font-sans, var(--font-geist-sans)), system-ui, sans-serif;
     scroll-behavior: smooth;
   }
 }
@@ -139,14 +140,15 @@
    PIXENTRA Custom Animations
    ============================================ */
 
-/* Floating animation for hero product card */
+/* Floating animation — subtle 6px travel */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-6px); }
 }
 
 .animate-float {
-  animation: float 4s ease-in-out infinite;
+  animation: float 5s ease-in-out infinite;
+  will-change: transform;
 }
 
 /* Slow spin for evidence visualization rings */
@@ -188,19 +190,25 @@
   animation: fade-in 0.3s ease-out forwards;
 }
 
-/* Heatmap pulse animation */
+/* Heatmap pulse — opacity only, no layout-disturbing scale */
 @keyframes heatmap-pulse {
-  0%, 100% { opacity: 0.7; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.1); }
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; }
 }
 
 .animate-heatmap-pulse {
   animation: heatmap-pulse 3s ease-in-out infinite;
+  will-change: opacity;
 }
 
 /* h-18 utility for taller navbar */
 .h-18 {
   height: 4.5rem;
+}
+
+/* Scan line animation — subtle blue sweep */
+.animate-scan {
+  will-change: transform;
 }
 
 /* Respect prefers-reduced-motion */
@@ -211,11 +219,14 @@
   .animate-scan,
   .animate-fade-in,
   .animate-heatmap-pulse {
-    animation: none;
+    animation: none !important;
   }
 
-  * {
+  *,
+  *::before,
+  *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

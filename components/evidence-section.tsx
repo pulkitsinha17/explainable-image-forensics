@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Grid, Waves, Activity, FileImage, BarChart2, Tag } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
+import { SPRING_GENTLE, EASE_OUT } from './motion-utils'
 
 const evidenceCards = [
   {
@@ -37,21 +38,45 @@ const evidenceCards = [
   },
 ]
 
+const leftContainerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+}
+
+const rightContainerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+}
+
+const leftCardVariants = {
+  hidden: { opacity: 0, x: -14 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: EASE_OUT } },
+}
+
+const rightCardVariants = {
+  hidden: { opacity: 0, x: 14 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: EASE_OUT } },
+}
+
+/* ------------------------------------------------------------------ */
+/* Castle visualization — refined, no spinning decoration             */
+/* ------------------------------------------------------------------ */
 function CastleVisualization() {
   return (
-    <div className="relative w-full max-w-xs mx-auto">
+    <div className="relative w-[280px] sm:w-[320px] max-w-full mx-auto">
       {/* Outer decorative ring */}
-      <div className="absolute inset-0 rounded-full border-2 border-blue-100/80 animate-spin-slow" style={{ margin: '-24px' }} />
+      <div className="absolute inset-0 rounded-full border-2 border-blue-100/80 animate-spin-slow pointer-events-none" style={{ margin: '-24px' }} />
       {/* Inner ring */}
-      <div className="absolute inset-0 rounded-full border border-blue-200/50 animate-spin-slow-reverse" style={{ margin: '-12px' }} />
+      <div className="absolute inset-0 rounded-full border border-blue-200/50 animate-spin-slow-reverse pointer-events-none" style={{ margin: '-12px' }} />
 
       {/* Castle image card */}
-      <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/60" style={{ aspectRatio: '3/4' }}>
+      <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/60 bg-gray-900">
         {/* Layer 1: Original castle */}
         <Image
           src="/images/castle.png"
           alt="Castle photograph for forensic analysis"
           fill
+          priority
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 320px"
         />
@@ -61,7 +86,7 @@ function CastleVisualization() {
 
         {/* Layer 3: Forensic heatmap hotspot */}
         <div
-          className="absolute rounded-full blur-2xl"
+          className="absolute rounded-full blur-2xl pointer-events-none"
           style={{
             width: '110px',
             height: '90px',
@@ -71,7 +96,7 @@ function CastleVisualization() {
           }}
         />
         <div
-          className="absolute rounded-full blur-xl"
+          className="absolute rounded-full blur-xl pointer-events-none"
           style={{
             width: '70px',
             height: '65px',
@@ -82,11 +107,11 @@ function CastleVisualization() {
         />
 
         {/* Layer 4: Scan line (noise analysis) */}
-        <div className="absolute inset-x-0 h-0.5 bg-[#1a7fc4]/40 animate-scan" />
+        <div className="absolute inset-x-0 h-0.5 bg-[#1a7fc4]/40 animate-scan pointer-events-none" />
 
         {/* Analysis badge */}
         <div
-          className="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[9px] font-bold"
+          className="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[9px] font-bold z-10"
           style={{
             background: 'rgba(220,38,38,0.15)',
             border: '1px solid rgba(220,38,38,0.4)',
@@ -98,9 +123,9 @@ function CastleVisualization() {
         </div>
 
         {/* Layer labels */}
-        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3 z-10">
           <div className="flex flex-wrap gap-1">
-            {['Compression', 'Frequency', 'Noise', 'ELA', 'Statistical'].map((layer) => (
+            {['Spatial', 'Frequency', 'Noise', 'ELA', 'Statistical'].map((layer) => (
               <span
                 key={layer}
                 className="text-[8px] font-semibold text-white/90 px-1.5 py-0.5 rounded"
@@ -113,9 +138,9 @@ function CastleVisualization() {
         </div>
       </div>
 
-      {/* Dot indicators on ring */}
+      {/* Subtle staggered dot indicators around the card */}
       {[0, 60, 120, 180, 240, 300].map((deg, i) => (
-        <div
+        <motion.div
           key={i}
           className="absolute w-3 h-3 rounded-full bg-[#1a7fc4] border-2 border-white shadow"
           style={{
@@ -123,6 +148,10 @@ function CastleVisualization() {
             left: `${parseFloat((50 + 52 * Math.sin((deg * Math.PI) / 180)).toFixed(2))}%`,
             transform: 'translate(-50%, -50%)',
           }}
+          initial={{ opacity: 0, scale: 0 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.3, delay: i * 0.08, ease: EASE_OUT }}
         />
       ))}
     </div>
@@ -130,32 +159,19 @@ function CastleVisualization() {
 }
 
 export function EvidenceSection() {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const cards = el.querySelectorAll('.evidence-card')
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          cards.forEach((card, i) => {
-            setTimeout(() => card.classList.add('in-view'), i * 120)
-          })
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.1 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <section className="py-24 bg-gradient-to-b from-white to-blue-50/40" aria-label="Multi-evidence forensic analysis">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.55, ease: EASE_OUT }}
+        >
           <p className="text-xs font-semibold text-[#1a7fc4] uppercase tracking-widest mb-3">
             Powered by Explainable AI
           </p>
@@ -167,65 +183,109 @@ export function EvidenceSection() {
           <p className="text-gray-500 max-w-2xl mx-auto text-base leading-relaxed">
             PIXENTRA combines pixel-level localization with complementary forensic evidence to provide a more interpretable view of potential image manipulation.
           </p>
-        </div>
+        </motion.div>
 
         {/* Main layout: cards + center visualization */}
-        <div ref={ref} className="grid lg:grid-cols-3 gap-8 items-center">
-          {/* Left column */}
-          <div className="space-y-5">
-            {evidenceCards.slice(0, 3).map((card, i) => {
+        <div className="grid lg:grid-cols-3 gap-8 items-center">
+          {/* Left column — slide from left */}
+          <motion.div
+            className="space-y-5"
+            variants={leftContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            {evidenceCards.slice(0, 3).map((card) => {
               const Icon = card.icon
               return (
-                <div
+                <motion.div
                   key={card.title}
-                  className="evidence-card opacity-0 -translate-x-4 [&.in-view]:opacity-100 [&.in-view]:translate-x-0 transition-all duration-500 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-100 group"
-                  style={{ transitionDelay: `${i * 100}ms` }}
+                  variants={leftCardVariants}
+                  whileHover={
+                    prefersReducedMotion
+                      ? {}
+                      : {
+                          x: 3,
+                          boxShadow: '0 6px 20px -4px rgba(26,127,196,0.12)',
+                          borderColor: 'rgba(26,127,196,0.2)',
+                        }
+                  }
+                  transition={SPRING_GENTLE}
+                  className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-default"
                 >
                   <div className="flex items-start gap-3">
                     <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-[#1a7fc4] transition-colors duration-200">
-                      <Icon className="w-4 h-4 text-[#1a7fc4] group-hover:text-white transition-colors duration-200" />
+                      <Icon className="w-4 h-4 text-[#1a7fc4]" />
                     </div>
                     <div>
                       <h3 className="text-sm font-semibold text-gray-800 mb-1">{card.title}</h3>
                       <p className="text-xs text-gray-500 leading-relaxed">{card.description}</p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               )
             })}
-          </div>
+          </motion.div>
 
           {/* Center: castle visualization */}
-          <div className="hidden lg:flex flex-col items-center justify-center py-8">
-            <CastleVisualization />
+          <div className="hidden lg:flex flex-col items-center justify-center py-8 w-full">
+            <motion.div
+              className="w-full flex justify-center"
+              initial={{ opacity: 0, scale: 0.96 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={
+                prefersReducedMotion
+                  ? { duration: 0 }
+                  : { duration: 0.6, ease: EASE_OUT, delay: 0.15 }
+              }
+            >
+              <CastleVisualization />
+            </motion.div>
             <p className="mt-6 text-xs text-gray-400 text-center font-medium">
               Multi-signal convergence
             </p>
           </div>
 
-          {/* Right column */}
-          <div className="space-y-5">
-            {evidenceCards.slice(3).map((card, i) => {
+          {/* Right column — slide from right */}
+          <motion.div
+            className="space-y-5"
+            variants={rightContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            {evidenceCards.slice(3).map((card) => {
               const Icon = card.icon
               return (
-                <div
+                <motion.div
                   key={card.title}
-                  className="evidence-card opacity-0 translate-x-4 [&.in-view]:opacity-100 [&.in-view]:translate-x-0 transition-all duration-500 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-100 group"
-                  style={{ transitionDelay: `${(i + 3) * 100}ms` }}
+                  variants={rightCardVariants}
+                  whileHover={
+                    prefersReducedMotion
+                      ? {}
+                      : {
+                          x: -3,
+                          boxShadow: '0 6px 20px -4px rgba(26,127,196,0.12)',
+                          borderColor: 'rgba(26,127,196,0.2)',
+                        }
+                  }
+                  transition={SPRING_GENTLE}
+                  className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-default"
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-[#1a7fc4] transition-colors duration-200">
-                      <Icon className="w-4 h-4 text-[#1a7fc4] group-hover:text-white transition-colors duration-200" />
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-4 h-4 text-[#1a7fc4]" />
                     </div>
                     <div>
                       <h3 className="text-sm font-semibold text-gray-800 mb-1">{card.title}</h3>
                       <p className="text-xs text-gray-500 leading-relaxed">{card.description}</p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               )
             })}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

@@ -1,5 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
+import { motion } from 'motion/react'
+import { EASE_OUT, containerVariants, fadeUpItem } from './motion-utils'
 
 const footerLinks = {
   Product: [
@@ -29,9 +33,15 @@ export function Footer() {
     <footer className="bg-white border-t border-gray-100" aria-label="Site footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main footer */}
-        <div className="py-14 grid sm:grid-cols-2 lg:grid-cols-6 gap-10">
+        <motion.div
+          className="py-14 grid sm:grid-cols-2 lg:grid-cols-6 gap-10"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+        >
           {/* Brand column */}
-          <div className="lg:col-span-2">
+          <motion.div variants={fadeUpItem} className="lg:col-span-2">
             <Link href="/" aria-label="PIXENTRA home">
               <Image
                 src="/pixentra-logo.svg"
@@ -45,11 +55,11 @@ export function Footer() {
             <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
               Explainable multi-evidence image forgery detection and localization.
             </p>
-          </div>
+          </motion.div>
 
           {/* Nav columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
+            <motion.div key={category} variants={fadeUpItem}>
               <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-4">
                 {category}
               </h3>
@@ -65,18 +75,23 @@ export function Footer() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Bottom bar */}
-        <div className="py-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <motion.div
+          className="py-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.2 }}
+        >
           <p className="text-xs text-gray-400">
             © 2026 PIXENTRA. All rights reserved.
           </p>
-        </div>
+        </motion.div>
       </div>
     </footer>
   )
 }
-

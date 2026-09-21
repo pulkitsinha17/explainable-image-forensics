@@ -5,6 +5,19 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, CheckCircle2, Shield } from 'lucide-react'
 import { useAuth } from '@clerk/nextjs'
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from 'motion/react'
+import {
+  heroContainerVariants,
+  heroItemVariants,
+  SPRING_PRESS,
+  SPRING_GENTLE,
+  EASE_OUT,
+} from './motion-utils'
 
 /* ------------------------------------------------------------------ */
 /* Image comparison slider using mountain.png                          */
@@ -12,7 +25,9 @@ import { useAuth } from '@clerk/nextjs'
 function ImageComparisonSlider() {
   const [sliderPos, setSliderPos] = useState(50)
   const [dragging, setDragging] = useState(false)
+  const [hasInteracted, setHasInteracted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const prefersReducedMotion = useReducedMotion()
 
   const updateSlider = useCallback((clientX: number) => {
     const el = containerRef.current
@@ -20,7 +35,8 @@ function ImageComparisonSlider() {
     const rect = el.getBoundingClientRect()
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width))
     setSliderPos((x / rect.width) * 100)
-  }, [])
+    if (!hasInteracted) setHasInteracted(true)
+  }, [hasInteracted])
 
   const onMouseMove = useCallback((e: MouseEvent) => {
     if (!dragging) return
@@ -87,15 +103,17 @@ function ImageComparisonSlider() {
         style={{ left: `${sliderPos}%` }}
       />
 
-      {/* Slider handle */}
-      <div
+      {/* Slider handle — premium feel with motion */}
+      <motion.div
         className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 bg-white rounded-full shadow-xl border-2 border-gray-200 flex items-center justify-center pointer-events-none z-10"
         style={{ left: `${sliderPos}%` }}
+        animate={dragging ? { scale: 1.12 } : { scale: 1 }}
+        transition={prefersReducedMotion ? { duration: 0 } : SPRING_GENTLE}
       >
         <svg className="w-5 h-5 text-[#1a7fc4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l-3 3 3 3M16 9l3 3-3 3" />
         </svg>
-      </div>
+      </motion.div>
 
       {/* Labels */}
       <div className="absolute bottom-3 left-3 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-lg pointer-events-none">
@@ -105,9 +123,38 @@ function ImageComparisonSlider() {
         <span className="text-[10px] font-semibold text-white tracking-wide uppercase">Forgery Heatmap</span>
       </div>
 
-      {/* Drag hint */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/40 backdrop-blur-sm rounded-full pointer-events-none">
+      {/* Drag hint — fades out after first interaction */}
+      <motion.div
+        className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/40 backdrop-blur-sm rounded-full pointer-events-none"
+        animate={hasInteracted ? { opacity: 0 } : { opacity: 1 }}
+        transition={{ duration: 0.4, ease: 'easeOut', delay: hasInteracted ? 0.2 : 0 }}
+      >
         <span className="text-[9px] text-white/90 font-medium">← Drag to Compare →</span>
+      </motion.div>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Animated evidence bar                                               */
+/* ------------------------------------------------------------------ */
+function EvidenceBar({ label, val, color, delay }: {
+  label: string; val: number; color: string; delay: number
+}) {
+  return (
+    <div>
+      <div className="flex justify-between mb-1">
+        <span className="text-[9px] text-gray-500">{label}</span>
+        <span className="text-[9px] font-bold" style={{ color }}>{val}%</span>
+      </div>
+      <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+        <motion.div
+          className="h-full rounded-full"
+          style={{ background: color }}
+          initial={{ width: 0 }}
+          animate={{ width: `${val}%` }}
+          transition={{ duration: 0.8, ease: EASE_OUT, delay }}
+        />
       </div>
     </div>
   )
@@ -118,25 +165,24 @@ function ImageComparisonSlider() {
 /* ------------------------------------------------------------------ */
 export function Hero() {
   const { isSignedIn } = useAuth()
-  const heroRef = useRef<HTMLDivElement>(null)
+  const prefersReducedMotion = useReducedMotion()
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const el = heroRef.current
-    if (!el) return
-    el.style.opacity = '0'
-    el.style.transform = 'translateY(20px)'
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        el.style.transition = 'opacity 0.8s ease, transform 0.8s ease'
-        el.style.opacity = '1'
-        el.style.transform = 'translateY(0)'
-      })
-    })
-  }, [])
+  // Subtle parallax on the right panel — scroll drives a very slight Y offset
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end start'],
+  })
+  const rightPanelY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion ? [0, 0] : [0, 40]
+  )
 
   return (
     <section
       id="home"
+      ref={containerRef}
       className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-white"
     >
       {/* Background subtle gradient */}
@@ -146,18 +192,28 @@ export function Hero() {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left: Text content */}
-          <div ref={heroRef}>
+          {/* Left: Text content — staggered Motion entrance */}
+          <motion.div
+            variants={heroContainerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {/* Eyebrow badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full mb-6">
+            <motion.div
+              variants={heroItemVariants}
+              className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full mb-6"
+            >
               <div className="w-1.5 h-1.5 rounded-full bg-[#1a7fc4] animate-pulse" />
               <span className="text-xs font-semibold text-[#1a7fc4] tracking-wide uppercase">
                 AI-Powered • Explainable • Multi-Evidence Analysis
               </span>
-            </div>
+            </motion.div>
 
             {/* Headline */}
-            <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6">
+            <motion.h1
+              variants={heroItemVariants}
+              className="text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6"
+            >
               Uncover the{' '}
               <span className="relative">
                 <span className="text-[#1a7fc4]">Truth</span>
@@ -171,59 +227,84 @@ export function Hero() {
                 </svg>
               </span>
               {' '}Behind Every Image
-            </h1>
+            </motion.h1>
 
             {/* Supporting copy */}
-            <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl">
+            <motion.p
+              variants={heroItemVariants}
+              className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl"
+            >
               PIXENTRA combines AI-powered forgery localization with multiple digital forensic signals to detect suspicious image regions and explain the evidence behind every result.
-            </p>
+            </motion.p>
 
             {/* Feature indicators */}
-            <div className="flex flex-wrap gap-4 mb-10">
+            <motion.div variants={heroItemVariants} className="flex flex-wrap gap-4 mb-10">
               {['Forgery Detection', 'Pixel-Level Localization', 'Explainable Evidence'].map((feat) => (
                 <div key={feat} className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-[#1a7fc4]" />
                   <span className="text-sm font-medium text-gray-700">{feat}</span>
                 </div>
               ))}
-            </div>
+            </motion.div>
 
             {/* CTAs */}
-            <div className="flex flex-wrap gap-4 mb-6">
-              <Link
-                href={isSignedIn ? "/dashboard" : "/sign-up"}
-                className="group inline-flex items-center gap-2 px-6 py-3.5 bg-[#1a7fc4] text-white font-semibold rounded-xl hover:bg-[#1565a8] transition-all duration-200 shadow-md hover:shadow-lg hover:shadow-blue-100 text-sm"
-                id="hero-cta-get-started"
+            <motion.div variants={heroItemVariants} className="flex flex-wrap gap-4 mb-6">
+              <motion.div
+                whileHover={prefersReducedMotion ? {} : { scale: 1.01 }}
+                whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
+                transition={SPRING_PRESS}
               >
-                Get Started
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
+                <Link
+                  href={isSignedIn ? "/dashboard" : "/sign-up"}
+                  className="group inline-flex items-center gap-2 px-6 py-3.5 bg-[#1a7fc4] text-white font-semibold rounded-xl hover:bg-[#1565a8] transition-colors duration-200 shadow-md hover:shadow-lg hover:shadow-blue-100 text-sm"
+                  id="hero-cta-get-started"
+                >
+                  Get Started
+                  <motion.span
+                    className="inline-block"
+                    whileHover={prefersReducedMotion ? {} : { x: 2 }}
+                    transition={SPRING_PRESS}
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.span>
+                </Link>
+              </motion.div>
               <a
                 href="#how-it-works"
                 onClick={(e) => {
                   e.preventDefault()
                   document.querySelector('#how-it-works')?.scrollIntoView({ behavior: 'smooth' })
                 }}
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:border-[#1a7fc4] hover:text-[#1a7fc4] transition-all duration-200 text-sm"
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:border-[#1a7fc4] hover:text-[#1a7fc4] transition-all duration-200 text-sm cursor-pointer"
                 id="hero-cta-how-it-works"
               >
                 Explore How It Works
               </a>
-            </div>
+            </motion.div>
 
             {/* Trust statement */}
-            <div className="flex items-center gap-2 text-xs text-gray-400">
+            <motion.div variants={heroItemVariants} className="flex items-center gap-2 text-xs text-gray-400">
               <Shield className="w-3.5 h-3.5" />
               <span>Sign in required to analyze images</span>
               <span className="text-gray-300">•</span>
               <span>Secure analysis</span>
               <span className="text-gray-300">•</span>
               <span>Privacy focused</span>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* Right: Image comparison slider */}
-          <div className="relative">
+          {/* Right: Image comparison slider — subtle parallax */}
+          <motion.div
+            className="relative"
+            style={{ y: rightPanelY }}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={
+              prefersReducedMotion
+                ? { duration: 0 }
+                : { duration: 0.8, ease: EASE_OUT, delay: 0.2 }
+            }
+          >
             <div className="relative">
               {/* Header bar above slider */}
               <div className="bg-gray-50 rounded-t-2xl border border-gray-200 border-b-0 px-4 py-2.5 flex items-center justify-between">
@@ -244,7 +325,7 @@ export function Hero() {
               {/* Comparison slider */}
               <ImageComparisonSlider />
 
-              {/* Evidence summary below slider */}
+              {/* Evidence summary below slider — animated bars */}
               <div className="bg-white rounded-b-2xl border border-gray-200 border-t border-gray-100 px-4 py-3">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Evidence Summary</span>
@@ -254,25 +335,13 @@ export function Hero() {
                     { label: 'Compression', val: 78, color: '#dc2626' },
                     { label: 'Frequency', val: 62, color: '#ea580c' },
                     { label: 'Noise', val: 71, color: '#ca8a04' },
-                  ].map((ev) => (
-                    <div key={ev.label}>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-[9px] text-gray-500">{ev.label}</span>
-                        <span className="text-[9px] font-bold" style={{ color: ev.color }}>{ev.val}%</span>
-                      </div>
-                      <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full" style={{ width: `${ev.val}%`, background: ev.color }} />
-                      </div>
-                    </div>
+                  ].map((ev, i) => (
+                    <EvidenceBar key={ev.label} {...ev} delay={0.4 + i * 0.1} />
                   ))}
                 </div>
               </div>
             </div>
-
-            {/* Floating accent elements */}
-            <div className="absolute -top-4 -right-4 w-20 h-20 bg-blue-100 rounded-full blur-2xl opacity-60 pointer-events-none" />
-            <div className="absolute -bottom-6 -left-6 w-28 h-28 bg-blue-50 rounded-full blur-2xl opacity-50 pointer-events-none" />
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

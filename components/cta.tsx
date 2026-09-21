@@ -1,7 +1,13 @@
+'use client'
+
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
+import { SPRING_PRESS, SPRING_GENTLE, EASE_OUT, containerVariants, fadeUpItem } from './motion-utils'
 
 export function CTA() {
+  const prefersReducedMotion = useReducedMotion()
+
   return (
     <section
       className="py-24 bg-[#0d1117] relative overflow-hidden"
@@ -21,36 +27,66 @@ export function CTA() {
         />
       </div>
 
-      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <motion.div
+        className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.4 }}
+      >
         {/* Eyebrow */}
-        <p className="text-xs font-semibold text-[#1a7fc4] uppercase tracking-widest mb-6">
+        <motion.p
+          variants={fadeUpItem}
+          className="text-xs font-semibold text-[#1a7fc4] uppercase tracking-widest mb-6"
+        >
           TRUST EVIDENCE, NOT ASSUMPTIONS
-        </p>
+        </motion.p>
 
         {/* Headline */}
-        <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+        <motion.h2
+          variants={fadeUpItem}
+          className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight"
+        >
           See Beyond the Pixels.
-        </h2>
+        </motion.h2>
 
         {/* Supporting text */}
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+        <motion.p
+          variants={fadeUpItem}
+          className="text-gray-400 text-lg max-w-2xl mx-auto mb-10 leading-relaxed"
+        >
           Explore image forensics through AI-powered localization and explainable multi-evidence analysis.
-        </p>
+        </motion.p>
 
         {/* CTA */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link
-            href="/sign-up"
-            className="group inline-flex items-center gap-2 px-8 py-4 bg-[#1a7fc4] text-white font-bold rounded-xl hover:bg-[#1565a8] transition-all duration-200 shadow-lg shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-900/40 text-base"
-            id="cta-create-account"
+        <motion.div
+          variants={fadeUpItem}
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+        >
+          <motion.div
+            whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+            whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
+            transition={SPRING_PRESS}
           >
-            Create Your Account
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-        </div>
+            <Link
+              href="/sign-up"
+              className="group inline-flex items-center gap-2 px-8 py-4 bg-[#1a7fc4] text-white font-bold rounded-xl hover:bg-[#1565a8] transition-colors duration-200 shadow-lg shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-900/40 text-base"
+              id="cta-create-account"
+            >
+              Create Your Account
+              <motion.span
+                className="inline-block"
+                whileHover={prefersReducedMotion ? {} : { x: 3 }}
+                transition={SPRING_GENTLE}
+              >
+                <ArrowRight className="w-5 h-5" />
+              </motion.span>
+            </Link>
+          </motion.div>
+        </motion.div>
 
         {/* Sign in link */}
-        <p className="mt-5 text-sm text-gray-500">
+        <motion.p variants={fadeUpItem} className="mt-5 text-sm text-gray-500">
           Already have an account?{' '}
           <Link
             href="/sign-in"
@@ -59,9 +95,8 @@ export function CTA() {
           >
             Sign In
           </Link>
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
     </section>
   )
 }
-

@@ -148,7 +148,7 @@ export default function AboutPage() {
               href="/"
               className="px-8 py-3 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:border-[#1a7fc4] hover:text-[#1a7fc4] transition-all duration-200"
             >
-              View Landing Page
+              Home
             </Link>
           </div>
         </div>

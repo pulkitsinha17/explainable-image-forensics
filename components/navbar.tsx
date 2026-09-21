@@ -5,6 +5,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
 import { useAuth, UserButton } from '@clerk/nextjs'
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+} from 'motion/react'
+import { SPRING_LAYOUT, SPRING_PANEL, SPRING_PRESS } from './motion-utils'
 
 const navLinks = [
   { label: 'Home', href: '#home', external: false },
@@ -18,7 +24,9 @@ const navLinks = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null)
   const { isSignedIn, isLoaded } = useAuth()
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10)
@@ -52,7 +60,7 @@ export function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-18">
-          {/* Logo — increased size for better visibility */}
+          {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0 py-2" aria-label="PIXENTRA home">
             <Image
               src="/pixentra-logo.svg"
@@ -65,39 +73,83 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-            {navLinks.map((link) => (
-              link.external ? (
+          <nav
+            className="hidden md:flex items-center gap-1"
+            aria-label="Main navigation"
+            onMouseLeave={() => setHoveredLink(null)}
+          >
+            {navLinks.map((link) => {
+              const isHovered = hoveredLink === link.label
+              const content = (
+                <span className="relative z-10">{link.label}</span>
+              )
+              const baseClass =
+                'relative px-4 py-2 text-sm font-medium text-gray-600 rounded-lg transition-colors duration-200 hover:text-[#1a7fc4] cursor-pointer'
+
+              return link.external ? (
                 <Link
                   key={link.label}
                   href={link.href}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:text-[#1a7fc4] hover:bg-blue-50 transition-all duration-200"
+                  className={baseClass}
+                  onMouseEnter={() => setHoveredLink(link.label)}
                 >
-                  {link.label}
+                  {/* Shared-layout hover pill */}
+                  <AnimatePresence>
+                    {isHovered && (
+                      <motion.span
+                        layoutId="nav-hover-pill"
+                        className="absolute inset-0 rounded-lg bg-blue-50"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={prefersReducedMotion ? { duration: 0 } : SPRING_LAYOUT}
+                      />
+                    )}
+                  </AnimatePresence>
+                  {content}
                 </Link>
               ) : (
                 <a
                   key={link.label}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href, link.external)}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:text-[#1a7fc4] hover:bg-blue-50 transition-all duration-200"
+                  className={baseClass}
+                  onMouseEnter={() => setHoveredLink(link.label)}
                 >
-                  {link.label}
+                  <AnimatePresence>
+                    {isHovered && (
+                      <motion.span
+                        layoutId="nav-hover-pill"
+                        className="absolute inset-0 rounded-lg bg-blue-50"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={prefersReducedMotion ? { duration: 0 } : SPRING_LAYOUT}
+                      />
+                    )}
+                  </AnimatePresence>
+                  {content}
                 </a>
               )
-            ))}
+            })}
           </nav>
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
             {isLoaded && isSignedIn ? (
               <>
-                <Link
-                  href="/dashboard"
-                  className="px-4 py-2 text-sm font-semibold text-white bg-[#1a7fc4] rounded-lg hover:bg-[#1565a8] transition-all duration-200 shadow-sm hover:shadow-md"
+                <motion.div
+                  whileHover={prefersReducedMotion ? {} : { scale: 1.01 }}
+                  whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
+                  transition={SPRING_PRESS}
                 >
-                  Dashboard
-                </Link>
+                  <Link
+                    href="/dashboard"
+                    className="px-4 py-2 text-sm font-semibold text-white bg-[#1a7fc4] rounded-lg hover:bg-[#1565a8] transition-colors duration-200 shadow-sm block"
+                  >
+                    Dashboard
+                  </Link>
+                </motion.div>
                 <UserButton
                   userProfileMode="navigation"
                   userProfileUrl="/settings/profile"
@@ -116,98 +168,134 @@ export function Navbar() {
                 >
                   Sign In
                 </Link>
-                <Link
-                  href="/sign-up"
-                  className="px-5 py-2 text-sm font-semibold text-white bg-[#1a7fc4] rounded-lg hover:bg-[#1565a8] transition-all duration-200 shadow-sm hover:shadow-md"
+                <motion.div
+                  whileHover={prefersReducedMotion ? {} : { scale: 1.01 }}
+                  whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
+                  transition={SPRING_PRESS}
                 >
-                  Get Started
-                </Link>
+                  <Link
+                    href="/sign-up"
+                    className="px-5 py-2 text-sm font-semibold text-white bg-[#1a7fc4] rounded-lg hover:bg-[#1565a8] transition-colors duration-200 shadow-sm block"
+                  >
+                    Get Started
+                  </Link>
+                </motion.div>
               </>
             )}
           </div>
 
           {/* Mobile hamburger */}
-          <button
+          <motion.button
             className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
+            whileTap={prefersReducedMotion ? {} : { scale: 0.92 }}
+            transition={SPRING_PRESS}
           >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+            <AnimatePresence mode="wait" initial={false}>
+              {mobileOpen ? (
+                <motion.span
+                  key="close"
+                  initial={{ opacity: 0, rotate: -45 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: 45 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <X className="w-5 h-5" />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="menu"
+                  initial={{ opacity: 0, rotate: 45 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: -45 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <Menu className="w-5 h-5" />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.button>
         </div>
       </div>
 
-      {/* Mobile Nav */}
-      <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          mobileOpen ? 'max-h-[480px] opacity-100' : 'max-h-0 opacity-0'
-        } bg-white/98 backdrop-blur-md border-b border-gray-100`}
-      >
-        <nav className="px-4 py-4 flex flex-col gap-1" aria-label="Mobile navigation">
-          {navLinks.map((link) => (
-            link.external ? (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:text-[#1a7fc4] hover:bg-blue-50 transition-all duration-200"
-                onClick={() => setMobileOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ) : (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.href, link.external)}
-                className="px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:text-[#1a7fc4] hover:bg-blue-50 transition-all duration-200"
-              >
-                {link.label}
-              </a>
-            )
-          ))}
-          <div className="pt-3 mt-2 border-t border-gray-100 flex flex-col gap-2">
-            {isLoaded && isSignedIn ? (
-              <div className="flex items-center justify-between px-2 py-2">
-                <Link
-                  href="/dashboard"
-                  className="flex-1 mr-3 px-4 py-3 text-sm font-semibold text-white bg-[#1a7fc4] rounded-xl hover:bg-[#1565a8] transition-all duration-200 text-center"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Dashboard
-                </Link>
-                <UserButton
-                  userProfileMode="navigation"
-                  userProfileUrl="/settings/profile"
-                  appearance={{
-                    elements: {
-                      avatarBox: 'w-9 h-9',
-                    },
-                  }}
-                />
+      {/* Mobile Nav — AnimatePresence for proper enter/exit */}
+      <AnimatePresence initial={false}>
+        {mobileOpen && (
+          <motion.div
+            key="mobile-nav"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={prefersReducedMotion ? { duration: 0 } : SPRING_PANEL}
+            className="md:hidden overflow-hidden bg-white/98 backdrop-blur-md border-b border-gray-100"
+          >
+            <nav className="px-4 py-4 flex flex-col gap-1" aria-label="Mobile navigation">
+              {navLinks.map((link) =>
+                link.external ? (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:text-[#1a7fc4] hover:bg-blue-50 transition-all duration-200"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href, link.external)}
+                    className="px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:text-[#1a7fc4] hover:bg-blue-50 transition-all duration-200"
+                  >
+                    {link.label}
+                  </a>
+                )
+              )}
+              <div className="pt-3 mt-2 border-t border-gray-100 flex flex-col gap-2">
+                {isLoaded && isSignedIn ? (
+                  <div className="flex items-center justify-between px-2 py-2">
+                    <Link
+                      href="/dashboard"
+                      className="flex-1 mr-3 px-4 py-3 text-sm font-semibold text-white bg-[#1a7fc4] rounded-xl hover:bg-[#1565a8] transition-all duration-200 text-center"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <UserButton
+                      userProfileMode="navigation"
+                      userProfileUrl="/settings/profile"
+                      appearance={{
+                        elements: {
+                          avatarBox: 'w-9 h-9',
+                        },
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <Link
+                      href="/sign-in"
+                      className="px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:text-[#1a7fc4] hover:bg-blue-50 transition-all duration-200 text-center"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/sign-up"
+                      className="px-4 py-3 text-sm font-semibold text-white bg-[#1a7fc4] rounded-xl hover:bg-[#1565a8] transition-all duration-200 text-center"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Get Started
+                    </Link>
+                  </>
+                )}
               </div>
-            ) : (
-              <>
-                <Link
-                  href="/sign-in"
-                  className="px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:text-[#1a7fc4] hover:bg-blue-50 transition-all duration-200 text-center"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/sign-up"
-                  className="px-4 py-3 text-sm font-semibold text-white bg-[#1a7fc4] rounded-xl hover:bg-[#1565a8] transition-all duration-200 text-center"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Get Started
-                </Link>
-              </>
-            )}
-          </div>
-        </nav>
-      </div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   )
 }
-
