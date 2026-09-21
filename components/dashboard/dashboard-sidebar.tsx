@@ -65,7 +65,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       <div>
         {/* Brand Header */}
         <div className="px-6 py-6 border-b border-gray-100">
-          <Link href="/dashboard" className="inline-block group">
+          <Link href="/" className="inline-block group">
             <div className="flex items-center gap-2.5">
               <Image
                 src="/pixentra-logo.svg"
@@ -183,7 +183,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
       {/* Mobile Top Header / Toggle */}
       <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 sticky top-0 z-40">
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <Image
             src="/pixentra-logo.svg"
             alt="PIXENTRA"

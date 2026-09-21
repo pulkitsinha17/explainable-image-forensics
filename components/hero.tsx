@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, CheckCircle2, Shield } from 'lucide-react'
+import { useAuth } from '@clerk/nextjs'
 
 /* ------------------------------------------------------------------ */
 /* Image comparison slider using mountain.png                          */
@@ -116,6 +117,7 @@ function ImageComparisonSlider() {
 /* Hero section                                                        */
 /* ------------------------------------------------------------------ */
 export function Hero() {
+  const { isSignedIn } = useAuth()
   const heroRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -189,7 +191,7 @@ export function Hero() {
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 mb-6">
               <Link
-                href="/sign-up"
+                href={isSignedIn ? "/dashboard" : "/sign-up"}
                 className="group inline-flex items-center gap-2 px-6 py-3.5 bg-[#1a7fc4] text-white font-semibold rounded-xl hover:bg-[#1565a8] transition-all duration-200 shadow-md hover:shadow-lg hover:shadow-blue-100 text-sm"
                 id="hero-cta-get-started"
               >

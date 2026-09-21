@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UserButton } from "@clerk/nextjs";
 import { Sun, Moon } from "lucide-react";
 
 interface DashboardHeaderProps {
@@ -27,7 +26,7 @@ export function DashboardHeader({ firstName }: DashboardHeaderProps) {
   }, []);
 
   return (
-    <div className="pt-2 sm:pt-3 flex items-center justify-between gap-4">
+    <div className="pt-1 sm:pt-2 flex items-center justify-between gap-4">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight flex items-center gap-2.5">
           {timeOfDay === "morning" && (
@@ -46,19 +45,6 @@ export function DashboardHeader({ firstName }: DashboardHeaderProps) {
         <p className="text-xs sm:text-sm text-gray-500 mt-1">
           Investigate an image and uncover the evidence behind its pixels.
         </p>
-      </div>
-
-      <div className="flex items-center shrink-0">
-        <UserButton
-          userProfileMode="navigation"
-          userProfileUrl="/settings/profile"
-          appearance={{
-            elements: {
-              avatarBox:
-                "w-10 h-10 ring-2 ring-gray-200/80 hover:ring-[#1a7fc4]/50 transition-all",
-            },
-          }}
-        />
       </div>
     </div>
   );

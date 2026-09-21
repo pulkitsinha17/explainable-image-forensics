@@ -4,6 +4,7 @@ import { getUserAnalysisHistory, type ActivityDataPoint, type ActivityTimelines 
 import type { HistorySummaryStats } from "@/components/history/types";
 
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
+import { DashboardNavbar } from "@/components/dashboard/dashboard-navbar";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { AnalysisCTA } from "@/components/dashboard/analysis-cta";
 import { StatsGrid, type DashboardStats } from "@/components/dashboard/stats-grid";
@@ -99,6 +100,9 @@ export default async function DashboardPage() {
 
       {/* Main Forensic Workspace */}
       <div className="flex-1 min-w-0 flex flex-col">
+        {/* Sticky Dashboard Top Navbar */}
+        <DashboardNavbar />
+
         <main className="flex-1 p-4 sm:p-6 lg:p-7 max-w-7xl w-full mx-auto space-y-5 sm:space-y-6 animate-fade-in">
           {/* Top Header */}
           <DashboardHeader firstName={firstName} />
