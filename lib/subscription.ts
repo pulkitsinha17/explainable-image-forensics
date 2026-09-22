@@ -104,7 +104,7 @@ export interface UserUsageInfo {
 export async function getUserUsageAndLimit(clerkUserId: string): Promise<UserUsageInfo> {
   await connectToDatabase();
 
-  let subscriptionDoc = await Subscription.findOne({ clerkUserId }).lean();
+  const subscriptionDoc = await Subscription.findOne({ clerkUserId }).lean();
   
   const planTier = (subscriptionDoc?.plan as PlanTier) || "free";
   const planDef = PLAN_DEFINITIONS[planTier] || PLAN_DEFINITIONS.free;

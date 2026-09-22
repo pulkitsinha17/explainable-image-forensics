@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
-import { SPRING_PRESS, SPRING_GENTLE, EASE_OUT, containerVariants, fadeUpItem } from './motion-utils'
+import { SPRING_PRESS, SPRING_GENTLE, containerVariants, fadeUpItem } from './motion-utils'
 
 export function CTA() {
   const prefersReducedMotion = useReducedMotion()

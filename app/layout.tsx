@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { GlobalPageTransition } from "@/components/global-page-transition";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -59,10 +61,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       >
         <body className="min-h-full flex flex-col bg-white text-gray-900 overflow-x-hidden">
+          <Suspense fallback={null}>
+            <GlobalPageTransition />
+          </Suspense>
           {children}
         </body>
       </html>
     </ClerkProvider>
   );
 }
+
 

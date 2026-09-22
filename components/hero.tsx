@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, CheckCircle2, Shield, Sparkles } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Shield } from 'lucide-react'
 import { useAuth } from '@clerk/nextjs'
 import {
   motion,
