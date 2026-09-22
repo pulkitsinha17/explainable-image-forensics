@@ -3,13 +3,15 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, CheckCircle2, Shield } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Shield, Sparkles } from 'lucide-react'
 import { useAuth } from '@clerk/nextjs'
 import {
   motion,
   useReducedMotion,
   useScroll,
   useTransform,
+  useMotionValue,
+  useSpring,
 } from 'motion/react'
 import {
   heroContainerVariants,
@@ -66,7 +68,7 @@ function ImageComparisonSlider() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden select-none cursor-col-resize shadow-xl border border-gray-200"
+      className="relative w-full aspect-[4/3] overflow-hidden select-none cursor-col-resize"
       onMouseDown={(e) => { setDragging(true); updateSlider(e.clientX) }}
       onTouchStart={(e) => { setDragging(true); updateSlider(e.touches[0].clientX) }}
     >
@@ -97,39 +99,39 @@ function ImageComparisonSlider() {
         />
       </div>
 
-      {/* Slider divider line */}
+      {/* Slider divider line with subtle glow */}
       <div
-        className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg pointer-events-none"
+        className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] pointer-events-none z-10"
         style={{ left: `${sliderPos}%` }}
       />
 
       {/* Slider handle — premium feel with motion */}
       <motion.div
-        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 bg-white rounded-full shadow-xl border-2 border-gray-200 flex items-center justify-center pointer-events-none z-10"
+        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 bg-white/95 backdrop-blur-md rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.25)] border-2 border-gray-100 flex items-center justify-center pointer-events-none z-20"
         style={{ left: `${sliderPos}%` }}
-        animate={dragging ? { scale: 1.12 } : { scale: 1 }}
+        animate={dragging ? { scale: 1.15 } : { scale: 1 }}
         transition={prefersReducedMotion ? { duration: 0 } : SPRING_GENTLE}
       >
         <svg className="w-5 h-5 text-[#1a7fc4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l-3 3 3 3M16 9l3 3-3 3" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 9l-3 3 3 3M16 9l3 3-3 3" />
         </svg>
       </motion.div>
 
       {/* Labels */}
-      <div className="absolute bottom-3 left-3 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-lg pointer-events-none">
+      <div className="absolute bottom-3 left-3 px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-lg pointer-events-none border border-white/10">
         <span className="text-[10px] font-semibold text-white tracking-wide uppercase">Original Image</span>
       </div>
-      <div className="absolute bottom-3 right-3 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-lg pointer-events-none">
+      <div className="absolute bottom-3 right-3 px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-lg pointer-events-none border border-white/10">
         <span className="text-[10px] font-semibold text-white tracking-wide uppercase">Forgery Heatmap</span>
       </div>
 
       {/* Drag hint — fades out after first interaction */}
       <motion.div
-        className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/40 backdrop-blur-sm rounded-full pointer-events-none"
+        className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/50 backdrop-blur-md rounded-full pointer-events-none border border-white/10 shadow-sm"
         animate={hasInteracted ? { opacity: 0 } : { opacity: 1 }}
         transition={{ duration: 0.4, ease: 'easeOut', delay: hasInteracted ? 0.2 : 0 }}
       >
-        <span className="text-[9px] text-white/90 font-medium">← Drag to Compare →</span>
+        <span className="text-[9px] text-white/90 font-medium tracking-wide">← Drag to Compare →</span>
       </motion.div>
     </div>
   )
@@ -144,8 +146,8 @@ function EvidenceBar({ label, val, color, delay }: {
   return (
     <div>
       <div className="flex justify-between mb-1">
-        <span className="text-[9px] text-gray-500">{label}</span>
-        <span className="text-[9px] font-bold" style={{ color }}>{val}%</span>
+        <span className="text-[9px] text-gray-500 font-medium">{label}</span>
+        <span className="text-[9px] font-bold font-mono" style={{ color }}>{val}%</span>
       </div>
       <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
         <motion.div
@@ -167,8 +169,32 @@ export function Hero() {
   const { isSignedIn } = useAuth()
   const prefersReducedMotion = useReducedMotion()
   const containerRef = useRef<HTMLDivElement>(null)
+  const imagePanelRef = useRef<HTMLDivElement>(null)
 
-  // Subtle parallax on the right panel — scroll drives a very slight Y offset
+  // 3D Mouse Tilt Physics for the Image Window
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
+  const mouseXSpring = useSpring(mouseX, { stiffness: 200, damping: 22 })
+  const mouseYSpring = useSpring(mouseY, { stiffness: 200, damping: 22 })
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['4deg', '-4deg'])
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-4deg', '4deg'])
+
+  const handleImageMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion || !imagePanelRef.current) return
+    const rect = imagePanelRef.current.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width - 0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5
+    mouseX.set(x)
+    mouseY.set(y)
+  }, [prefersReducedMotion, mouseX, mouseY])
+
+  const handleImageMouseLeave = useCallback(() => {
+    mouseX.set(0)
+    mouseY.set(0)
+  }, [mouseX, mouseY])
+
+  // Subtle parallax on the right panel
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end start'],
@@ -176,7 +202,7 @@ export function Hero() {
   const rightPanelY = useTransform(
     scrollYProgress,
     [0, 1],
-    prefersReducedMotion ? [0, 0] : [0, 40]
+    prefersReducedMotion ? [0, 0] : [0, 30]
   )
 
   return (
@@ -201,7 +227,7 @@ export function Hero() {
             {/* Eyebrow badge */}
             <motion.div
               variants={heroItemVariants}
-              className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full mb-6"
+              className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full mb-6 shadow-xs"
             >
               <div className="w-1.5 h-1.5 rounded-full bg-[#1a7fc4] animate-pulse" />
               <span className="text-xs font-semibold text-[#1a7fc4] tracking-wide uppercase">
@@ -209,22 +235,41 @@ export function Hero() {
               </span>
             </motion.div>
 
-            {/* Headline */}
+            {/* Headline with animated 'Truth' */}
             <motion.h1
               variants={heroItemVariants}
               className="text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6"
             >
               Uncover the{' '}
-              <span className="relative">
-                <span className="text-[#1a7fc4]">Truth</span>
-                <svg
-                  className="absolute -bottom-1 left-0 w-full"
-                  height="4"
-                  viewBox="0 0 100 4"
+              <span className="relative inline-block">
+                {/* Subtle luminous ambient glow behind 'Truth' */}
+                <span className="absolute inset-0 bg-blue-400/15 blur-lg rounded-full -z-10 pointer-events-none animate-pulse" />
+                {/* Shimmering animated brand blue text */}
+                <span className="bg-gradient-to-r from-[#1a7fc4] via-[#5bb8f5] to-[#1a7fc4] bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shimmer font-bold">
+                  Truth
+                </span>
+                {/* Animated draw-in curved underline */}
+                <motion.svg
+                  className="absolute -bottom-1 left-0 w-full overflow-visible pointer-events-none"
+                  height="6"
+                  viewBox="0 0 100 6"
                   preserveAspectRatio="none"
                 >
-                  <path d="M0 2 Q50 0 100 2" stroke="#1a7fc4" strokeWidth="1.5" fill="none" opacity="0.5" />
-                </svg>
+                  <motion.path
+                    d="M 0 3 Q 50 0 100 3"
+                    stroke="#1a7fc4"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    fill="none"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 0.85 }}
+                    transition={{
+                      duration: 1.1,
+                      ease: EASE_OUT,
+                      delay: 0.5,
+                    }}
+                  />
+                </motion.svg>
               </span>
               {' '}Behind Every Image
             </motion.h1>
@@ -250,7 +295,7 @@ export function Hero() {
             {/* CTAs */}
             <motion.div variants={heroItemVariants} className="flex flex-wrap gap-4 mb-6">
               <motion.div
-                whileHover={prefersReducedMotion ? {} : { scale: 1.01 }}
+                whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                 whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
                 transition={SPRING_PRESS}
               >
@@ -293,54 +338,116 @@ export function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* Right: Image comparison slider — subtle parallax */}
+          {/* Right: Floating 3D Image Comparison Window */}
           <motion.div
-            className="relative"
+            className="relative [perspective:1200px]"
             style={{ y: rightPanelY }}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 24, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={
               prefersReducedMotion
                 ? { duration: 0 }
                 : { duration: 0.8, ease: EASE_OUT, delay: 0.2 }
             }
           >
-            <div className="relative">
-              {/* Header bar above slider */}
-              <div className="bg-gray-50 rounded-t-2xl border border-gray-200 border-b-0 px-4 py-2.5 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
+            {/* Ambient Background Aura behind Image Window */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 bg-gradient-to-tr from-blue-400/20 via-[#1a7fc4]/15 to-indigo-400/15 rounded-full blur-3xl pointer-events-none -z-10" />
+
+            {/* Continuous Floating Levitation Wrapper */}
+            <motion.div
+              animate={
+                prefersReducedMotion
+                  ? {}
+                  : {
+                      y: [-7, 7, -7],
+                    }
+              }
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            >
+              {/* Interactive 3D Card with Tilt */}
+              <motion.div
+                ref={imagePanelRef}
+                onMouseMove={handleImageMouseMove}
+                onMouseLeave={handleImageMouseLeave}
+                style={
+                  prefersReducedMotion
+                    ? {}
+                    : {
+                        rotateX,
+                        rotateY,
+                        transformStyle: 'preserve-3d',
+                      }
+                }
+                className="relative bg-white rounded-3xl border border-gray-200/90 shadow-[0_20px_50px_-12px_rgba(26,127,196,0.18),0_8px_24px_-6px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.04] overflow-hidden group transition-shadow duration-500 hover:shadow-[0_30px_70px_-15px_rgba(26,127,196,0.26),0_12px_32px_-8px_rgba(0,0,0,0.08)]"
+              >
+                {/* Top Specular Glaze Line */}
+                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5bb8f5]/60 to-transparent pointer-events-none z-30" />
+
+                {/* Header bar above slider */}
+                <div className="bg-gray-50/95 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-gray-200/80">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-400/90 border border-red-500/20" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/90 border border-yellow-500/20" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-400/90 border border-green-500/20" />
+                    </div>
+                    <span className="text-[10px] text-gray-500 font-mono ml-1.5 font-medium">
+                      mountain.jpg — Forensic Analysis
+                    </span>
                   </div>
-                  <span className="text-[10px] text-gray-500 font-mono ml-1">mountain.jpg — Forensic Analysis</span>
+                  <div className="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full border border-green-200/60">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-[9px] text-green-700 font-semibold tracking-wide uppercase">
+                      Analysis Complete
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-[10px] text-green-600 font-semibold">Analysis Complete</span>
-                </div>
-              </div>
 
-              {/* Comparison slider */}
-              <ImageComparisonSlider />
+                {/* Comparison slider */}
+                <ImageComparisonSlider />
 
-              {/* Evidence summary below slider — animated bars */}
-              <div className="bg-white rounded-b-2xl border border-gray-200 border-t border-gray-100 px-4 py-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Evidence Summary</span>
+                {/* Evidence summary below slider — animated bars */}
+                <div className="bg-white px-5 py-3.5 border-t border-gray-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      Evidence Summary
+                    </span>
+                    <span className="text-[9px] text-gray-400 font-mono">3 Active Channels</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { label: 'Compression', val: 78, color: '#dc2626' },
+                      { label: 'Frequency', val: 62, color: '#ea580c' },
+                      { label: 'Noise', val: 71, color: '#ca8a04' },
+                    ].map((ev, i) => (
+                      <EvidenceBar key={ev.label} {...ev} delay={0.4 + i * 0.1} />
+                    ))}
+                  </div>
                 </div>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { label: 'Compression', val: 78, color: '#dc2626' },
-                    { label: 'Frequency', val: 62, color: '#ea580c' },
-                    { label: 'Noise', val: 71, color: '#ca8a04' },
-                  ].map((ev, i) => (
-                    <EvidenceBar key={ev.label} {...ev} delay={0.4 + i * 0.1} />
-                  ))}
-                </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Dynamic Ground Contact Shadow */}
+            <motion.div
+              className="w-3/4 h-7 bg-blue-900/15 rounded-[100%] mx-auto blur-xl -mt-2 -z-10 pointer-events-none"
+              animate={
+                prefersReducedMotion
+                  ? {}
+                  : {
+                      scaleX: [0.9, 1.05, 0.9],
+                      opacity: [0.2, 0.45, 0.2],
+                    }
+              }
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
           </motion.div>
         </div>
       </div>

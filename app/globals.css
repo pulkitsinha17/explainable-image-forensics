@@ -180,6 +180,18 @@
   animation: scan 2.5s linear infinite;
 }
 
+/* Subtle text shimmer animation */
+@keyframes text-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-text-shimmer {
+  background-size: 200% auto;
+  animation: text-shimmer 5s ease-in-out infinite;
+}
+
 /* Fade in animation for tab content */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(6px); }
@@ -206,11 +218,6 @@
   height: 4.5rem;
 }
 
-/* Scan line animation — subtle blue sweep */
-.animate-scan {
-  will-change: transform;
-}
-
 /* Respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .animate-float,
@@ -218,7 +225,8 @@
   .animate-spin-slow-reverse,
   .animate-scan,
   .animate-fade-in,
-  .animate-heatmap-pulse {
+  .animate-heatmap-pulse,
+  .animate-text-shimmer {
     animation: none !important;
   }
 
