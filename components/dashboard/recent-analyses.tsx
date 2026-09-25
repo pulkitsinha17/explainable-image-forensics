@@ -78,11 +78,11 @@ export function RecentAnalyses({ analyses = [] }: RecentAnalysesProps) {
   const hasAnalyses = analyses.length > 0;
 
   return (
-    <div className="bg-white rounded-3xl border border-gray-100/90 p-6 sm:p-7 shadow-xs flex flex-col justify-between h-full">
+    <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col justify-between h-full hover:border-slate-300 transition-all">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+      <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
         <div>
-          <h3 className="text-base sm:text-lg font-bold text-gray-900">
+          <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
             Recent Analyses
           </h3>
         </div>

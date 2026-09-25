@@ -1,150 +1,109 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Sparkles, ArrowRight, Upload } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+
+const DASHBOARD_IMAGES = [
+  { src: "/images/dash_1.webp", alt: "Forensic image analysis 1" },
+  { src: "/images/dash_2.webp", alt: "Forensic image analysis 2" },
+  { src: "/images/dash_3.webp", alt: "Forensic image analysis 3" },
+  { src: "/images/dash_4.webp", alt: "Forensic image analysis 4" },
+  { src: "/images/dash_5.webp", alt: "Forensic image analysis 5" },
+  { src: "/images/dash_6.webp", alt: "Forensic image analysis 6" },
+];
+
+// Duplicate 3 times to ensure a seamless infinite marquee loop
+const TICKER_ITEMS = [
+  ...DASHBOARD_IMAGES,
+  ...DASHBOARD_IMAGES,
+  ...DASHBOARD_IMAGES,
+];
 
 export function AnalysisCTA() {
-  const [sliderPos, setSliderPos] = useState(50);
-  const [isDragging, setIsDragging] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const updateSlider = useCallback((clientX: number) => {
-    const el = containerRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    setSliderPos((x / rect.width) * 100);
-  }, []);
-
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    setIsDragging(true);
-    updateSlider(e.clientX);
-    e.currentTarget.setPointerCapture(e.pointerId);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
-    updateSlider(e.clientX);
-  };
-
-  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    setIsDragging(false);
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {
-      // safe fallback
-    }
-  };
+  const prefersReducedMotion = useReducedMotion();
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-blue-100/80 bg-gradient-to-br from-blue-50/60 via-white to-blue-50/20 p-6 sm:p-8 shadow-xs hover:shadow-md transition-shadow">
-      <div className="grid lg:grid-cols-12 gap-8 items-center">
-        {/* Left Copy & Action */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100/70 text-[#1a7fc4] text-xs font-semibold tracking-wide">
+    <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-gradient-to-br from-blue-50/50 via-white to-slate-50/50 p-6 sm:p-8 shadow-xs hover:shadow-sm transition-shadow">
+      <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+        {/* Left Action Area */}
+        <div className="lg:col-span-5 space-y-4 z-10 relative">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#1a7fc4] text-xs font-semibold tracking-wide">
             <Sparkles className="w-3.5 h-3.5 text-[#1a7fc4]" />
-            <span>IMAGE FORENSIC ANALYSIS</span>
+            <span>IMAGE FORENSICS</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
             Analyze an image
           </h2>
 
-          <p className="text-sm text-gray-600 leading-relaxed max-w-lg">
+          <p className="text-sm text-slate-600 leading-relaxed max-w-lg">
             Upload an image to detect possible manipulation and uncover the evidence behind it.
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-3">
             <Link
               href="/analyze"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#1a7fc4] hover:bg-[#1565a8] text-white text-sm font-semibold shadow-sm hover:shadow transition-all group"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#1a7fc4] hover:bg-[#1565a8] text-white text-sm font-semibold shadow-xs hover:shadow transition-all group active:scale-[0.98]"
             >
               <Upload className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
               <span>Analyze an Image</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
 
-            <span className="text-xs text-gray-400 sm:pl-2">
+            <span className="text-xs text-slate-400 sm:pl-2">
               JPG · JPEG · PNG · WEBP · Up to 10 MB
             </span>
           </div>
         </div>
 
-        {/* Right Preview Graphic */}
-        <div className="lg:col-span-6 flex flex-col sm:flex-row items-center gap-6 justify-end">
-          {/* Comparison Slider Frame */}
-          <div
-            ref={containerRef}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            className="relative w-full max-w-[340px] sm:max-w-[380px] aspect-[16/10] rounded-2xl overflow-hidden select-none cursor-ew-resize border border-gray-200/80 shadow-md bg-gray-900 group"
-            title="Drag slider to compare original vs localization map"
+        {/* Right Animated Stream of 6 Clean Images (Ending into the text) */}
+        <div className="lg:col-span-7 relative w-full h-[200px] sm:h-[225px] flex items-center overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,rgba(0,0,0,0.8)_16%,black_35%,black_88%,transparent_100%)]">
+          {/* Left blend fade adjacent to text */}
+          <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white via-white/40 to-transparent pointer-events-none z-20" />
+          
+          {/* Right edge fade */}
+          <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white via-white/40 to-transparent pointer-events-none z-20" />
+
+          {/* Smooth Motion Ticker */}
+          <motion.div
+            className="flex items-center gap-4 sm:gap-4.5 w-max"
+            animate={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    x: ["0%", "-33.333%"],
+                  }
+            }
+            transition={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    x: {
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      duration: 22,
+                      ease: "linear",
+                    },
+                  }
+            }
           >
-            {/* Base Image (Full) */}
-            <div className="absolute inset-0">
-              <Image
-                src="/images/mountain.png"
-                alt="Original"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 400px"
-                priority
-              />
-            </div>
-
-            {/* Original Badge */}
-            <div className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 rounded-md bg-gray-900/75 backdrop-blur-xs text-[10px] font-medium text-white shadow-xs">
-              Original
-            </div>
-
-            {/* Localization Map with clipping */}
-            <div
-              className="absolute inset-0 overflow-hidden"
-              style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
-            >
-              <Image
-                src="/images/mountain-heatmap.png"
-                alt="Localization Map"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 400px"
-                priority
-              />
-
-              {/* Localization Map Badge */}
-              <div className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded-md bg-gray-900/80 backdrop-blur-xs text-[10px] font-medium text-blue-200 border border-blue-400/30 shadow-xs">
-                Localization Map
+            {TICKER_ITEMS.map((item, idx) => (
+              <div
+                key={`${item.src}-${idx}`}
+                className="group relative w-[140px] sm:w-[160px] h-[180px] sm:h-[200px] rounded-2xl overflow-hidden shrink-0 border border-slate-200/90 shadow-2xs hover:shadow-md bg-slate-100 transition-all duration-300 hover:border-[#1a7fc4]/50"
+              >
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  fill
+                  sizes="(max-width: 768px) 140px, 160px"
+                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-108"
+                />
               </div>
-            </div>
-
-            {/* Divider Line */}
-            <div
-              className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg pointer-events-none z-20"
-              style={{ left: `${sliderPos}%` }}
-            />
-
-            {/* Handle `< >` */}
-            <div
-              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-7 h-7 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center pointer-events-none z-20 transition-transform group-hover:scale-110"
-              style={{ left: `${sliderPos}%` }}
-            >
-              <span className="text-[10px] font-bold text-gray-600 tracking-tighter select-none">
-                {"‹ ›"}
-              </span>
-            </div>
-          </div>
-
-          {/* Right Quote Callout */}
-          <div className="hidden sm:flex flex-col justify-center text-left space-y-2 max-w-[130px] shrink-0">
-            <p className="text-xs font-semibold text-gray-800 leading-snug">
-              Uncover what others can&apos;t see
-            </p>
-            <div className="w-6 h-0.5 bg-[#1a7fc4] rounded-full" />
-          </div>
+            ))}
+          </motion.div>
         </div>
       </div>
     </div>

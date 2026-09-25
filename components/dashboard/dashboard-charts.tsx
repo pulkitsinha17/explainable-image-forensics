@@ -91,7 +91,7 @@ export function DashboardCharts({
     : null;
 
   // -------------------------------------------------------------
-  // 2. Analysis Activity Chart (Angular Light-Blue Line & Ranges)
+  // 2. Analysis Activity Chart
   // -------------------------------------------------------------
   const points: ActivityDataPoint[] = (() => {
     if (timelines) {
@@ -121,21 +121,6 @@ export function DashboardCharts({
     return { x, y, data: p };
   });
 
-  // Construct Angular / Segmented straight-line path
-  let linePath = "";
-  let areaPath = "";
-
-  if (coords.length > 0) {
-    linePath = coords
-      .map((c, i) => `${i === 0 ? "M" : "L"} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`)
-      .join(" ");
-
-    const lastX = coords[coords.length - 1].x.toFixed(1);
-    const firstX = coords[0].x.toFixed(1);
-    const baseY = (padTop + plotHeight).toFixed(1);
-    areaPath = `${linePath} L ${lastX} ${baseY} L ${firstX} ${baseY} Z`;
-  }
-
   const activePoint =
     hoveredPointIndex !== null && coords[hoveredPointIndex]
       ? coords[hoveredPointIndex]
@@ -146,23 +131,23 @@ export function DashboardCharts({
       {/* -------------------------------------------------------- */}
       {/* LEFT: Forensic Overview Donut Chart                      */}
       {/* -------------------------------------------------------- */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 sm:p-6 shadow-xs flex flex-col justify-between hover:border-gray-200/90 transition-all">
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-gray-100/80">
+        <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-50/80 text-[#1a7fc4] border border-blue-100/60 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] border border-blue-100/80 flex items-center justify-center shadow-2xs">
               <PieChart className="w-4 h-4 stroke-[2.2]" />
             </div>
             <div>
-              <h2 className="text-sm sm:text-base font-bold text-gray-900 tracking-tight">
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
                 Forensic Overview
               </h2>
-              <p className="text-[11px] text-gray-400">
+              <p className="text-[11px] text-slate-400">
                 Breakdown of canonical verdict distributions
               </p>
             </div>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100/80 text-gray-600">
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-mono">
             {total} {total === 1 ? "Analysis" : "Analyses"}
           </span>
         </div>
@@ -180,7 +165,7 @@ export function DashboardCharts({
                 cx="80"
                 cy="80"
                 r={radius}
-                className="stroke-gray-100"
+                className="stroke-slate-100"
                 strokeWidth="18"
                 fill="none"
               />
@@ -215,7 +200,7 @@ export function DashboardCharts({
                 })}
             </svg>
 
-            {/* Center Dynamic Label / Tooltip */}
+            {/* Center Dynamic Label */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-2">
               {activeCategory ? (
                 <div className="animate-fade-in">
@@ -224,22 +209,22 @@ export function DashboardCharts({
                   >
                     {activeCategory.label}
                   </span>
-                  <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                  <p className="text-2xl font-extrabold text-slate-900 tracking-tight font-mono">
                     {activeCategory.count}
                   </p>
-                  <span className="text-[11px] font-semibold text-gray-500">
+                  <span className="text-[11px] font-semibold text-slate-500">
                     {activeCategory.pct}% of total
                   </span>
                 </div>
               ) : (
                 <div>
-                  <span className="text-[10px] font-medium uppercase tracking-wider text-gray-400">
+                  <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
                     Total Scans
                   </span>
-                  <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                  <p className="text-2xl font-extrabold text-slate-900 tracking-tight font-mono">
                     {total}
                   </p>
-                  <span className="text-[11px] font-medium text-gray-400">
+                  <span className="text-[11px] font-medium text-slate-400">
                     {total > 0 ? "100% verified" : "No scans yet"}
                   </span>
                 </div>
@@ -256,23 +241,23 @@ export function DashboardCharts({
                   key={cat.id}
                   onMouseEnter={() => setHoveredSegment(cat.id)}
                   onMouseLeave={() => setHoveredSegment(null)}
-                  className={`flex items-center justify-between gap-3 px-3 py-2 rounded-xl border transition-all cursor-pointer ${
+                  className={`flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl border transition-all cursor-pointer ${
                     isHovered
                       ? `${cat.bgSubtle} shadow-xs -translate-y-0.5`
-                      : "bg-gray-50/50 border-gray-100 hover:border-gray-200"
+                      : "bg-slate-50/60 border-slate-200/70 hover:border-slate-300"
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     <span className={`w-2.5 h-2.5 rounded-full ${cat.dotClass}`} />
-                    <span className="text-xs font-semibold text-gray-700">
+                    <span className="text-xs font-semibold text-slate-700">
                       {cat.label}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-gray-900">
+                  <div className="flex items-center gap-2 font-mono">
+                    <span className="text-xs font-bold text-slate-900">
                       {cat.count}
                     </span>
-                    <span className="text-[10px] font-semibold text-gray-400">
+                    <span className="text-[10px] font-semibold text-slate-400">
                       ({cat.pct}%)
                     </span>
                   </div>
@@ -284,27 +269,27 @@ export function DashboardCharts({
       </div>
 
       {/* -------------------------------------------------------- */}
-      {/* RIGHT: Analysis Activity Chart (Angular Light Blue Line) */}
+      {/* RIGHT: Analysis Activity Chart                           */}
       {/* -------------------------------------------------------- */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 sm:p-6 shadow-xs flex flex-col justify-between hover:border-gray-200/90 transition-all">
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
         {/* Header with Segmented Time Range Options */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100/80">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50/80 text-emerald-600 border border-emerald-100/60 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100/80 flex items-center justify-center shadow-2xs">
               <Activity className="w-4 h-4 stroke-[2.2]" />
             </div>
             <div>
-              <h2 className="text-sm sm:text-base font-bold text-gray-900 tracking-tight">
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
                 Analysis Activity
               </h2>
-              <p className="text-[11px] text-gray-400">
+              <p className="text-[11px] text-slate-400">
                 Analysis throughput over time
               </p>
             </div>
           </div>
 
-          {/* Three Inline Segmented Options */}
-          <div className="inline-flex items-center p-0.5 rounded-lg bg-gray-100/90 border border-gray-200/60 shrink-0 self-start sm:self-auto">
+          {/* Segmented Options */}
+          <div className="inline-flex items-center p-0.5 rounded-lg bg-slate-100 border border-slate-200/80 shrink-0 self-start sm:self-auto">
             <button
               type="button"
               onClick={() => {
@@ -313,8 +298,8 @@ export function DashboardCharts({
               }}
               className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
                 selectedRange === "7d"
-                  ? "bg-white text-gray-900 font-semibold shadow-2xs"
-                  : "text-gray-500 hover:text-gray-900"
+                  ? "bg-white text-slate-900 font-semibold shadow-2xs"
+                  : "text-slate-500 hover:text-slate-900"
               }`}
             >
               Last 7 days
@@ -327,8 +312,8 @@ export function DashboardCharts({
               }}
               className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
                 selectedRange === "30d"
-                  ? "bg-white text-gray-900 font-semibold shadow-2xs"
-                  : "text-gray-500 hover:text-gray-900"
+                  ? "bg-white text-slate-900 font-semibold shadow-2xs"
+                  : "text-slate-500 hover:text-slate-900"
               }`}
             >
               Last 30 days
@@ -341,8 +326,8 @@ export function DashboardCharts({
               }}
               className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
                 selectedRange === "all"
-                  ? "bg-white text-gray-900 font-semibold shadow-2xs"
-                  : "text-gray-500 hover:text-gray-900"
+                  ? "bg-white text-slate-900 font-semibold shadow-2xs"
+                  : "text-slate-500 hover:text-slate-900"
               }`}
             >
               All time
@@ -355,17 +340,17 @@ export function DashboardCharts({
           {/* Active Tooltip Pill */}
           <div className="h-6 flex items-center justify-end px-1">
             {activePoint ? (
-              <div className="inline-flex items-center gap-2 text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200/80 px-2.5 py-0.5 rounded-md shadow-2xs animate-fade-in">
-                <span className="text-gray-500 font-normal">
+              <div className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200/80 px-2.5 py-0.5 rounded-md shadow-2xs animate-fade-in font-mono">
+                <span className="text-slate-500 font-normal">
                   {activePoint.data.fullDate}:
                 </span>
-                <span className="font-bold text-[#1d4ed8]">
+                <span className="font-bold text-[#1a7fc4]">
                   {activePoint.data.count}{" "}
                   {activePoint.data.count === 1 ? "analysis" : "analyses"}
                 </span>
               </div>
             ) : (
-              <span className="text-[11px] text-gray-400">
+              <span className="text-[11px] text-slate-400">
                 Hover over any bar to inspect volume
               </span>
             )}
@@ -379,7 +364,7 @@ export function DashboardCharts({
             {/* Horizontal Gridlines */}
             {[0, 0.25, 0.5, 0.75, 1].map((ratio, idx) => {
               const y = padTop + ratio * plotHeight;
-              const labelVal = Math.round(maxCount * (1 - ratio));
+              const value = Math.round(maxCount * (1 - ratio));
               return (
                 <g key={idx}>
                   <line
@@ -388,95 +373,82 @@ export function DashboardCharts({
                     x2={svgWidth - padRight}
                     y2={y}
                     stroke="#f1f5f9"
-                    strokeDasharray="3 3"
                     strokeWidth="1"
+                    strokeDasharray="3 3"
                   />
                   <text
-                    x={padLeft - 8}
+                    x={padLeft - 6}
                     y={y + 3}
                     textAnchor="end"
-                    className="text-[9px] fill-gray-400 font-medium"
+                    className="text-[9px] fill-slate-400 font-mono select-none"
                   >
-                    {labelVal}
+                    {value}
                   </text>
                 </g>
               );
             })}
 
-            {/* Individual Vertical Rectangular Bars and Interactive Hit Columns */}
+            {/* Bars */}
             {coords.map((c, i) => {
-              const isHovered = hoveredPointIndex === i;
-              const slotWidth = plotWidth / (coords.length || 1);
-              
-              // Dynamic bar width: thin, elegant vertical bars
-              let barWidth = 6;
-              if (selectedRange === "7d") barWidth = 8;
-              else if (selectedRange === "all") barWidth = 8;
-              else if (selectedRange === "30d") barWidth = 4;
-
+              const barWidth = Math.max(
+                4,
+                Math.min(18, (plotWidth / Math.max(1, coords.length)) * 0.55)
+              );
+              const barHeight = Math.max(
+                c.data.count > 0 ? 4 : 0,
+                padTop + plotHeight - c.y
+              );
               const barX = c.x - barWidth / 2;
-              const baseY = padTop + plotHeight;
-              const hasValue = c.data.count > 0;
-              const rawHeight = (c.data.count / maxCount) * plotHeight;
-              const barHeight = hasValue ? Math.max(4, rawHeight) : 2;
-              const barY = baseY - barHeight;
-
-              // X-axis label display condition depending on selected range
-              let showLabel = true;
-              if (selectedRange === "30d") {
-                showLabel = i % 5 === 0 || i === coords.length - 1;
-              }
+              const barY = padTop + plotHeight - barHeight;
+              const isHovered = hoveredPointIndex === i;
 
               return (
                 <g key={i}>
-                  {/* Vertical Rectangular Bar */}
+                  {/* Invisible Hover target */}
                   <rect
-                    x={barX}
-                    y={barY}
-                    width={barWidth}
-                    height={barHeight}
-                    rx={1.5}
-                    fill={
-                      isHovered
-                        ? "#1d4ed8"
-                        : hasValue
-                        ? "#60a5fa"
-                        : "#cbd5e1"
-                    }
-                    className="transition-all duration-150 cursor-pointer"
-                    style={{
-                      filter:
-                        isHovered && hasValue
-                          ? "drop-shadow(0 2px 6px rgba(29, 78, 216, 0.45))"
-                          : "none",
-                    }}
-                  />
-
-                  {/* X-axis date / day label */}
-                  {showLabel && (
-                    <text
-                      x={c.x}
-                      y={svgHeight - 10}
-                      textAnchor="middle"
-                      className={`text-[10px] font-medium transition-colors cursor-pointer ${
-                        isHovered ? "fill-gray-900 font-bold" : "fill-gray-400"
-                      }`}
-                    >
-                      {selectedRange === "30d" ? c.data.date : c.data.day}
-                    </text>
-                  )}
-
-                  {/* Transparent hover hit-box */}
-                  <rect
-                    x={c.x - slotWidth / 2}
+                    x={c.x - (plotWidth / Math.max(1, coords.length)) / 2}
                     y={padTop}
-                    width={slotWidth}
-                    height={plotHeight + 25}
+                    width={plotWidth / Math.max(1, coords.length)}
+                    height={plotHeight + padBottom}
                     fill="transparent"
                     className="cursor-pointer"
                     onMouseEnter={() => setHoveredPointIndex(i)}
                     onMouseLeave={() => setHoveredPointIndex(null)}
                   />
+
+                  {/* Visible Bar */}
+                  <rect
+                    x={barX}
+                    y={barY}
+                    width={barWidth}
+                    height={barHeight}
+                    rx={barWidth / 3}
+                    className={`transition-all duration-200 pointer-events-none ${
+                      isHovered
+                        ? "fill-[#1a7fc4]"
+                        : c.data.count > 0
+                        ? "fill-[#3b82f6]/80"
+                        : "fill-slate-100"
+                    }`}
+                  />
+
+                  {/* X-axis Label */}
+                  {(selectedRange === "7d" ||
+                    (selectedRange === "30d" && i % 5 === 0) ||
+                    (selectedRange === "all" && i % Math.max(1, Math.floor(coords.length / 6)) === 0)) && (
+                    <text
+                      x={c.x}
+                      y={svgHeight - 8}
+                      textAnchor="middle"
+                      className={`text-[9px] select-none transition-colors ${
+                        isHovered
+                          ? "fill-[#1a7fc4] font-bold"
+                          : "fill-slate-400 font-medium"
+                      }`}
+                    >
+                      {c.data.date}
+                    </text>
+                  )}
                 </g>
               );
             })}

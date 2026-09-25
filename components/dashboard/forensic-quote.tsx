@@ -1,27 +1,30 @@
-import { Quote } from "lucide-react";
+import { Quote, ShieldCheck } from "lucide-react";
 
 export function ForensicQuote() {
   return (
-    <div className="bg-white rounded-3xl border border-gray-100/90 p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div className="flex items-start sm:items-center gap-3.5">
-        <div className="w-10 h-10 rounded-xl bg-blue-50/80 border border-blue-100/80 flex items-center justify-center text-[#1a7fc4] shrink-0">
-          <Quote className="w-5 h-5 fill-[#1a7fc4]/20 text-[#1a7fc4]" />
-        </div>
-        <div>
-          <p className="text-xs sm:text-sm font-semibold text-gray-900 leading-snug">
-            In a world of altered realities, evidence matters.
-          </p>
-          <p className="text-xs text-gray-500 mt-0.5">
-            PIXENTRA helps you see beyond the pixels.
-          </p>
-        </div>
-      </div>
+    <div className="relative overflow-hidden rounded-2xl bg-[#f0f7fd]/85 border border-[#d2e6f9] p-4 sm:p-4.5 shadow-2xs transition-colors">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+        {/* Quote Content */}
+        <div className="flex items-start sm:items-center gap-3">
+          <div className="w-8.5 h-8.5 rounded-xl bg-white text-[#1a7fc4] border border-[#d2e6f9] flex items-center justify-center shrink-0 shadow-2xs">
+            <Quote className="w-4 h-4 fill-[#1a7fc4]/15 text-[#1a7fc4]" />
+          </div>
 
-      <div className="flex items-center gap-3 self-end sm:self-auto shrink-0 pt-2 sm:pt-0">
-        <div className="w-10 sm:w-14 h-px bg-gray-200" />
-        <span className="text-[11px] font-medium text-gray-400 tracking-wide">
-          See Beyond the Pixels
-        </span>
+          <div className="min-w-0">
+            <p className="text-xs sm:text-sm font-bold text-slate-900 leading-snug">
+              &ldquo;In a world of altered realities, evidence matters.&rdquo;
+            </p>
+            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
+              PIXENTRA verifies digital authenticity through multi-evidence neural forensics.
+            </p>
+          </div>
+        </div>
+
+        {/* Brand Badge */}
+        <div className="flex items-center gap-2 self-start sm:self-center shrink-0 px-3 py-1 rounded-full bg-white border border-[#d2e6f9] text-[#1a7fc4] text-[10px] font-bold font-mono tracking-wide uppercase shadow-2xs">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#1a7fc4]" />
+          <span>PIXENTRA FORENSICS</span>
+        </div>
       </div>
     </div>
   );
