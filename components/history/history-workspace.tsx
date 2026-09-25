@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   PlusCircle,
@@ -11,14 +11,17 @@ import {
   ChevronRight,
   RotateCcw,
   X,
+  LayoutGrid,
+  List,
+  Filter,
+  ArrowUpDown,
   Layers,
-  Sparkles,
-  SlidersHorizontal,
 } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { EASE_OUT } from "@/components/motion-utils";
 import { TopNavBar } from "@/components/analyze/top-nav-bar";
 import { AnalysisHistoryCard } from "./analysis-history-card";
+import { AnalysisHistoryTable } from "./analysis-history-table";
 import { HistorySummaryCards } from "./history-summary-cards";
 import type { CompletedAnalysisRecord, HistorySummaryStats } from "./types";
 
@@ -34,6 +37,7 @@ export function HistoryWorkspace({
   userDisplayName = "Pulkit Sinha",
 }: HistoryWorkspaceProps) {
   const shouldReduceMotion = useReducedMotion();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [analyses, setAnalyses] = useState<CompletedAnalysisRecord[]>([]);
   const [stats, setStats] = useState<HistorySummaryStats>({
@@ -53,6 +57,7 @@ export function HistoryWorkspace({
   const [verdictFilter, setVerdictFilter] = useState("All Verdicts");
   const [sortBy, setSortBy] = useState("Newest First");
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
 
   // Fetch real analysis records from the authenticated /api/history endpoint
   const fetchHistory = async () => {
@@ -86,11 +91,23 @@ export function HistoryWorkspace({
     fetchHistory();
   }, []);
 
+  // Global keyboard shortcut to focus search with '/' or 'Cmd+K' / 'Ctrl+K'
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Filter and sort the real records
   const filteredAnalyses = useMemo(() => {
     return analyses
       .filter((item) => {
-        // Search match
+        // Search match across filename or analysis ID
         const query = searchQuery.trim().toLowerCase();
         if (query) {
           const matchesName = item.filename.toLowerCase().includes(query);
@@ -164,7 +181,7 @@ export function HistoryWorkspace({
       });
   }, [analyses, searchQuery, statusFilter, verdictFilter, sortBy]);
 
-  // Pagination calculation
+  // Pagination calculations
   const totalItems = filteredAnalyses.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
   const safeCurrentPage = Math.min(currentPage, totalPages);
@@ -226,7 +243,7 @@ export function HistoryWorkspace({
         backLabel="Back to Dashboard"
       />
 
-      {/* Main Editorial Header Row & Action CTA */}
+      {/* Editorial Header Row & Action CTA */}
       <motion.div
         variants={headerVariants}
         initial="hidden"
@@ -253,24 +270,32 @@ export function HistoryWorkspace({
         </div>
       </motion.div>
 
-      {/* Summary Stats Cards */}
+      {/* Interactive Summary KPI Cards */}
       {!loading && !error && analyses.length > 0 && (
-        <HistorySummaryCards stats={stats} />
+        <HistorySummaryCards
+          stats={stats}
+          selectedVerdictFilter={verdictFilter}
+          onSelectVerdictFilter={(selected) => {
+            setVerdictFilter(selected);
+            setCurrentPage(1);
+          }}
+        />
       )}
 
-      {/* Search, Filter & Sort Command Bar */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-2 sm:p-2.5 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center gap-2.5">
+      {/* Search, Filter & View Mode Command Bar */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-2 sm:p-2.5 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
         {/* Search Input Field */}
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
+            ref={searchInputRef}
             type="text"
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            placeholder="Search by filename or analysis ID..."
+            placeholder="Search by filename or analysis ID... (Press ⌘K)"
             className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs"
           />
           {searchQuery && (
@@ -287,10 +312,10 @@ export function HistoryWorkspace({
           )}
         </div>
 
-        {/* Dropdown Filters & Controls */}
-        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+        {/* Filters Group & View Mode Switcher */}
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap justify-between md:justify-end">
           {/* Status filter */}
-          <div className="relative shrink-0 flex-1 sm:flex-none">
+          <div className="relative shrink-0">
             <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400 absolute left-3 top-1 pointer-events-none">
               Status
             </div>
@@ -300,7 +325,7 @@ export function HistoryWorkspace({
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full sm:w-auto appearance-none bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[105px]"
+              className="appearance-none bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[105px]"
             >
               <option value="Completed">Completed</option>
               <option value="All Status">All Status</option>
@@ -309,7 +334,7 @@ export function HistoryWorkspace({
           </div>
 
           {/* Verdicts filter */}
-          <div className="relative shrink-0 flex-1 sm:flex-none">
+          <div className="relative shrink-0">
             <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400 absolute left-3 top-1 pointer-events-none">
               Verdict
             </div>
@@ -319,7 +344,7 @@ export function HistoryWorkspace({
                 setVerdictFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full sm:w-auto appearance-none bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[135px]"
+              className="appearance-none bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[135px]"
             >
               <option value="All Verdicts">All Verdicts</option>
               <option value="Manipulated">Manipulated</option>
@@ -330,7 +355,7 @@ export function HistoryWorkspace({
           </div>
 
           {/* Sort By filter */}
-          <div className="relative shrink-0 flex-1 sm:flex-none">
+          <div className="relative shrink-0">
             <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400 absolute left-3 top-1 pointer-events-none">
               Sort By
             </div>
@@ -340,7 +365,7 @@ export function HistoryWorkspace({
                 setSortBy(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full sm:w-auto appearance-none bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[145px]"
+              className="appearance-none bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[145px]"
             >
               <option value="Newest First">Newest First</option>
               <option value="Oldest First">Oldest First</option>
@@ -350,7 +375,7 @@ export function HistoryWorkspace({
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
-          {/* Reset Filters Shortcut Button if active filters */}
+          {/* Reset Filters Shortcut */}
           {isFiltered && (
             <button
               type="button"
@@ -362,14 +387,42 @@ export function HistoryWorkspace({
               <span className="hidden sm:inline">Reset</span>
             </button>
           )}
+
+          {/* View Mode Toggle Button Group */}
+          <div className="hidden sm:flex items-center p-0.5 rounded-xl bg-slate-100 border border-slate-200/80 shrink-0">
+            <button
+              type="button"
+              onClick={() => setViewMode("cards")}
+              title="Detailed Cards View"
+              className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                viewMode === "cards"
+                  ? "bg-white text-slate-900 shadow-2xs font-semibold"
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("table")}
+              title="Compact Table View"
+              className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                viewMode === "table"
+                  ? "bg-white text-slate-900 shadow-2xs font-semibold"
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Main Content Area */}
       {loading ? (
-        /* Refined SaaS Loading Skeleton */
-        <div className="space-y-3 sm:space-y-4">
-          {[1, 2, 3].map((n) => (
+        /* Refined SaaS Loading Shimmer */
+        <div className="space-y-3 sm:space-y-3.5">
+          {[1, 2, 3, 4].map((n) => (
             <div
               key={n}
               className="bg-white rounded-2xl border border-slate-200/70 p-4 sm:p-5 shadow-2xs animate-pulse flex flex-col md:flex-row md:items-center justify-between gap-4"
@@ -410,20 +463,42 @@ export function HistoryWorkspace({
           </button>
         </div>
       ) : (
-        /* Analysis Cards List */
-        <motion.div
-          variants={listContainerVariants}
-          initial="hidden"
-          animate="visible"
-          className="space-y-3 sm:space-y-3.5"
-        >
+        /* Analysis Records Display (Cards View or Table View) */
+        <AnimatePresence mode="wait">
           {totalItems > 0 ? (
-            paginatedAnalyses.map((analysis) => (
-              <AnalysisHistoryCard key={analysis.id} analysis={analysis} />
-            ))
+            viewMode === "cards" ? (
+              <motion.div
+                key="cards-view"
+                variants={listContainerVariants}
+                initial="hidden"
+                animate="visible"
+                exit={{ opacity: 0 }}
+                className="space-y-3 sm:space-y-3.5"
+              >
+                {paginatedAnalyses.map((analysis) => (
+                  <AnalysisHistoryCard key={analysis.id} analysis={analysis} />
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="table-view"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <AnalysisHistoryTable analyses={paginatedAnalyses} />
+              </motion.div>
+            )
           ) : (
             /* Refined SaaS Empty State */
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-10 sm:p-14 text-center shadow-2xs">
+            <motion.div
+              key="empty-state"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="bg-white rounded-2xl border border-slate-200/80 p-10 sm:p-14 text-center shadow-2xs"
+            >
               <div className="w-13 h-13 rounded-2xl bg-blue-50 text-[#1a7fc4] flex items-center justify-center mx-auto mb-4 border border-blue-100/80">
                 <HistoryIcon className="w-6 h-6 stroke-[1.75]" />
               </div>
@@ -453,9 +528,9 @@ export function HistoryWorkspace({
                   <span>Start First Analysis</span>
                 </Link>
               )}
-            </div>
+            </motion.div>
           )}
-        </motion.div>
+        </AnimatePresence>
       )}
 
       {/* Bottom Pagination & Count Bar */}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import {
   Shield,
   Lock,
@@ -14,10 +15,19 @@ import {
   X,
   Globe,
   Smartphone,
+  Sparkles,
 } from "lucide-react";
+import {
+  EASE_OUT,
+  SPRING_PANEL,
+  SPRING_PRESS,
+  containerVariantsFast,
+  fadeUpItem,
+} from "@/components/motion-utils";
 
 export function SecuritySettings() {
   const { user, isLoaded } = useUser();
+  const shouldReduceMotion = useReducedMotion();
 
   // Password Change Modal State
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -37,10 +47,10 @@ export function SecuritySettings() {
 
   if (!isLoaded || !user) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-xs flex items-center justify-center min-h-[300px]">
-        <div className="flex flex-col items-center gap-2 text-gray-500">
+      <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-xs flex items-center justify-center min-h-[320px]">
+        <div className="flex flex-col items-center gap-3 text-gray-500">
           <Loader2 className="w-6 h-6 animate-spin text-[#1a7fc4]" />
-          <span className="text-xs font-semibold">Loading security settings...</span>
+          <span className="text-xs font-semibold tracking-wide">Loading security settings...</span>
         </div>
       </div>
     );
@@ -118,11 +128,19 @@ export function SecuritySettings() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* 1. Account Security Status (Single Vertical Card) */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-5">
+    <motion.div
+      variants={containerVariantsFast}
+      initial={shouldReduceMotion ? "visible" : "hidden"}
+      animate="visible"
+      className="space-y-6"
+    >
+      {/* 1. Account Security Status */}
+      <motion.div
+        variants={fadeUpItem}
+        className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-5"
+      >
         <div className="flex items-center gap-4 pb-5 border-b border-gray-100">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 shadow-2xs">
             <Shield className="w-6 h-6" />
           </div>
           <div>
@@ -137,18 +155,18 @@ export function SecuritySettings() {
 
         {/* Vertically Stacked Security Overview Items */}
         <div className="space-y-3">
-          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors">
             <div>
               <p className="text-xs font-bold text-gray-900">Email Verification</p>
               <p className="text-[11px] text-gray-500 mt-0.5">{primaryEmail}</p>
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70 shrink-0 self-start sm:self-auto">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70 shrink-0 self-start sm:self-auto shadow-2xs">
               <CheckCircle2 className="w-3 h-3 text-emerald-600" />
               {emailVerified ? "Verified" : "Unverified"}
             </span>
           </div>
 
-          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors">
             <div>
               <p className="text-xs font-bold text-gray-900">Last Authenticated Session</p>
               <p className="text-[11px] text-gray-500 mt-0.5">Most recent sign-in activity</p>
@@ -158,7 +176,7 @@ export function SecuritySettings() {
             </span>
           </div>
 
-          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors">
             <div>
               <p className="text-xs font-bold text-gray-900">Two-Factor Authentication (2FA)</p>
               <p className="text-[11px] text-gray-500 mt-0.5">Multi-factor sign-in security protection</p>
@@ -169,10 +187,13 @@ export function SecuritySettings() {
             </span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* 2. Password & Authentication (Single Vertical Card) */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-4">
+      {/* 2. Password & Authentication */}
+      <motion.div
+        variants={fadeUpItem}
+        className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-4"
+      >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100">
           <div>
             <h3 className="text-base font-bold text-gray-900">
@@ -185,8 +206,11 @@ export function SecuritySettings() {
             </p>
           </div>
 
-          <button
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            transition={SPRING_PRESS}
             onClick={() => {
               setIsChangingPassword(true);
               setPasswordError(null);
@@ -196,22 +220,25 @@ export function SecuritySettings() {
           >
             <KeyRound className="w-3.5 h-3.5" />
             <span>{hasPassword ? "Change Password" : "Set Account Password"}</span>
-          </button>
+          </motion.button>
         </div>
 
-        <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100 flex items-center justify-between text-xs">
+        <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex items-center justify-between text-xs hover:bg-slate-50 transition-colors">
           <div className="flex items-center gap-2.5">
             <Lock className="w-4 h-4 text-[#1a7fc4]" />
             <span className="font-semibold text-gray-800">
               {hasPassword ? "Password Protection Enabled" : "Single Sign-On (SSO) Active"}
             </span>
           </div>
-          <span className="text-[11px] text-gray-500 font-mono">••••••••••••</span>
+          <span className="text-[11px] text-gray-500 font-mono tracking-wider">••••••••••••</span>
         </div>
-      </div>
+      </motion.div>
 
-      {/* 3. Email Addresses (Single Vertical Card) */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-4">
+      {/* 3. Email Addresses */}
+      <motion.div
+        variants={fadeUpItem}
+        className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-4"
+      >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100">
           <div>
             <h3 className="text-base font-bold text-gray-900">Email Addresses</h3>
@@ -220,8 +247,11 @@ export function SecuritySettings() {
             </p>
           </div>
 
-          <button
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            transition={SPRING_PRESS}
             onClick={() => {
               setIsAddingEmail(true);
               setEmailError(null);
@@ -231,7 +261,7 @@ export function SecuritySettings() {
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Email</span>
-          </button>
+          </motion.button>
         </div>
 
         <div className="space-y-2">
@@ -242,7 +272,7 @@ export function SecuritySettings() {
             return (
               <div
                 key={emailObj.id}
-                className="p-4 rounded-xl bg-gray-50/80 border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs hover:bg-slate-50 transition-colors"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Mail className="w-4 h-4 text-[#1a7fc4] shrink-0" />
@@ -250,7 +280,7 @@ export function SecuritySettings() {
                     {emailObj.emailAddress}
                   </span>
                   {isPrimary && (
-                    <span className="px-2 py-0.5 rounded-md bg-blue-50 text-[#1a7fc4] font-bold text-[10px] uppercase tracking-wider shrink-0">
+                    <span className="px-2 py-0.5 rounded-md bg-blue-50 text-[#1a7fc4] font-bold text-[10px] uppercase tracking-wider shrink-0 border border-blue-100/80">
                       Primary
                     </span>
                   )}
@@ -258,7 +288,7 @@ export function SecuritySettings() {
 
                 <div className="flex items-center gap-2 self-start sm:self-auto">
                   <span
-                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
+                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold shadow-2xs ${
                       isVer
                         ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                         : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -271,10 +301,13 @@ export function SecuritySettings() {
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
-      {/* 4. Connected Accounts (Single Vertical Card) */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-4">
+      {/* 4. Connected Accounts */}
+      <motion.div
+        variants={fadeUpItem}
+        className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-4"
+      >
         <div>
           <h3 className="text-base font-bold text-gray-900">Connected Accounts</h3>
           <p className="text-xs text-gray-500 mt-0.5">
@@ -287,7 +320,7 @@ export function SecuritySettings() {
             {user.externalAccounts.map((acc, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-xl bg-gray-50/80 border border-gray-100 flex items-center justify-between gap-3 text-xs"
+                className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex items-center justify-between gap-3 text-xs hover:bg-slate-50 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <Globe className="w-4 h-4 text-[#1a7fc4]" />
@@ -301,7 +334,7 @@ export function SecuritySettings() {
                   </div>
                 </div>
 
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
                   <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                   Connected
                 </span>
@@ -313,165 +346,211 @@ export function SecuritySettings() {
             No external OAuth accounts linked. Sign-in is handled via primary email credentials.
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Change / Set Password Modal */}
-      {isChangingPassword && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-              <h3 className="text-base font-bold text-gray-900">
-                {hasPassword ? "Change Password" : "Set New Password"}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsChangingPassword(false)}
-                className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {passwordError && (
-              <div className="p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                <span>{passwordError}</span>
-              </div>
-            )}
-
-            {passwordSuccess && (
-              <div className="p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{passwordSuccess}</span>
-              </div>
-            )}
-
-            <form onSubmit={handlePasswordSubmit} className="space-y-3.5">
-              {hasPassword && (
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-700 block">Current Password</label>
-                  <input
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="Enter current password"
-                    className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4]"
-                    required
-                  />
+      <AnimatePresence>
+        {isChangingPassword && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsChangingPassword(false)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 10 }}
+              transition={SPRING_PANEL}
+              className="relative z-10 bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-md w-full p-6 space-y-4"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] flex items-center justify-center">
+                    <KeyRound className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-base font-bold text-gray-900">
+                    {hasPassword ? "Change Password" : "Set New Password"}
+                  </h3>
                 </div>
-              )}
-
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700 block">New Password</label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="At least 8 characters"
-                  className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4]"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700 block">Confirm New Password</label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-enter new password"
-                  className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4]"
-                  required
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2.5 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsChangingPassword(false)}
-                  disabled={passwordSaving}
-                  className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                  className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={passwordSaving}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1a7fc4] hover:bg-[#1565a8] text-white text-xs font-semibold transition-colors disabled:opacity-60"
-                >
-                  {passwordSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  <span>{passwordSaving ? "Updating..." : "Update Password"}</span>
+                  <X className="w-4 h-4" />
                 </button>
               </div>
-            </form>
+
+              {passwordError && (
+                <div className="p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{passwordError}</span>
+                </div>
+              )}
+
+              {passwordSuccess && (
+                <div className="p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{passwordSuccess}</span>
+                </div>
+              )}
+
+              <form onSubmit={handlePasswordSubmit} className="space-y-3.5">
+                {hasPassword && (
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-700 block">Current Password</label>
+                    <input
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="Enter current password"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
+                      required
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-700 block">New Password</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="At least 8 characters"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-700 block">Confirm New Password</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter new password"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
+                    required
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2.5 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsChangingPassword(false)}
+                    disabled={passwordSaving}
+                    className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <motion.button
+                    type="submit"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={SPRING_PRESS}
+                    disabled={passwordSaving}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1a7fc4] hover:bg-[#1565a8] text-white text-xs font-semibold transition-colors disabled:opacity-60 shadow-2xs"
+                  >
+                    {passwordSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{passwordSaving ? "Updating..." : "Update Password"}</span>
+                  </motion.button>
+                </div>
+              </form>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* Add Email Modal */}
-      {isAddingEmail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-              <h3 className="text-base font-bold text-gray-900">Add Email Address</h3>
-              <button
-                type="button"
-                onClick={() => setIsAddingEmail(false)}
-                className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {emailError && (
-              <div className="p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                <span>{emailError}</span>
-              </div>
-            )}
-
-            {emailSuccess && (
-              <div className="p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{emailSuccess}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleAddEmailSubmit} className="space-y-3.5">
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700 block">Email Address</label>
-                <input
-                  type="email"
-                  value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4]"
-                  required
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2.5 pt-2">
+      <AnimatePresence>
+        {isAddingEmail && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAddingEmail(false)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 10 }}
+              transition={SPRING_PANEL}
+              className="relative z-10 bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-md w-full p-6 space-y-4"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] flex items-center justify-center">
+                    <Plus className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-base font-bold text-gray-900">Add Email Address</h3>
+                </div>
                 <button
                   type="button"
                   onClick={() => setIsAddingEmail(false)}
-                  disabled={emailSaving}
-                  className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                  className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={emailSaving}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1a7fc4] hover:bg-[#1565a8] text-white text-xs font-semibold transition-colors disabled:opacity-60"
-                >
-                  {emailSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  <span>{emailSaving ? "Sending..." : "Add & Verify"}</span>
+                  <X className="w-4 h-4" />
                 </button>
               </div>
-            </form>
+
+              {emailError && (
+                <div className="p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{emailError}</span>
+                </div>
+              )}
+
+              {emailSuccess && (
+                <div className="p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{emailSuccess}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleAddEmailSubmit} className="space-y-3.5">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-700 block">Email Address</label>
+                  <input
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="name@example.com"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
+                    required
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2.5 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingEmail(false)}
+                    disabled={emailSaving}
+                    className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <motion.button
+                    type="submit"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={SPRING_PRESS}
+                    disabled={emailSaving}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1a7fc4] hover:bg-[#1565a8] text-white text-xs font-semibold transition-colors disabled:opacity-60 shadow-2xs"
+                  >
+                    {emailSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{emailSaving ? "Sending..." : "Add & Verify"}</span>
+                  </motion.button>
+                </div>
+              </form>
+            </motion.div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
