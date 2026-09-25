@@ -336,7 +336,7 @@ export function AnalysisResults({
             </div>
             <div className="flex flex-col items-center gap-0.5 text-center sm:border-l sm:border-blue-100">
               <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
-                {isAuth || isInconc ? "Anomaly Area" : "Forged Area (Est.)"}
+                {isAuth || isInconc ? "Anomaly Area" : "Forged Area"}
               </span>
               <span className="text-base sm:text-lg font-black text-orange-500">
                 {typeof results.forgeryPixelFraction === "number" ? results.forgeryPixelFraction.toFixed(1) : results.forgeryPixelFraction}%

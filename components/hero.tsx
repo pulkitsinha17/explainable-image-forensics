@@ -163,11 +163,151 @@ function EvidenceBar({ label, val, color, delay }: {
 }
 
 /* ------------------------------------------------------------------ */
+/* Scramble text with center outward stagger ('Truth')               */
+/* ------------------------------------------------------------------ */
+const SCRAMBLE_SYMBOLS = ['†', '※', '#', '+', '?', '*', '%', '&', '/', '~', '§', '!', '0', '1', 'x', 'z']
+
+function ScrambleTruth({
+  text = 'Truth',
+  prefersReducedMotion,
+}: {
+  text?: string
+  prefersReducedMotion: boolean | null
+}) {
+  const [displayText, setDisplayText] = useState(text)
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setDisplayText(text)
+      return
+    }
+
+    const chars = text.split('')
+    const centerIndex = (chars.length - 1) / 2 // index 2 for 'Truth'
+    // Slow, highly visible center-outward reveal
+    // Center ('u'): 1100ms, Middle ('r', 't'): 1800ms, Edges ('T', 'h'): 2500ms
+    const resolveTimes = chars.map((_, i) => {
+      const dist = Math.abs(i - centerIndex) // 0, 1, 2
+      return 1100 + dist * 700
+    })
+
+    const startTime = performance.now()
+    let animationFrameId: number
+    let lastGlyphChange = 0
+    const currentChars = [...chars]
+
+    // Initialize with random glyphs so scramble is visible immediately on mount
+    for (let i = 0; i < chars.length; i++) {
+      currentChars[i] = SCRAMBLE_SYMBOLS[Math.floor(Math.random() * SCRAMBLE_SYMBOLS.length)]
+    }
+    setDisplayText(currentChars.join(''))
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime
+      let allDone = true
+
+      // Slow down glyph morphing to 85ms per change for clear legibility
+      const shouldRandomize = now - lastGlyphChange > 85
+      if (shouldRandomize) {
+        lastGlyphChange = now
+      }
+
+      for (let i = 0; i < chars.length; i++) {
+        if (elapsed >= resolveTimes[i]) {
+          currentChars[i] = chars[i]
+        } else {
+          allDone = false
+          if (shouldRandomize) {
+            currentChars[i] = SCRAMBLE_SYMBOLS[Math.floor(Math.random() * SCRAMBLE_SYMBOLS.length)]
+          }
+        }
+      }
+
+      setDisplayText(currentChars.join(''))
+
+      if (!allDone) {
+        animationFrameId = requestAnimationFrame(tick)
+      } else {
+        setDisplayText(text)
+      }
+    }
+
+    animationFrameId = requestAnimationFrame(tick)
+
+    return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId)
+    }
+  }, [text, prefersReducedMotion])
+
+  return <>{displayText}</>
+}
+
+/* ------------------------------------------------------------------ */
+/* Rolling staggered text button component                            */
+/* ------------------------------------------------------------------ */
+function RollingText({
+  text,
+  isHovered,
+  prefersReducedMotion,
+}: {
+  text: string
+  isHovered: boolean
+  prefersReducedMotion: boolean | null
+}) {
+  if (prefersReducedMotion) {
+    return <span>{text}</span>
+  }
+
+  const characters = text.split('')
+
+  return (
+    <span className="relative inline-flex items-center overflow-hidden leading-none select-none">
+      {characters.map((char, index) => {
+        const isSpace = char === ' '
+        return (
+          <span
+            key={index}
+            className="relative inline-block overflow-hidden"
+            style={{ width: isSpace ? '0.3em' : undefined }}
+          >
+            <motion.span
+              className="inline-block"
+              animate={{ y: isHovered ? '-100%' : '0%' }}
+              transition={{
+                duration: 0.28,
+                ease: [0.33, 1, 0.68, 1],
+                delay: index * 0.018,
+              }}
+            >
+              {isSpace ? '\u00A0' : char}
+            </motion.span>
+            <motion.span
+              className="absolute left-0 top-0 inline-block"
+              aria-hidden="true"
+              initial={{ y: '100%' }}
+              animate={{ y: isHovered ? '0%' : '100%' }}
+              transition={{
+                duration: 0.28,
+                ease: [0.33, 1, 0.68, 1],
+                delay: index * 0.018,
+              }}
+            >
+              {isSpace ? '\u00A0' : char}
+            </motion.span>
+          </span>
+        )
+      })}
+    </span>
+  )
+}
+
+/* ------------------------------------------------------------------ */
 /* Hero section                                                        */
 /* ------------------------------------------------------------------ */
 export function Hero() {
   const { isSignedIn } = useAuth()
   const prefersReducedMotion = useReducedMotion()
+  const [isGetStartedHovered, setIsGetStartedHovered] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const imagePanelRef = useRef<HTMLDivElement>(null)
 
@@ -246,7 +386,7 @@ export function Hero() {
                 <span className="absolute inset-0 bg-blue-400/15 blur-lg rounded-full -z-10 pointer-events-none animate-pulse" />
                 {/* Shimmering animated brand blue text */}
                 <span className="bg-gradient-to-r from-[#1a7fc4] via-[#5bb8f5] to-[#1a7fc4] bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shimmer font-bold">
-                  Truth
+                  <ScrambleTruth text="Truth" prefersReducedMotion={prefersReducedMotion} />
                 </span>
                 {/* Animated draw-in curved underline */}
                 <motion.svg
@@ -301,47 +441,24 @@ export function Hero() {
               {/* Subtle ambient backlight behind CTA buttons */}
               <div className="absolute -inset-2 w-72 h-16 bg-[#1a7fc4]/10 rounded-full blur-2xl pointer-events-none -z-10" />
 
-              <motion.div
-                animate={
-                  prefersReducedMotion
-                    ? {}
-                    : {
-                        y: [-3, 3, -3],
-                      }
-                }
-                transition={{
-                  duration: 4.5,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-                whileHover={prefersReducedMotion ? {} : { scale: 1.03 }}
-                whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
-              >
+              <div>
                 <Link
                   href={isSignedIn ? "/dashboard" : "/sign-up"}
                   className="group relative inline-flex items-center gap-2.5 px-7 py-3.5 bg-gradient-to-r from-[#1a7fc4] via-[#1670af] to-[#1565a8] text-white font-semibold rounded-xl hover:shadow-[0_12px_28px_rgba(26,127,196,0.45)] transition-all duration-200 shadow-[0_8px_22px_rgba(26,127,196,0.32)] border border-blue-400/25 text-sm"
                   id="hero-cta-get-started"
+                  onMouseEnter={() => setIsGetStartedHovered(true)}
+                  onMouseLeave={() => setIsGetStartedHovered(false)}
                 >
-                  <span>Get Started</span>
-                  <motion.span
-                    className="inline-flex items-center justify-center"
-                    animate={
-                      prefersReducedMotion
-                        ? {}
-                        : {
-                            x: [0, 2.5, 0],
-                          }
-                    }
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }}
-                  >
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                  </motion.span>
+                  <RollingText
+                    text="Get Started"
+                    isHovered={isGetStartedHovered}
+                    prefersReducedMotion={prefersReducedMotion}
+                  />
+                  <span className="inline-flex items-center justify-center">
+                    <ArrowRight className={`w-4 h-4 transition-transform duration-200 ${isGetStartedHovered && !prefersReducedMotion ? 'translate-x-1' : ''}`} />
+                  </span>
                 </Link>
-              </motion.div>
+              </div>
               <a
                 href="#how-it-works"
                 onClick={(e) => {
