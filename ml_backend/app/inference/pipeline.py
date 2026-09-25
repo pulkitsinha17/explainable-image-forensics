@@ -203,21 +203,33 @@ def _analyze_localization_support(
     # 6. Not full canvas/span saturation when classifier strongly indicates authentic
     not_canvas_saturation = not (manipulation_probability < 0.20 and spans_full_canvas)
 
-    if (
+    # Evaluate strong localization support
+    is_strong = (
         has_high_peak
         and has_non_trivial_area
         and has_coherent_component
         and has_solid_fill
         and not_diffuse_scatter
         and not_canvas_saturation
-    ):
-        strong_localization_support = True
+    )
+    strong_localization_support = bool(is_strong)
+
+    # 7. Broad localization conflict condition:
+    # Strongly authentic classifier (p < 0.20) + broad/large localization anomaly (>= 40%)
+    # without qualifying as a coherent localized forgery component.
+    broad_localization_conflict = (
+        manipulation_probability < 0.20
+        and loc_area_frac >= 0.40
+        and not strong_localization_support
+    )
+    stats_dict["broad_localization_conflict"] = broad_localization_conflict
+
+    if strong_localization_support:
         reason = (
             f"Strong compact localized anomaly detected (area={loc_area_frac*100:.1f}%, "
             f"largest_comp={largest_comp_frac*100:.1f}%, q999={q999:.4f}, fill={bbox_fill:.2f})"
         )
     else:
-        strong_localization_support = False
         reasons = []
         if not has_high_peak:
             reasons.append(f"peak probability low (max={max_p:.2f}, q999={q999:.2f})")
@@ -231,7 +243,13 @@ def _analyze_localization_support(
             reasons.append(f"diffuse noise scatter ({num_components} components)")
         if not not_canvas_saturation:
             reasons.append("edge-to-edge canvas saturation on authentic background")
-        reason = "; ".join(reasons) if reasons else "No significant localized anomaly"
+        if broad_localization_conflict:
+            reason = (
+                f"Broad localization conflict: classifier indicates authentic ({manipulation_probability*100:.2f}%), "
+                f"but localization anomaly covers {loc_area_frac*100:.1f}% without coherent localized support"
+            )
+        else:
+            reason = "; ".join(reasons) if reasons else "No significant localized anomaly"
 
     return strong_localization_support, reason, stats_dict
 
@@ -281,18 +299,24 @@ def _compute_hybrid_verdict(
     classifier_verdict: str,
     manipulation_probability: float,
     strong_localization_support: bool,
+    broad_localization_conflict: bool = False,
 ) -> str:
     """
     Final hybrid forensic verdict decision layer.
       A. classifier_verdict == "manipulated" -> manipulated
       B. strong_localization_support == True -> manipulated
-      C. otherwise -> use original classifier verdict unchanged
+      C. classifier_verdict in ("authenticated", "authentic") and broad_localization_conflict -> inconclusive
+      D. classifier_verdict in ("authenticated", "authentic") -> authentic
+      E. otherwise -> preserve classifier_verdict
     """
     if classifier_verdict == "manipulated":
         return "manipulated"
 
     if strong_localization_support:
         return "manipulated"
+
+    if classifier_verdict in ("authenticated", "authentic") and broad_localization_conflict:
+        return "inconclusive"
 
     if classifier_verdict in ("authenticated", "authentic"):
         return "authentic"
@@ -427,6 +451,7 @@ def run_inference(
             classifier_verdict=classifier_verdict,
             manipulation_probability=manipulation_probability,
             strong_localization_support=strong_localization_support,
+            broad_localization_conflict=loc_stats.get("broad_localization_conflict", False),
         )
 
         # Canonical verdict is hybrid_verdict for full backward compatibility

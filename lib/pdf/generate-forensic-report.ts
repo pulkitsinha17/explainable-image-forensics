@@ -424,7 +424,7 @@ export async function buildForensicPdfDoc(
   const s3Lines = doc.splitTextToSize("Confidence of the model in polarized decisions.", metricW - 5);
   doc.text(s3Lines, m3X + metricW / 2, currentY + 23.5, { align: "center" });
 
-  // Score Card 4: Forged Area (Estimated)
+  // Score Card 4: Forged Area (Estimated) / Localized Anomaly Area
   const m4X = m3X + metricW + cardGap;
   resetCardStroke(doc);
   doc.setFillColor(COLORS.cardBg[0], COLORS.cardBg[1], COLORS.cardBg[2]);
@@ -433,7 +433,7 @@ export async function buildForensicPdfDoc(
   doc.setFont("helvetica", "bold");
   doc.setFontSize(6.4);
   doc.setTextColor(COLORS.navySlate[0], COLORS.navySlate[1], COLORS.navySlate[2]);
-  doc.text("Forged Area (Est.)", m4X + metricW / 2, currentY + 5.5, { align: "center" });
+  doc.text((isAuth || isInconc) ? "Localized Anomaly" : "Forged Area (Est.)", m4X + metricW / 2, currentY + 5.5, { align: "center" });
 
   drawRadialMeter(doc, m4X + metricW / 2, currentY + 14.5, 5.8, forgedArea, [203, 213, 225]);
   doc.setFont("helvetica", "bold");
@@ -444,7 +444,7 @@ export async function buildForensicPdfDoc(
   doc.setFont("helvetica", "normal");
   doc.setFontSize(4.6);
   doc.setTextColor(COLORS.textSecondary[0], COLORS.textSecondary[1], COLORS.textSecondary[2]);
-  const s4Lines = doc.splitTextToSize("Percentage of image flagged as suspicious pixels.", metricW - 5);
+  const s4Lines = doc.splitTextToSize((isAuth || isInconc) ? "Percentage of image area with localized anomalies." : "Percentage of image flagged as suspicious pixels.", metricW - 5);
   doc.text(s4Lines, m4X + metricW / 2, currentY + 23.5, { align: "center" });
 
   // ── 2. IMAGE ANALYSIS & LOCALIZATION (y: 68 to 118mm, height: 50mm) ───────

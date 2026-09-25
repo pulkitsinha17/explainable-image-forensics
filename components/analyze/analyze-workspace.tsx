@@ -96,8 +96,21 @@ function toForensicResult(
     ? Number((mlResult.forensic_authenticity_score * 100).toFixed(1))
     : Number(Math.max(0, 100 - forensicScorePct).toFixed(1));
 
+  const isBroadConflict =
+    (classifierVerdict === "authentic" || classifierVerdict === "authenticated") &&
+    finalVerdict === "inconclusive";
+
   let aiExplanation: string;
-  if (
+  if (isBroadConflict) {
+    aiExplanation =
+      `The calibrated image-level model estimated a very low manipulation probability of ${manipPct}%. ` +
+      `However, the localization analysis produced an unusually broad anomalous response covering ${frac}% of the image. ` +
+      `Because these signals conflict, the final assessment is Inconclusive rather than a confident Authentic result. ` +
+      `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
+      `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
+      `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
+      `Model certainty: ${certPct}%.`;
+  } else if (
     (classifierVerdict === "authentic" || classifierVerdict === "authenticated" || classifierVerdict === "inconclusive") &&
     finalVerdict === "manipulated" &&
     mlResult.localization_support
@@ -113,7 +126,7 @@ function toForensicResult(
   } else if (finalVerdict === "authentic" || finalVerdict === "authenticated") {
     aiExplanation =
       `The calibrated image-level model estimated a manipulation probability of ${manipPct}%. ` +
-      `The final forensic authenticity score is ${forensicAuthPct}%, with no coherent localized anomalies detected. ` +
+      `No coherent localized anomalies were detected, so the final assessment is Authentic. ` +
       `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
       `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
       `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
