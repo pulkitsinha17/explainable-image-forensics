@@ -10,9 +10,13 @@ import {
   ChevronLeft,
   ChevronRight,
   RotateCcw,
-  Loader2,
-  AlertCircle,
+  X,
+  Layers,
+  Sparkles,
+  SlidersHorizontal,
 } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import { EASE_OUT } from "@/components/motion-utils";
 import { TopNavBar } from "@/components/analyze/top-nav-bar";
 import { AnalysisHistoryCard } from "./analysis-history-card";
 import { HistorySummaryCards } from "./history-summary-cards";
@@ -29,6 +33,8 @@ export function HistoryWorkspace({
   userInitial = "P",
   userDisplayName = "Pulkit Sinha",
 }: HistoryWorkspaceProps) {
+  const shouldReduceMotion = useReducedMotion();
+
   const [analyses, setAnalyses] = useState<CompletedAnalysisRecord[]>([]);
   const [stats, setStats] = useState<HistorySummaryStats>({
     totalAnalyses: 0,
@@ -103,7 +109,13 @@ export function HistoryWorkspace({
           verdictFilter === "Likely Manipulated" ||
           verdictFilter === "Potentially Forged"
         ) {
-          if (item.verdict !== "forged" && item.verdictLabel !== "Manipulated" && item.verdictLabel !== "Likely Manipulated" && item.verdictLabel !== "Potentially Forged") return false;
+          if (
+            item.verdict !== "forged" &&
+            item.verdictLabel !== "Manipulated" &&
+            item.verdictLabel !== "Likely Manipulated" &&
+            item.verdictLabel !== "Potentially Forged"
+          )
+            return false;
         }
         if (
           verdictFilter === "Authentic" ||
@@ -121,7 +133,8 @@ export function HistoryWorkspace({
             return false;
         }
         if (verdictFilter === "Inconclusive") {
-          if (item.verdict !== "inconclusive" && item.verdictLabel !== "Inconclusive") return false;
+          if (item.verdict !== "inconclusive" && item.verdictLabel !== "Inconclusive")
+            return false;
         }
 
         return true;
@@ -133,10 +146,18 @@ export function HistoryWorkspace({
         if (sortBy === "Oldest First") {
           return a.analyzedTimestamp - b.analyzedTimestamp;
         }
-        if (sortBy === "Highest Probability" || sortBy === "Highest Risk" || sortBy === "Highest Score") {
+        if (
+          sortBy === "Highest Probability" ||
+          sortBy === "Highest Risk" ||
+          sortBy === "Highest Score"
+        ) {
           return b.riskScore - a.riskScore;
         }
-        if (sortBy === "Lowest Probability" || sortBy === "Lowest Risk" || sortBy === "Lowest Score") {
+        if (
+          sortBy === "Lowest Probability" ||
+          sortBy === "Lowest Risk" ||
+          sortBy === "Lowest Score"
+        ) {
           return a.riskScore - b.riskScore;
         }
         return 0;
@@ -162,12 +183,37 @@ export function HistoryWorkspace({
     }
   };
 
+  const isFiltered =
+    searchQuery !== "" ||
+    statusFilter !== "Completed" ||
+    verdictFilter !== "All Verdicts" ||
+    sortBy !== "Newest First";
+
   const handleResetFilters = () => {
     setSearchQuery("");
     setStatusFilter("Completed");
     setVerdictFilter("All Verdicts");
     setSortBy("Newest First");
     setCurrentPage(1);
+  };
+
+  const headerVariants = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : -8 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: shouldReduceMotion ? 0.1 : 0.45, ease: EASE_OUT },
+    },
+  };
+
+  const listContainerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: shouldReduceMotion ? 0 : 0.05,
+        delayChildren: shouldReduceMotion ? 0 : 0.02,
+      },
+    },
   };
 
   return (
@@ -180,38 +226,43 @@ export function HistoryWorkspace({
         backLabel="Back to Dashboard"
       />
 
-      {/* Main Heading Row & Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Main Editorial Header Row & Action CTA */}
+      <motion.div
+        variants={headerVariants}
+        initial="hidden"
+        animate="visible"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 pb-1"
+      >
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
             Analysis History
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
-            View and manage your previous image-forensics analyses, evidence and reports.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+            Review, search and export your historical multi-evidence forensic investigations.
           </p>
         </div>
 
         <div>
           <Link
             href="/analyze"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1a7fc4] hover:bg-[#1565a8] text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-xl bg-[#1a7fc4] hover:bg-[#1565a8] text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Start New Analysis</span>
           </Link>
         </div>
-      </div>
+      </motion.div>
 
       {/* Summary Stats Cards */}
       {!loading && !error && analyses.length > 0 && (
         <HistorySummaryCards stats={stats} />
       )}
 
-      {/* Search, Filter & Sort Controls */}
-      <div className="bg-transparent flex flex-col md:flex-row items-stretch md:items-center gap-3 pt-1">
-        {/* Search input */}
+      {/* Search, Filter & Sort Command Bar */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-2 sm:p-2.5 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center gap-2.5">
+        {/* Search Input Field */}
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
@@ -220,15 +271,27 @@ export function HistoryWorkspace({
               setCurrentPage(1);
             }}
             placeholder="Search by filename or analysis ID..."
-            className="w-full pl-9 pr-4 py-2.5 text-xs sm:text-sm bg-white hover:border-gray-300 focus:bg-white border border-gray-200/80 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs"
+            className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs"
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setCurrentPage(1);
+              }}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-md transition-colors cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
-        {/* Dropdown Filters */}
-        <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+        {/* Dropdown Filters & Controls */}
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           {/* Status filter */}
-          <div className="relative shrink-0">
-            <div className="text-[10px] uppercase font-semibold text-gray-400 absolute left-3 top-1 pointer-events-none">
+          <div className="relative shrink-0 flex-1 sm:flex-none">
+            <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400 absolute left-3 top-1 pointer-events-none">
               Status
             </div>
             <select
@@ -237,17 +300,17 @@ export function HistoryWorkspace({
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="appearance-none bg-white border border-gray-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[110px]"
+              className="w-full sm:w-auto appearance-none bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[105px]"
             >
               <option value="Completed">Completed</option>
               <option value="All Status">All Status</option>
             </select>
-            <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
           {/* Verdicts filter */}
-          <div className="relative shrink-0">
-            <div className="text-[10px] uppercase font-semibold text-gray-400 absolute left-3 top-1 pointer-events-none">
+          <div className="relative shrink-0 flex-1 sm:flex-none">
+            <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400 absolute left-3 top-1 pointer-events-none">
               Verdict
             </div>
             <select
@@ -256,19 +319,19 @@ export function HistoryWorkspace({
                 setVerdictFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="appearance-none bg-white border border-gray-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[145px]"
+              className="w-full sm:w-auto appearance-none bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[135px]"
             >
               <option value="All Verdicts">All Verdicts</option>
               <option value="Manipulated">Manipulated</option>
               <option value="Authentic">Authentic</option>
               <option value="Inconclusive">Inconclusive</option>
             </select>
-            <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
           {/* Sort By filter */}
-          <div className="relative shrink-0">
-            <div className="text-[10px] uppercase font-semibold text-gray-400 absolute left-3 top-1 pointer-events-none">
+          <div className="relative shrink-0 flex-1 sm:flex-none">
+            <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400 absolute left-3 top-1 pointer-events-none">
               Sort By
             </div>
             <select
@@ -277,34 +340,70 @@ export function HistoryWorkspace({
                 setSortBy(e.target.value);
                 setCurrentPage(1);
               }}
-              className="appearance-none bg-white border border-gray-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[155px]"
+              className="w-full sm:w-auto appearance-none bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[145px]"
             >
               <option value="Newest First">Newest First</option>
               <option value="Oldest First">Oldest First</option>
-              <option value="Highest Probability">Highest Probability</option>
-              <option value="Lowest Probability">Lowest Probability</option>
+              <option value="Highest Probability">Highest Score</option>
+              <option value="Lowest Probability">Lowest Score</option>
             </select>
-            <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
+
+          {/* Reset Filters Shortcut Button if active filters */}
+          {isFiltered && (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              title="Reset all filters"
+              className="px-2.5 py-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer shrink-0 flex items-center gap-1 text-xs font-semibold"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Reset</span>
+            </button>
+          )}
         </div>
       </div>
 
       {/* Main Content Area */}
       {loading ? (
-        <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center shadow-xs flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#1a7fc4]" />
-          <p className="text-sm font-semibold text-gray-700">Loading analysis history...</p>
-          <p className="text-xs text-gray-400">Fetching records from database</p>
+        /* Refined SaaS Loading Skeleton */
+        <div className="space-y-3 sm:space-y-4">
+          {[1, 2, 3].map((n) => (
+            <div
+              key={n}
+              className="bg-white rounded-2xl border border-slate-200/70 p-4 sm:p-5 shadow-2xs animate-pulse flex flex-col md:flex-row md:items-center justify-between gap-4"
+            >
+              <div className="flex items-center gap-4 flex-1">
+                <div className="w-24 h-16 sm:w-28 sm:h-18 rounded-xl bg-slate-100 shrink-0" />
+                <div className="space-y-2 flex-1 max-w-sm">
+                  <div className="h-4 bg-slate-200/80 rounded-md w-3/4" />
+                  <div className="h-3 bg-slate-100 rounded-md w-1/2" />
+                  <div className="h-3 bg-slate-100 rounded-md w-1/3" />
+                </div>
+              </div>
+              <div className="flex items-center gap-6 justify-between md:justify-end">
+                <div className="space-y-1.5 w-24">
+                  <div className="h-5 bg-slate-100 rounded-full w-20" />
+                  <div className="h-6 bg-slate-200/80 rounded-md w-16" />
+                </div>
+                <div className="w-28 h-9 bg-slate-100 rounded-xl" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : error ? (
-        <div className="bg-white rounded-3xl border border-red-100 p-8 text-center shadow-xs space-y-3 max-w-md mx-auto">
-          <AlertCircle className="w-8 h-8 text-red-500 mx-auto" />
-          <h3 className="text-base font-bold text-gray-900">Unable to load history</h3>
-          <p className="text-xs text-red-600">{error}</p>
+        /* Error State */
+        <div className="bg-white rounded-2xl border border-red-200 p-8 sm:p-10 text-center shadow-xs space-y-3 max-w-md mx-auto">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto border border-red-100">
+            <HistoryIcon className="w-6 h-6 stroke-[1.75]" />
+          </div>
+          <h3 className="text-base font-bold text-slate-900">Unable to load history</h3>
+          <p className="text-xs text-red-600 leading-relaxed">{error}</p>
           <button
             type="button"
             onClick={fetchHistory}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 transition-colors shadow-2xs"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition-colors shadow-2xs cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Try Again</span>
@@ -312,55 +411,59 @@ export function HistoryWorkspace({
         </div>
       ) : (
         /* Analysis Cards List */
-        <div className="space-y-3 sm:space-y-4">
+        <motion.div
+          variants={listContainerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-3 sm:space-y-3.5"
+        >
           {totalItems > 0 ? (
             paginatedAnalyses.map((analysis) => (
               <AnalysisHistoryCard key={analysis.id} analysis={analysis} />
             ))
           ) : (
-            /* Empty state for 0 results or filtered empty */
-            <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center shadow-xs">
-              <div className="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mx-auto mb-4 border border-purple-100/60">
-                <HistoryIcon className="w-7 h-7 stroke-[1.75]" />
+            /* Refined SaaS Empty State */
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-10 sm:p-14 text-center shadow-2xs">
+              <div className="w-13 h-13 rounded-2xl bg-blue-50 text-[#1a7fc4] flex items-center justify-center mx-auto mb-4 border border-blue-100/80">
+                <HistoryIcon className="w-6 h-6 stroke-[1.75]" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                {searchQuery || verdictFilter !== "All Verdicts" || statusFilter !== "Completed"
-                  ? "No matching analyses found"
-                  : "No Past Analyses"}
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1">
+                {isFiltered ? "No matching analyses found" : "No Past Analyses"}
               </h3>
-              <p className="text-xs sm:text-sm text-gray-500 mb-6 max-w-sm mx-auto">
-                {searchQuery || verdictFilter !== "All Verdicts" || statusFilter !== "Completed"
-                  ? "Try adjusting your search query or filter options to find previous forensic records."
-                  : "You haven't run any image forensics yet. Upload your first image to generate forensic evidence."}
+              <p className="text-xs sm:text-sm text-slate-500 mb-6 max-w-sm mx-auto leading-relaxed">
+                {isFiltered
+                  ? "Try adjusting your search terms or filter criteria to discover previous forensic records."
+                  : "You have not performed any image forensic analyses yet. Analyze your first image to begin generating evidence records."}
               </p>
-              {searchQuery || verdictFilter !== "All Verdicts" || statusFilter !== "Completed" ? (
+              {isFiltered ? (
                 <button
                   type="button"
                   onClick={handleResetFilters}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs sm:text-sm font-semibold rounded-xl transition-colors shadow-2xs cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition-colors shadow-2xs cursor-pointer"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Reset Filters</span>
+                  <span>Reset All Filters</span>
                 </button>
               ) : (
                 <Link
                   href="/analyze"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#1a7fc4] text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-[#1565a8] transition-colors shadow-xs cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1a7fc4] text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-[#1565a8] transition-all shadow-xs cursor-pointer hover:shadow"
                 >
+                  <PlusCircle className="w-4 h-4" />
                   <span>Start First Analysis</span>
                 </Link>
               )}
             </div>
           )}
-        </div>
+        </motion.div>
       )}
 
-      {/* Bottom Pagination & Count */}
+      {/* Bottom Pagination & Count Bar */}
       {!loading && !error && totalItems > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 pb-4">
-          <p className="text-xs sm:text-sm text-gray-500 font-medium">
-            Showing <span className="font-semibold text-gray-900">{startRecord}–{endRecord}</span> of{" "}
-            <span className="font-semibold text-gray-900">{totalItems}</span> analyses
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3.5 pt-2 pb-4 border-t border-slate-200/60">
+          <p className="text-xs text-slate-500 font-medium">
+            Showing <span className="font-semibold text-slate-900">{startRecord}–{endRecord}</span> of{" "}
+            <span className="font-semibold text-slate-900">{totalItems}</span> analyses
           </p>
 
           <div className="flex items-center gap-1.5">
@@ -369,7 +472,7 @@ export function HistoryWorkspace({
               type="button"
               onClick={() => handlePageChange(safeCurrentPage - 1)}
               disabled={safeCurrentPage <= 1}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-xs font-semibold text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs cursor-pointer"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
               <span>Previous</span>
@@ -385,8 +488,8 @@ export function HistoryWorkspace({
                   onClick={() => handlePageChange(page)}
                   className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     isActive
-                      ? "bg-[#1a7fc4] text-white shadow-xs"
-                      : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-2xs"
+                      ? "bg-[#1a7fc4] text-white shadow-xs font-bold"
+                      : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs"
                   }`}
                 >
                   {page}
@@ -399,7 +502,7 @@ export function HistoryWorkspace({
               type="button"
               onClick={() => handlePageChange(safeCurrentPage + 1)}
               disabled={safeCurrentPage >= totalPages}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-xs font-semibold text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs cursor-pointer"
             >
               <span>Next</span>
               <ChevronRight className="w-3.5 h-3.5" />
