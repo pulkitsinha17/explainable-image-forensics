@@ -27,7 +27,7 @@ export function HistorySummaryCards({ stats }: HistorySummaryCardsProps) {
       iconBorder: "border-blue-100/60",
     },
     {
-      title: "Authenticated",
+      title: "Authentic",
       value: authenticated.toString(),
       subtext: `${authPercentage}% of total`,
       icon: CheckCircle2,

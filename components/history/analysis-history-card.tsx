@@ -16,18 +16,25 @@ export function AnalysisHistoryCard({ analysis }: AnalysisHistoryCardProps) {
 
   const isAuthentic =
     analysis.verdict === "authentic" ||
+    analysis.verdictLabel === "Authentic" ||
     analysis.verdictLabel === "Appears Authentic" ||
     analysis.verdictLabel === "Authenticated" ||
     analysis.verdictLabel === "Likely Authentic";
 
   const isInconclusive = !isForged && !isAuthentic;
 
-  const scoreText =
-    analysis.forgeryAnomalyScore !== null && analysis.forgeryAnomalyScore !== undefined
-      ? `${analysis.forgeryAnomalyScore}%`
+  const scoreVal =
+    analysis.forensicManipulationScore !== null && analysis.forensicManipulationScore !== undefined
+      ? analysis.forensicManipulationScore
+      : analysis.manipulationProbability !== null && analysis.manipulationProbability !== undefined
+      ? analysis.manipulationProbability
+      : analysis.forgeryAnomalyScore !== null && analysis.forgeryAnomalyScore !== undefined
+      ? analysis.forgeryAnomalyScore
       : typeof analysis.riskScore === "number" && analysis.riskScore >= 0
-      ? `${analysis.riskScore}%`
-      : "Not available";
+      ? analysis.riskScore
+      : null;
+
+  const scoreText = scoreVal !== null ? `${scoreVal.toFixed(1)}%` : "Not available";
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100/90 p-4 sm:p-5 shadow-xs hover:border-gray-200/90 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
@@ -92,13 +99,13 @@ export function AnalysisHistoryCard({ analysis }: AnalysisHistoryCardProps) {
             </div>
           )}
 
-          {/* Forgery Anomaly Score and Label */}
+          {/* Forensic Manipulation Score and Label */}
           <div className="mt-1">
             <span className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
               {scoreText}
             </span>
             <span className="block text-[11px] font-medium text-gray-400 tracking-tight">
-              Forgery Anomaly Score
+              Forensic Score
             </span>
           </div>
         </div>

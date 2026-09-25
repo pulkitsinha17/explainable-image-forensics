@@ -99,16 +99,26 @@ export function HistoryWorkspace({
 
         // Verdict filter
         if (
+          verdictFilter === "Manipulated" ||
           verdictFilter === "Likely Manipulated" ||
           verdictFilter === "Potentially Forged"
         ) {
-          if (item.verdict !== "forged" && item.verdictLabel !== "Likely Manipulated" && item.verdictLabel !== "Potentially Forged") return false;
+          if (item.verdict !== "forged" && item.verdictLabel !== "Manipulated" && item.verdictLabel !== "Likely Manipulated" && item.verdictLabel !== "Potentially Forged") return false;
         }
         if (
+          verdictFilter === "Authentic" ||
+          verdictFilter === "Authenticated" ||
           verdictFilter === "Appears Authentic" ||
           verdictFilter === "Likely Authentic"
         ) {
-          if (item.verdict !== "authentic" && item.verdictLabel !== "Appears Authentic" && item.verdictLabel !== "Likely Authentic") return false;
+          if (
+            item.verdict !== "authentic" &&
+            item.verdictLabel !== "Authentic" &&
+            item.verdictLabel !== "Authenticated" &&
+            item.verdictLabel !== "Appears Authentic" &&
+            item.verdictLabel !== "Likely Authentic"
+          )
+            return false;
         }
         if (verdictFilter === "Inconclusive") {
           if (item.verdict !== "inconclusive" && item.verdictLabel !== "Inconclusive") return false;
@@ -123,10 +133,10 @@ export function HistoryWorkspace({
         if (sortBy === "Oldest First") {
           return a.analyzedTimestamp - b.analyzedTimestamp;
         }
-        if (sortBy === "Highest Risk") {
+        if (sortBy === "Highest Probability" || sortBy === "Highest Risk" || sortBy === "Highest Score") {
           return b.riskScore - a.riskScore;
         }
-        if (sortBy === "Lowest Risk") {
+        if (sortBy === "Lowest Probability" || sortBy === "Lowest Risk" || sortBy === "Lowest Score") {
           return a.riskScore - b.riskScore;
         }
         return 0;
@@ -249,8 +259,8 @@ export function HistoryWorkspace({
               className="appearance-none bg-white border border-gray-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[145px]"
             >
               <option value="All Verdicts">All Verdicts</option>
-              <option value="Likely Manipulated">Likely Manipulated</option>
-              <option value="Appears Authentic">Appears Authentic</option>
+              <option value="Manipulated">Manipulated</option>
+              <option value="Authentic">Authentic</option>
               <option value="Inconclusive">Inconclusive</option>
             </select>
             <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -267,12 +277,12 @@ export function HistoryWorkspace({
                 setSortBy(e.target.value);
                 setCurrentPage(1);
               }}
-              className="appearance-none bg-white border border-gray-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[130px]"
+              className="appearance-none bg-white border border-gray-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[155px]"
             >
               <option value="Newest First">Newest First</option>
               <option value="Oldest First">Oldest First</option>
-              <option value="Highest Risk">Highest Risk</option>
-              <option value="Lowest Risk">Lowest Risk</option>
+              <option value="Highest Probability">Highest Probability</option>
+              <option value="Lowest Probability">Lowest Probability</option>
             </select>
             <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>

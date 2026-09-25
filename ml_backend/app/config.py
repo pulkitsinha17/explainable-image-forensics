@@ -28,6 +28,15 @@ MPC_CHECKPOINT = Path(
     )
 )
 
+# Final Kaggle forensic classifier bundle (PIXENTRA_FORGERY_CLASSIFIER_V2)
+# Contains: base_model_state_dict, classifier_state_dict, calibrator_coef/intercept, thresholds
+FORENSIC_BUNDLE_PATH = Path(
+    os.environ.get(
+        "PIXENTRA_FORENSIC_BUNDLE_PATH",
+        str(MODELS_DIR / "pixentra_forensic_classifier_bundle.pth"),
+    )
+)
+
 # ── Inference settings ─────────────────────────────────────────────────────────
 # Input spatial resolution expected by the trained model and MPC backbone
 INPUT_SIZE: int = int(os.environ.get("INPUT_SIZE", "512"))
@@ -37,7 +46,15 @@ INPUT_SIZE: int = int(os.environ.get("INPUT_SIZE", "512"))
 FORGERY_THRESHOLD: float = float(os.environ.get("FORGERY_THRESHOLD", "0.38"))
 
 # Image-level decision threshold derived from 400-image calibration experiment (p999 >= 0.995)
+# (Legacy / localization-only path — superseded by the classifier bundle when available)
 CALIBRATED_IMAGE_THRESHOLD: float = float(os.environ.get("CALIBRATED_IMAGE_THRESHOLD", "0.995"))
+
+# Confidence threshold below which a verdict is INCONCLUSIVE.
+# conf = 2 * |manipulation_prob - 0.5|; loaded from bundle at startup; overridable via env.
+# Bundle value: 0.5851
+INCONCLUSIVE_CONFIDENCE_THRESHOLD: float = float(
+    os.environ.get("INCONCLUSIVE_CONFIDENCE_THRESHOLD", "0.5851")
+)
 
 # ── Upload / file handling ─────────────────────────────────────────────────────
 MAX_UPLOAD_MB: int = int(os.environ.get("MAX_UPLOAD_MB", "10"))

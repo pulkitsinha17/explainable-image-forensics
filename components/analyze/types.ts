@@ -19,10 +19,19 @@ export interface ForensicEvidence {
 }
 
 export interface ForensicAnalysisResult {
-  verdict: "likely_manipulated" | "authentic" | "suspicious";
+  verdict: "manipulated" | "authenticated" | "inconclusive" | "likely_manipulated" | "authentic" | "suspicious";
   verdictLabel: string;
   verdictDescription: string;
-  forgeryRiskScore: number; // 0 - 100
+  forgeryRiskScore: number; // 0 - 100 (kept for compatibility)
+  manipulationProbability?: number; // 0 - 100
+  authenticityProbability?: number; // 0 - 100
+  predictionCertainty?: number; // 0 - 100
+  forensicManipulationScore?: number; // 0 - 100
+  forensicAuthenticityScore?: number; // 0 - 100
+  classifierVerdict?: string;
+  hybridVerdict?: string;
+  localizationSupport?: boolean;
+  localizationSupportReason?: string;
   /** Proposed StrongMultiEvidenceNet model risk score (0–100) */
   proposedRiskScore: number;
   /** Confidence of the model (0–100) */
@@ -88,9 +97,20 @@ export interface AnalysisState {
 export interface MLRunResult {
   verdict: string;
   risk_score: number;             // 0.0–1.0
+  manipulation_probability?: number; // 0.0–1.0
+  authenticity_probability?: number; // 0.0–1.0
+  prediction_certainty?: number;     // 0.0–1.0
+  forensic_manipulation_score?: number; // 0.0–1.0
+  forensic_authenticity_score?: number; // 0.0–1.0
+  classifier_verdict?: string;
+  hybrid_verdict?: string;
+  localization_support?: boolean;
+  localization_support_reason?: string;
   proposed_risk_score?: number;   // 0.0–1.0
   confidence: number;             // 0.0–1.0
   mpc_risk_score: number;         // 0.0–1.0
+  decision_threshold?: number;
+  inconclusive_threshold?: number;
   evidence: {
     compression?: number;
     noise_residual: number;

@@ -534,3 +534,86 @@ class MultiEvidenceModel(nn.Module):
 
 # Alias for compatibility
 StrongMultiEvidenceNet = MultiEvidenceModel
+
+
+# ================================================================
+# IMAGE-LEVEL CLASSIFIER HEAD  (PIXENTRA_FORGERY_CLASSIFIER_V2)
+# ================================================================
+
+CLASSIFIER_INPUT_DIM = 270  # avg(128) + max(128) + loc_stats(9) + branch(5)
+
+
+class ImageLevelClassifier(nn.Module):
+    """
+    Thin MLP that maps a 270-dim fused feature vector to a manipulation logit.
+    Architecture mirrors the Kaggle notebook cell 18:
+        Linear(270,160) → LayerNorm(160) → GELU → Dropout(0.20)
+        Linear(160,80)  → GELU → Dropout(0.15)
+        Linear(80,1)
+    """
+
+    def __init__(self, in_dim: int = CLASSIFIER_INPUT_DIM):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(in_dim, 160),
+            nn.LayerNorm(160),
+            nn.GELU(),
+            nn.Dropout(0.20),
+            nn.Linear(160, 80),
+            nn.GELU(),
+            nn.Dropout(0.15),
+            nn.Linear(80, 1),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x).squeeze(1)
+
+
+def build_classifier_features(model_out: dict) -> torch.Tensor:
+    """
+    Construct the 270-dim feature vector from a MultiEvidenceModel forward output dict.
+
+    Breakdown (matches notebook cell 18 exactly):
+      - avg_pool(fused_features, 1×1) flattened  →  128 dims
+      - max_pool(fused_features, 1×1) flattened  →  128 dims
+      - localization_statistics(prob, mpc_prob)   →    9 dims
+      - branch_contributions (5 branches)         →    5 dims
+                                                 ──────────────
+                                                    270 dims total
+
+    localization_statistics:
+      q999, q995, q990, q950, max, mean, area≥0.38, certainty, mpc_mean
+    """
+    fused = model_out["fused_features"]   # (B, 128, H', W')
+    prob = model_out["prob"]              # (B, 1, 512, 512)
+    mpc_prob = model_out["mpc_prob"]      # (B, 1, H_mpc, W_mpc)
+
+    # Spatial pooling of fused features
+    avg = F.adaptive_avg_pool2d(fused, 1).flatten(1)   # (B, 128)
+    mx = F.adaptive_max_pool2d(fused, 1).flatten(1)    # (B, 128)
+
+    # Localization statistics from prob map
+    flat = prob.flatten(1)                              # (B, 512*512)
+    q999 = torch.quantile(flat, 0.999, dim=1)
+    q995 = torch.quantile(flat, 0.995, dim=1)
+    q990 = torch.quantile(flat, 0.990, dim=1)
+    q950 = torch.quantile(flat, 0.950, dim=1)
+    p_max = flat.max(1).values
+    p_mean = flat.mean(1)
+    area = (flat >= 0.38).float().mean(1)
+    p_clamped = flat.clamp(1e-6, 1 - 1e-6)
+    ent = (-p_clamped * torch.log2(p_clamped) - (1 - p_clamped) * torch.log2(1 - p_clamped)).mean(1)
+    certainty = 1 - ent
+    mpc_mean = mpc_prob.flatten(1).mean(1)
+
+    stats = torch.stack([q999, q995, q990, q950, p_max, p_mean, area, certainty, mpc_mean], dim=1)  # (B, 9)
+
+    # Branch attention weights
+    bc = model_out["branch_contribution"]
+    branch = torch.stack(
+        [bc[k] for k in ["compression", "frequency_noise", "statistical", "ela", "deep_learning_mpc"]],
+        dim=1,
+    )  # (B, 5)
+
+    return torch.cat([avg, mx, stats, branch], dim=1)  # (B, 270)
+

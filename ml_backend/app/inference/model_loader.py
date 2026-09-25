@@ -1,46 +1,67 @@
 """
 PIXENTRA — model loader.
 
-Loads both the MPC backbone and the StrongMultiEvidenceNet exactly as done in
-the authoritative Kaggle notebook (MPC_MultiEvidence_Corrected_STRONG_FINAL.ipynb).
+Loads the PIXENTRA_FORGERY_CLASSIFIER_V2 bundle which contains:
+  - base_model_state_dict   → StrongMultiEvidenceNet (localization backbone)
+  - classifier_state_dict   → ImageLevelClassifier (270-dim MLP head)
+  - calibrator_coef / calibrator_intercept → logistic calibration layer
+  - inconclusive_confidence_threshold
+  - localization_threshold
+
+Legacy fallback:
+  If the bundle is not present, falls back to loading best_multi_evidence_stage1.pth
+  and using the p999 localization score for the verdict (original pipeline).
 
 Loading strategy
 ────────────────
-MPC backbone:
+Bundle:
+    torch.load(bundle_path, map_location="cpu", weights_only=False)
+    Reads base_model_state_dict, classifier_state_dict, calibrator_coef, calibrator_intercept.
+
+MPC backbone (standalone):
     torch.load(checkpoint, map_location="cpu", weights_only=False)
     Handle module. prefix stripping; require >95% key match.
-
-StrongMultiEvidenceNet:
-    checkpoint["model_state_dict"]  — this is the save convention from cell 16:
-        torch.save({"epoch": epoch, "model_state_dict": model.state_dict(), ...}, BEST_PATH)
 
 Both models are frozen after loading (eval(), requires_grad=False).
 """
 from __future__ import annotations
 import logging
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+import numpy as np
 import torch
 
-from app.config import PROPOSED_CHECKPOINT, MPC_CHECKPOINT
-from app.inference.model_arch import StrongMultiEvidenceNet, _import_mpc_model
+from app.config import (
+    FORENSIC_BUNDLE_PATH,
+    PROPOSED_CHECKPOINT,
+    MPC_CHECKPOINT,
+    INCONCLUSIVE_CONFIDENCE_THRESHOLD,
+)
+from app.inference.model_arch import (
+    StrongMultiEvidenceNet,
+    ImageLevelClassifier,
+    CLASSIFIER_INPUT_DIM,
+    _import_mpc_model,
+)
 
 logger = logging.getLogger(__name__)
 
 
+@dataclass
 class LoadedModels:
-    """Container for the two loaded models, shared across requests."""
+    """Container for all loaded models and calibration state, shared across requests."""
 
-    def __init__(
-        self,
-        proposed: StrongMultiEvidenceNet,
-        mpc,
-        device: torch.device,
-    ):
-        self.proposed = proposed
-        self.mpc = mpc
-        self.device = device
+    proposed: Optional[StrongMultiEvidenceNet]   # localization backbone
+    mpc: Optional[object]                         # MPC backbone (standalone, optional)
+    classifier: Optional[ImageLevelClassifier]    # image-level classification head
+    # Logistic calibration: probability = sigmoid(coef * logit + intercept)
+    calibrator_coef: Optional[np.ndarray] = None        # shape (1,)
+    calibrator_intercept: Optional[np.ndarray] = None   # shape (1,)
+    inconclusive_threshold: float = INCONCLUSIVE_CONFIDENCE_THRESHOLD
+    device: torch.device = field(default_factory=lambda: torch.device("cpu"))
+    bundle_loaded: bool = False
 
     @property
     def proposed_loaded(self) -> bool:
@@ -50,6 +71,26 @@ class LoadedModels:
     def mpc_loaded(self) -> bool:
         return self.mpc is not None
 
+    @property
+    def classifier_loaded(self) -> bool:
+        return self.classifier is not None
+
+    def calibrate(self, logit: float) -> float:
+        """
+        Apply logistic calibration to a raw classifier logit.
+        Returns calibrated manipulation probability in [0, 1].
+        Falls back to sigmoid(logit) if calibrator is not loaded.
+        """
+        if self.calibrator_coef is not None and self.calibrator_intercept is not None:
+            cal_logit = float(self.calibrator_coef[0]) * logit + float(self.calibrator_intercept[0])
+        else:
+            cal_logit = logit
+        return float(1.0 / (1.0 + np.exp(-cal_logit)))
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  MPC backbone loader (unchanged from original)
+# ─────────────────────────────────────────────────────────────────────────────
 
 def _load_mpc(path: Path, device: torch.device):
     """
@@ -111,51 +152,33 @@ def _load_mpc(path: Path, device: torch.device):
         return None
 
 
-def _load_proposed(path: Path, device: torch.device) -> Optional[StrongMultiEvidenceNet]:
-    """
-    Load StrongMultiEvidenceNet from BEST_PATH checkpoint.
-    checkpoint["model_state_dict"] — save convention from notebook cell 16.
-    """
-    if not path.exists():
-        logger.error(
-            "Proposed checkpoint not found: %s\n"
-            "Place best_multi_evidence_stage1.pth in ml_backend/models/.",
-            path,
-        )
-        return None
+# ─────────────────────────────────────────────────────────────────────────────
+#  Legacy proposed-only loader (fallback when bundle is unavailable)
+# ─────────────────────────────────────────────────────────────────────────────
 
-    if path.stat().st_size == 0:
-        logger.error(
-            "Proposed checkpoint is EMPTY (0 bytes): %s\n"
-            "The file best_multi_evidence_stage1 .pth downloaded from Kaggle was a "
-            "0-byte placeholder. Re-download the actual trained checkpoint from your "
-            "Kaggle notebook output and place it at:\n"
-            "  ml_backend/models/best_multi_evidence_stage1.pth",
-            path,
-        )
+def _load_proposed_legacy(path: Path, device: torch.device) -> Optional[StrongMultiEvidenceNet]:
+    """
+    Load StrongMultiEvidenceNet from a standalone best_multi_evidence_stage1.pth checkpoint.
+    Used as a fallback when the full classifier bundle is not present.
+    """
+    if not path.exists() or path.stat().st_size == 0:
+        logger.error("Legacy proposed checkpoint not found or empty: %s", path)
         return None
 
     try:
         model = StrongMultiEvidenceNet().to(device)
-
         ck = torch.load(str(path), map_location=device, weights_only=False)
 
-        # Notebook saves: {"epoch": ..., "model_state_dict": ..., "history": ..., "val_score": ...}
         if isinstance(ck, dict) and "model_state_dict" in ck:
-            epoch = ck.get("epoch", "unknown")
-            val_score = ck.get("val_score", float("nan"))
             state_dict = ck["model_state_dict"]
             logger.info(
-                "Proposed checkpoint: epoch=%s  val_score=%.4f", epoch, val_score
+                "Legacy proposed checkpoint: epoch=%s  val_score=%.4f",
+                ck.get("epoch", "?"), ck.get("val_score", float("nan")),
             )
         elif isinstance(ck, dict):
-            # Fallback: assume the dict IS the state dict
             state_dict = ck
         else:
-            raise RuntimeError(
-                f"Unexpected checkpoint format: {type(ck)}. "
-                "Expected a dict with 'model_state_dict'."
-            )
+            raise RuntimeError(f"Unexpected checkpoint format: {type(ck)}")
 
         model.load_state_dict(state_dict, strict=True)
         model.eval()
@@ -163,48 +186,160 @@ def _load_proposed(path: Path, device: torch.device) -> Optional[StrongMultiEvid
             p.requires_grad_(False)
 
         logger.info(
-            "StrongMultiEvidenceNet loaded from %s — %s parameters",
-            path.name,
-            f"{sum(p.numel() for p in model.parameters()):,}",
+            "StrongMultiEvidenceNet loaded (legacy) from %s — %s parameters",
+            path.name, f"{sum(p.numel() for p in model.parameters()):,}",
         )
         return model
 
     except Exception as exc:
-        logger.error("Failed to load proposed checkpoint: %s", exc)
+        logger.error("Failed to load legacy proposed checkpoint: %s", exc)
         return None
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Bundle loader (PIXENTRA_FORGERY_CLASSIFIER_V2)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _load_bundle(path: Path, device: torch.device):
+    """
+    Load the full PIXENTRA_FORGERY_CLASSIFIER_V2 bundle.
+
+    Returns (proposed, classifier, cal_coef, cal_intercept, inconclusive_threshold)
+    or raises on failure.
+    """
+    logger.info("Loading PIXENTRA_FORGERY_CLASSIFIER_V2 bundle from %s", path)
+
+    bundle = torch.load(str(path), map_location="cpu", weights_only=False)
+    fmt = bundle.get("format_version", "UNKNOWN")
+    logger.info("Bundle format version: %s", fmt)
+
+    # ── 1. Load base model ────────────────────────────────────────────────────
+    proposed = StrongMultiEvidenceNet().to(device)
+    base_sd = bundle["base_model_state_dict"]
+    proposed.load_state_dict(base_sd, strict=True)
+    proposed.eval()
+    for p in proposed.parameters():
+        p.requires_grad_(False)
+    logger.info(
+        "Bundle base model loaded — %s parameters",
+        f"{sum(p.numel() for p in proposed.parameters()):,}",
+    )
+
+    # ── 2. Load classifier head ───────────────────────────────────────────────
+    in_dim = bundle.get("classifier_input_dim", CLASSIFIER_INPUT_DIM)
+    classifier = ImageLevelClassifier(in_dim=in_dim).to(device)
+    classifier.load_state_dict(bundle["classifier_state_dict"], strict=True)
+    classifier.eval()
+    for p in classifier.parameters():
+        p.requires_grad_(False)
+    logger.info("Bundle classifier head loaded — input_dim=%d", in_dim)
+
+    # ── 3. Calibration ────────────────────────────────────────────────────────
+    # calibrator_coef / calibrator_intercept may be torch.Tensor OR numpy.ndarray
+    # depending on the torch.save() call in the notebook.
+    def _to_numpy_1d(v) -> np.ndarray:
+        if isinstance(v, torch.Tensor):
+            return v.cpu().numpy().reshape(-1).astype(np.float64)
+        return np.asarray(v, dtype=np.float64).reshape(-1)
+
+    cal_coef = _to_numpy_1d(bundle["calibrator_coef"])         # shape (1,)
+    cal_intercept = _to_numpy_1d(bundle["calibrator_intercept"])  # shape (1,)
+    logger.info(
+        "Bundle calibrator: coef=%.6f  intercept=%.6f",
+        float(cal_coef[0]), float(cal_intercept[0]),
+    )
+
+
+    # ── 4. Thresholds ─────────────────────────────────────────────────────────
+    inconclusive_thr = float(bundle.get(
+        "inconclusive_confidence_threshold",
+        INCONCLUSIVE_CONFIDENCE_THRESHOLD,
+    ))
+    loc_thr = float(bundle.get("localization_threshold", 0.38))
+    logger.info(
+        "Bundle thresholds: inconclusive_conf=%.4f  localization=%.4f",
+        inconclusive_thr, loc_thr,
+    )
+
+    return proposed, classifier, cal_coef, cal_intercept, inconclusive_thr
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Public entry point
+# ─────────────────────────────────────────────────────────────────────────────
 
 def load_all_models() -> LoadedModels:
     """
     Called once at FastAPI startup.
-    Loads both models and returns a LoadedModels container.
+    Tries to load the full V2 bundle first; falls back to the legacy checkpoint.
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info("=" * 60)
     logger.info("PIXENTRA ML Backend — model loading")
     logger.info("Device: %s", device)
-    logger.info("Proposed checkpoint: %s", PROPOSED_CHECKPOINT)
+    logger.info("Bundle path:         %s", FORENSIC_BUNDLE_PATH)
+    logger.info("Legacy proposed:     %s", PROPOSED_CHECKPOINT)
     logger.info("MPC checkpoint:      %s", MPC_CHECKPOINT)
     logger.info("=" * 60)
 
-    proposed = _load_proposed(Path(PROPOSED_CHECKPOINT), device)
+    proposed = None
+    classifier = None
+    cal_coef = None
+    cal_intercept = None
+    inconclusive_threshold = INCONCLUSIVE_CONFIDENCE_THRESHOLD
+    bundle_loaded = False
+
+    bundle_path = Path(FORENSIC_BUNDLE_PATH)
+    if bundle_path.exists() and bundle_path.stat().st_size > 0:
+        try:
+            proposed, classifier, cal_coef, cal_intercept, inconclusive_threshold = (
+                _load_bundle(bundle_path, device)
+            )
+            bundle_loaded = True
+            logger.info("✓ Bundle loaded successfully (V2 inference path active)")
+        except Exception as exc:
+            logger.error("Bundle load failed, falling back to legacy: %s", exc)
+            proposed = None
+    else:
+        logger.warning(
+            "Bundle not found at %s — using legacy checkpoint path.", bundle_path
+        )
+
+    # Fallback: load base model from standalone checkpoint if bundle failed
+    if proposed is None:
+        proposed = _load_proposed_legacy(Path(PROPOSED_CHECKPOINT), device)
+
+    # MPC backbone (standalone — also embedded in bundle's base model, but kept
+    # for the separate mpc_risk_score output and legacy compat)
     mpc = _load_mpc(Path(MPC_CHECKPOINT), device)
 
     if proposed is None:
         logger.critical(
-            "StrongMultiEvidenceNet could not be loaded. "
-            "/analyze will return errors until the checkpoint is available."
+            "StrongMultiEvidenceNet could not be loaded from any source. "
+            "/analyze will return errors until a valid checkpoint is available."
         )
     if mpc is None:
         logger.warning(
             "MPC backbone unavailable. "
             "Evidence channel 0 will be zero-filled. "
-            "Risk scores will be less accurate."
+            "mpc_risk_score will be 0.0."
         )
 
     logger.info(
-        "Startup complete — proposed_loaded=%s  mpc_loaded=%s",
+        "Startup complete — proposed=%s  mpc=%s  bundle=%s  inconclusive_thr=%.4f",
         proposed is not None,
         mpc is not None,
+        bundle_loaded,
+        inconclusive_threshold,
     )
-    return LoadedModels(proposed=proposed, mpc=mpc, device=device)
+
+    return LoadedModels(
+        proposed=proposed,
+        mpc=mpc,
+        classifier=classifier,
+        calibrator_coef=cal_coef,
+        calibrator_intercept=cal_intercept,
+        inconclusive_threshold=inconclusive_threshold,
+        device=device,
+        bundle_loaded=bundle_loaded,
+    )

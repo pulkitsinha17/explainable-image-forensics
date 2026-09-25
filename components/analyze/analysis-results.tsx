@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Download,
   Share2,
@@ -31,6 +32,7 @@ export function AnalysisResults({
   onShare,
   onAnalyzeAnother,
 }: AnalysisResultsProps) {
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
@@ -44,7 +46,7 @@ export function AnalysisResults({
     if (onViewReport) {
       onViewReport();
     } else if (results.analysisId) {
-      window.open(`/report/${results.analysisId}`, "_blank");
+      router.push(`/report/${results.analysisId}`);
     }
   };
 
@@ -83,7 +85,7 @@ export function AnalysisResults({
     } catch (err) {
       console.error("Failed to generate forensic PDF report:", err);
       // Graceful fallback download
-      const reportContent = `PIXENTRA IMAGE FORENSIC REPORT\n===============================\nVerdict: ${results.verdictLabel}\nForgery Anomaly Score: ${results.forgeryRiskScore}%\nPrediction Certainty: ${results.confidence}%\nCompleted in: ${results.elapsedSeconds} seconds\n\nEVIDENCE BREAKDOWN:\n- Compression: ${results.evidence.compression}%\n- Frequency / Noise: ${results.evidence.frequencyNoise}%\n- Local Statistics: ${results.evidence.statistics}%\n- Error Level Analysis (ELA): ${results.evidence.ela}%\n- Metadata: ${results.evidence.metadata}%\n\nAI EXPLANATION:\n${results.aiExplanation}\n\nGenerated with PIXENTRA — See Beyond the Pixels\n`;
+      const reportContent = `PIXENTRA IMAGE FORENSIC REPORT\n===============================\nVerdict: ${results.verdictLabel}\nForensic Manipulation Score: ${forensicScore.toFixed(1)}%\nForensic Authenticity Score: ${forensicAuthScore.toFixed(1)}%\nPrediction Certainty: ${certVal}%\nCompleted in: ${results.elapsedSeconds} seconds\n\nEVIDENCE BREAKDOWN:\n- Compression: ${results.evidence.compression}%\n- Frequency / Noise: ${results.evidence.frequencyNoise}%\n- Local Statistics: ${results.evidence.statistics}%\n- Error Level Analysis (ELA): ${results.evidence.ela}%\n- Metadata: ${results.evidence.metadata}%\n\nAI EXPLANATION:\n${results.aiExplanation}\n\nGenerated with PIXENTRA — See Beyond the Pixels\n`;
       const blob = new Blob([reportContent], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -152,11 +154,23 @@ export function AnalysisResults({
     },
   ];
 
-  // Radial score gauge calculation
+  const forensicScore = results.forensicManipulationScore ?? results.forgeryRiskScore;
+  const forensicAuthScore = results.forensicAuthenticityScore ?? Math.max(0, 100 - forensicScore);
+  const manipProb = results.manipulationProbability ?? results.forgeryRiskScore;
+  const authProb = results.authenticityProbability ?? Math.max(0, 100 - manipProb);
+  const certVal = results.predictionCertainty ?? results.confidence;
+
+  const isAuth = results.verdict === "authenticated" || results.verdict === "authentic" || results.verdictLabel === "Authentic";
+  const isInconc = results.verdict === "inconclusive" || results.verdict === "suspicious" || results.verdictLabel === "Inconclusive";
+
+  // Radial score gauge calculation based on Forensic Manipulation Score
   const radius = 34;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset =
-    circumference - (results.forgeryRiskScore / 100) * circumference;
+    circumference - (Math.min(100, Math.max(0, forensicScore)) / 100) * circumference;
+
+  const gaugeColor = forensicScore >= 60 ? "text-red-500" : forensicScore >= 40 ? "text-amber-500" : "text-emerald-500";
+  const gaugeTrack = forensicScore >= 60 ? "text-red-100" : forensicScore >= 40 ? "text-amber-100" : "text-emerald-100";
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 space-y-4 animate-fade-in">
@@ -215,17 +229,30 @@ export function AnalysisResults({
 
       {/* Main 2-Column Results Body */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Visual Comparison Slider */}
-        <div className="lg:col-span-6 space-y-3">
+        {/* Left Column: Visual Comparison Slider & Analyze Another Action */}
+        <div className="lg:col-span-6 space-y-3.5">
           <ImageComparisonSlider
             originalImage={results.originalImageUrl}
             heatmapImage={results.localizationMapUrl}
           />
+
+          {onAnalyzeAnother && (
+            <div className="pt-4 flex justify-center items-center">
+              <button
+                type="button"
+                onClick={onAnalyzeAnother}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-xs sm:text-sm font-semibold text-gray-700 hover:text-gray-900 transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4 text-gray-500" />
+                <span>Analyze Another Image</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Right Column: Verdict, Forgery Risk, Evidence Breakdown & AI Explanation */}
         <div className="lg:col-span-6 space-y-3.5">
-          {/* Top Row: Verdict + Forgery Anomaly Score Gauge */}
+          {/* Top Row: Verdict + Forensic Manipulation Score Gauge */}
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-2xl bg-gray-50/70 border border-gray-100">
             {/* Verdict */}
             <div className="sm:col-span-7 flex flex-col justify-center space-y-1 sm:pr-3">
@@ -234,14 +261,14 @@ export function AnalysisResults({
               </span>
               <div
                 className={`flex items-center gap-2 ${
-                  results.verdict === "authentic"
+                  isAuth
                     ? "text-[#16a34a]"
-                    : results.verdict === "suspicious"
+                    : isInconc
                     ? "text-[#2563eb]"
                     : "text-[#dc2626]"
                 }`}
               >
-                {results.verdict === "authentic" ? (
+                {isAuth ? (
                   <CheckCircle2 className="w-5 h-5 shrink-0 stroke-[2.2]" />
                 ) : (
                   <AlertTriangle className="w-5 h-5 shrink-0 stroke-[2.2]" />
@@ -255,10 +282,10 @@ export function AnalysisResults({
               </p>
             </div>
 
-            {/* Forgery Anomaly Score Circular Radial Meter */}
+            {/* Forensic Manipulation Score Circular Radial Meter */}
             <div className="sm:col-span-5 flex flex-col items-center justify-center pt-2 sm:pt-0 sm:pl-3 sm:border-l sm:border-gray-200/60">
               <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1 whitespace-nowrap text-center">
-                Forgery Anomaly Score
+                Forensic Manipulation Score
               </span>
               <div className="relative w-18 h-18 flex items-center justify-center">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
@@ -267,7 +294,7 @@ export function AnalysisResults({
                     cx="40"
                     cy="40"
                     r={radius}
-                    className="text-red-100 stroke-current"
+                    className={`${gaugeTrack} stroke-current`}
                     strokeWidth="6"
                     fill="transparent"
                   />
@@ -276,7 +303,7 @@ export function AnalysisResults({
                     cx="40"
                     cy="40"
                     r={radius}
-                    className="text-red-500 stroke-current transition-all duration-1000 ease-out"
+                    className={`${gaugeColor} stroke-current transition-all duration-1000 ease-out`}
                     strokeWidth="6"
                     strokeDasharray={circumference}
                     strokeDashoffset={strokeDashoffset}
@@ -286,26 +313,35 @@ export function AnalysisResults({
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-base font-black text-gray-900 tracking-tight">
-                    {results.forgeryRiskScore}%
+                    {forensicScore.toFixed(1)}%
                   </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ML Metrics Row: Prediction Certainty + Detected Forged Area + Analysis Speed */}
-          <div className="grid grid-cols-3 gap-2.5 p-3 rounded-2xl bg-blue-50/50 border border-blue-100/80">
+          {/* ML Metrics Row: Prediction Certainty + Authenticity + Detected Forged Area + Speed */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-2xl bg-blue-50/50 border border-blue-100/80">
             <div className="flex flex-col items-center gap-0.5 text-center">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Prediction Certainty</span>
-              <span className="text-base sm:text-lg font-black text-[#1a7fc4]">{results.confidence}%</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Certainty</span>
+              <span className="text-base sm:text-lg font-black text-[#1a7fc4]">{certVal}%</span>
               <span className="text-[10px] text-gray-500">Model certainty</span>
             </div>
-            <div className="flex flex-col items-center gap-0.5 text-center border-x border-blue-100">
+            <div className="flex flex-col items-center gap-0.5 text-center sm:border-l sm:border-blue-100">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Authenticity</span>
+              <span className={`text-base sm:text-lg font-black ${forensicAuthScore >= 60 ? "text-emerald-600" : forensicAuthScore >= 40 ? "text-amber-500" : "text-red-500"}`}>
+                {forensicAuthScore.toFixed(1)}%
+              </span>
+              <span className="text-[10px] text-gray-500">Forensic Authenticity Score</span>
+            </div>
+            <div className="flex flex-col items-center gap-0.5 text-center sm:border-l sm:border-blue-100">
               <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Forged Area</span>
-              <span className="text-base sm:text-lg font-black text-orange-500">{results.forgeryPixelFraction}%</span>
+              <span className="text-base sm:text-lg font-black text-orange-500">
+                {typeof results.forgeryPixelFraction === "number" ? results.forgeryPixelFraction.toFixed(1) : results.forgeryPixelFraction}%
+              </span>
               <span className="text-[10px] text-gray-500">Detected pixels</span>
             </div>
-            <div className="flex flex-col items-center gap-0.5 text-center">
+            <div className="flex flex-col items-center gap-0.5 text-center sm:border-l sm:border-blue-100">
               <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Speed</span>
               <span className="text-base sm:text-lg font-black text-emerald-600">{results.elapsedSeconds}s</span>
               <span className="text-[10px] text-gray-500">Analysis time</span>
@@ -429,20 +465,6 @@ export function AnalysisResults({
           </div>
         ) : null}
       </div>
-
-      {/* Action: Analyze Another Image inside the Result Card directly below main content */}
-      {onAnalyzeAnother && (
-        <div className="pt-4 border-t border-gray-100 flex justify-center">
-          <button
-            type="button"
-            onClick={onAnalyzeAnother}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-xs sm:text-sm font-semibold text-gray-700 hover:text-gray-900 transition-all shadow-2xs hover:shadow-xs active:scale-[0.98]"
-          >
-            <ArrowLeft className="w-4 h-4 text-gray-500" />
-            <span>Analyze Another Image</span>
-          </button>
-        </div>
-      )}
     </div>
   );
 }

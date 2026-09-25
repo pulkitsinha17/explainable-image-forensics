@@ -31,8 +31,17 @@ function toForensicResult(
   elapsedSeconds: number,
   selectedImageData?: SelectedImageData | null
 ): ForensicAnalysisResult {
-  const riskPct = Math.round(mlResult.risk_score * 100);
   const ev = mlResult.evidence;
+
+  const manipPct = mlResult.manipulation_probability != null
+    ? Math.round(mlResult.manipulation_probability * 100)
+    : Math.round(mlResult.risk_score * 100);
+  const authPct = mlResult.authenticity_probability != null
+    ? Math.round(mlResult.authenticity_probability * 100)
+    : Math.max(0, 100 - manipPct);
+  const certPct = mlResult.prediction_certainty != null
+    ? Math.round(mlResult.prediction_certainty * 100)
+    : Math.round(mlResult.confidence * 100);
 
   // Map ML verdict → UI labels
   const verdictMap: Record<
@@ -40,21 +49,28 @@ function toForensicResult(
     { label: string; description: string; verdict: ForensicAnalysisResult["verdict"] }
   > = {
     forged: {
-      verdict: "likely_manipulated",
-      label: "Likely Manipulated",
+      verdict: "manipulated",
+      label: "Manipulated",
+      description:
+        "Strong evidence of digital manipulation detected across multiple forensic channels. " +
+        "The model identified suspicious pixel patterns inconsistent with an authentic image.",
+    },
+    manipulated: {
+      verdict: "manipulated",
+      label: "Manipulated",
       description:
         "Strong evidence of digital manipulation detected across multiple forensic channels. " +
         "The model identified suspicious pixel patterns inconsistent with an authentic image.",
     },
     authentic: {
       verdict: "authentic",
-      label: "Appears Authentic",
+      label: "Authentic",
       description:
         "No significant evidence of manipulation found. The image is consistent with " +
         "an unmodified photograph across all forensic channels.",
     },
     inconclusive: {
-      verdict: "suspicious",
+      verdict: "inconclusive",
       label: "Inconclusive",
       description:
         "Mixed signals detected. Some forensic channels indicate possible manipulation " +
@@ -70,26 +86,74 @@ function toForensicResult(
   const statsScore = Math.round(ev.local_statistics * 100);
   const elaScore = Math.round(ev.ela * 100);
   const metaScore = Math.round((ev.metadata ?? 0) * 100);
-  const frac = (mlResult.localization.forgery_pixel_fraction * 100).toFixed(1);
-  const conf = Math.round(mlResult.confidence * 100);
+  const frac = ((mlResult.localization?.forgery_pixel_fraction ?? 0) * 100).toFixed(1);
+  const classifierVerdict = mlResult.classifier_verdict ?? mlResult.verdict;
+  const finalVerdict = mapped.verdict;
+  const forensicScorePct = mlResult.forensic_manipulation_score != null
+    ? Number((mlResult.forensic_manipulation_score * 100).toFixed(1))
+    : manipPct;
+  const forensicAuthPct = mlResult.forensic_authenticity_score != null
+    ? Number((mlResult.forensic_authenticity_score * 100).toFixed(1))
+    : Number(Math.max(0, 100 - forensicScorePct).toFixed(1));
 
-  const aiExplanation =
-    `The forensic model computed an overall forgery anomaly score of ${riskPct}% ` +
-    `with approximately ${frac}% of image area flagged as suspicious pixels. ` +
-    `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
-    `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
-    `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
-    `Model certainty: ${conf}%.`;
+  let aiExplanation: string;
+  if (
+    (classifierVerdict === "authentic" || classifierVerdict === "authenticated" || classifierVerdict === "inconclusive") &&
+    finalVerdict === "manipulated" &&
+    mlResult.localization_support
+  ) {
+    aiExplanation =
+      `The calibrated image-level model estimated a manipulation probability of ${manipPct}% (authenticity probability: ${authPct}%). ` +
+      `The localization channel identified a concentrated suspicious region covering ${frac}% of the image. ` +
+      `The combined forensic assessment is Manipulated. ` +
+      `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
+      `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
+      `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
+      `Model certainty: ${certPct}%.`;
+  } else if (finalVerdict === "authentic" || finalVerdict === "authenticated") {
+    aiExplanation =
+      `The calibrated image-level model estimated a manipulation probability of ${manipPct}%. ` +
+      `The final forensic authenticity score is ${forensicAuthPct}%, with no coherent localized anomalies detected. ` +
+      `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
+      `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
+      `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
+      `Model certainty: ${certPct}%.`;
+  } else if (finalVerdict === "inconclusive") {
+    aiExplanation =
+      `The calibrated image-level model produced a manipulation probability of ${manipPct}%, ` +
+      `but the available forensic evidence was not strong enough for a definitive assessment. ` +
+      `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
+      `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
+      `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
+      `Model certainty: ${certPct}%.`;
+  } else {
+    aiExplanation =
+      `The calibrated image-level model estimated a manipulation probability of ${manipPct}% (authenticity probability: ${authPct}%) ` +
+      `with approximately ${frac}% of image area flagged as suspicious pixels. ` +
+      `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
+      `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
+      `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
+      `Model certainty: ${certPct}%.`;
+  }
 
   return {
     verdict: mapped.verdict,
     verdictLabel: mapped.label,
     verdictDescription: mapped.description,
-    forgeryRiskScore: riskPct,
-    proposedRiskScore: riskPct,
-    confidence: conf,
+    forgeryRiskScore: forensicScorePct,
+    manipulationProbability: manipPct,
+    authenticityProbability: authPct,
+    predictionCertainty: certPct,
+    forensicManipulationScore: forensicScorePct,
+    forensicAuthenticityScore: forensicAuthPct,
+    classifierVerdict: mlResult.classifier_verdict ?? mlResult.verdict,
+    hybridVerdict: mlResult.hybrid_verdict ?? mlResult.verdict,
+    localizationSupport: mlResult.localization_support,
+    localizationSupportReason: mlResult.localization_support_reason,
+    proposedRiskScore: manipPct,
+    confidence: certPct,
     mpcRiskScore: Math.round(mlResult.mpc_risk_score * 100),
-    forgeryPixelFraction: Math.round(mlResult.localization.forgery_pixel_fraction * 100),
+    forgeryPixelFraction: Number(frac),
     evidence: {
       compression: compScore,
       frequencyNoise: freqNoiseScore,

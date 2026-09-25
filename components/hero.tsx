@@ -283,34 +283,62 @@ export function Hero() {
             </motion.p>
 
             {/* Feature indicators */}
-            <motion.div variants={heroItemVariants} className="flex flex-wrap gap-4 mb-10">
+            <motion.div variants={heroItemVariants} className="flex flex-wrap gap-3 mb-10">
               {['Forgery Detection', 'Pixel-Level Localization', 'Explainable Evidence'].map((feat) => (
-                <div key={feat} className="flex items-center gap-2">
+                <motion.div
+                  key={feat}
+                  whileHover={prefersReducedMotion ? {} : { y: -2 }}
+                  className="flex items-center gap-2 px-3.5 py-1.5 bg-slate-50/90 hover:bg-blue-50/60 rounded-full border border-slate-200/70 hover:border-blue-200 shadow-2xs transition-all duration-200 cursor-default"
+                >
                   <CheckCircle2 className="w-4 h-4 text-[#1a7fc4]" />
-                  <span className="text-sm font-medium text-gray-700">{feat}</span>
-                </div>
+                  <span className="text-xs sm:text-sm font-medium text-gray-700">{feat}</span>
+                </motion.div>
               ))}
             </motion.div>
 
             {/* CTAs */}
-            <motion.div variants={heroItemVariants} className="flex flex-wrap gap-4 mb-6">
+            <motion.div variants={heroItemVariants} className="relative flex flex-wrap gap-4 mb-6 items-center">
+              {/* Subtle ambient backlight behind CTA buttons */}
+              <div className="absolute -inset-2 w-72 h-16 bg-[#1a7fc4]/10 rounded-full blur-2xl pointer-events-none -z-10" />
+
               <motion.div
-                whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                animate={
+                  prefersReducedMotion
+                    ? {}
+                    : {
+                        y: [-3, 3, -3],
+                      }
+                }
+                transition={{
+                  duration: 4.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                whileHover={prefersReducedMotion ? {} : { scale: 1.03 }}
                 whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
-                transition={SPRING_PRESS}
               >
                 <Link
                   href={isSignedIn ? "/dashboard" : "/sign-up"}
-                  className="group inline-flex items-center gap-2 px-6 py-3.5 bg-[#1a7fc4] text-white font-semibold rounded-xl hover:bg-[#1565a8] transition-colors duration-200 shadow-md hover:shadow-lg hover:shadow-blue-100 text-sm"
+                  className="group relative inline-flex items-center gap-2.5 px-7 py-3.5 bg-gradient-to-r from-[#1a7fc4] via-[#1670af] to-[#1565a8] text-white font-semibold rounded-xl hover:shadow-[0_12px_28px_rgba(26,127,196,0.45)] transition-all duration-200 shadow-[0_8px_22px_rgba(26,127,196,0.32)] border border-blue-400/25 text-sm"
                   id="hero-cta-get-started"
                 >
-                  Get Started
+                  <span>Get Started</span>
                   <motion.span
-                    className="inline-block"
-                    whileHover={prefersReducedMotion ? {} : { x: 2 }}
-                    transition={SPRING_PRESS}
+                    className="inline-flex items-center justify-center"
+                    animate={
+                      prefersReducedMotion
+                        ? {}
+                        : {
+                            x: [0, 2.5, 0],
+                          }
+                    }
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
                   >
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                   </motion.span>
                 </Link>
               </motion.div>
@@ -320,7 +348,7 @@ export function Hero() {
                   e.preventDefault()
                   document.querySelector('#how-it-works')?.scrollIntoView({ behavior: 'smooth' })
                 }}
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:border-[#1a7fc4] hover:text-[#1a7fc4] transition-all duration-200 text-sm cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:border-[#1a7fc4] hover:text-[#1a7fc4] hover:shadow-xs transition-all duration-200 text-sm cursor-pointer"
                 id="hero-cta-how-it-works"
               >
                 Explore How It Works
@@ -329,7 +357,7 @@ export function Hero() {
 
             {/* Trust statement */}
             <motion.div variants={heroItemVariants} className="flex items-center gap-2 text-xs text-gray-400">
-              <Shield className="w-3.5 h-3.5" />
+              <Shield className="w-3.5 h-3.5 text-[#1a7fc4]" />
               <span>Sign in required to analyze images</span>
               <span className="text-gray-300">•</span>
               <span>Secure analysis</span>
@@ -337,6 +365,7 @@ export function Hero() {
               <span>Privacy focused</span>
             </motion.div>
           </motion.div>
+
 
           {/* Right: Floating 3D Image Comparison Window */}
           <motion.div

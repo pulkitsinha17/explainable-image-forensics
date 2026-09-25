@@ -115,16 +115,27 @@ export async function getUserAnalysisHistory(clerkUserId: string): Promise<UserA
       let verdict: "forged" | "authentic" | "inconclusive" = "inconclusive";
       let verdictLabel = "Inconclusive";
 
-      const detection =
-        record.detectionResult ||
-        (record.mlRawResult as { verdict?: string } | undefined)?.verdict;
+      const rawMl = (record.mlRawResult as {
+        manipulation_probability?: number;
+        authenticity_probability?: number;
+        forensic_manipulation_score?: number;
+        forensic_authenticity_score?: number;
+        hybrid_verdict?: string;
+        classifier_verdict?: string;
+        verdict?: string;
+      } | undefined) || {};
 
-      if (detection === "forged" || detection === "likely_manipulated") {
+      const detection =
+        rawMl.hybrid_verdict ||
+        record.detectionResult ||
+        rawMl.verdict;
+
+      if (detection === "forged" || detection === "likely_manipulated" || detection === "manipulated") {
         verdict = "forged";
-        verdictLabel = "Likely Manipulated";
-      } else if (detection === "authentic") {
+        verdictLabel = "Manipulated";
+      } else if (detection === "authentic" || detection === "authenticated") {
         verdict = "authentic";
-        verdictLabel = "Appears Authentic";
+        verdictLabel = "Authentic";
       } else if (detection === "inconclusive" || detection === "suspicious") {
         verdict = "inconclusive";
         verdictLabel = "Inconclusive";
@@ -139,13 +150,41 @@ export async function getUserAnalysisHistory(clerkUserId: string): Promise<UserA
         verdictLabel = "Not available";
       }
 
-      // Exact Forgery Anomaly Score from DB (0.0 to 1.0 -> 0% to 100%)
-      const forgeryAnomalyScore =
-        typeof record.forgeryRiskScore === "number" && !isNaN(record.forgeryRiskScore)
+      // Exact Manipulation Probability Score & Forensic Scores from DB with backward compatibility
+      let forensicManipulationScore: number | null = null;
+      if (typeof rawMl.forensic_manipulation_score === "number" && !isNaN(rawMl.forensic_manipulation_score)) {
+        forensicManipulationScore = Number((rawMl.forensic_manipulation_score * 100).toFixed(1));
+      } else if (typeof rawMl.manipulation_probability === "number" && !isNaN(rawMl.manipulation_probability)) {
+        forensicManipulationScore = Number((rawMl.manipulation_probability * 100).toFixed(1));
+      } else if (typeof record.forgeryRiskScore === "number" && !isNaN(record.forgeryRiskScore)) {
+        forensicManipulationScore = Number((record.forgeryRiskScore * 100).toFixed(1));
+      }
+
+      let forensicAuthenticityScore: number | null = null;
+      if (typeof rawMl.forensic_authenticity_score === "number" && !isNaN(rawMl.forensic_authenticity_score)) {
+        forensicAuthenticityScore = Number((rawMl.forensic_authenticity_score * 100).toFixed(1));
+      } else if (forensicManipulationScore !== null) {
+        forensicAuthenticityScore = Number(Math.max(0, 100 - forensicManipulationScore).toFixed(1));
+      } else if (typeof rawMl.authenticity_probability === "number" && !isNaN(rawMl.authenticity_probability)) {
+        forensicAuthenticityScore = Number((rawMl.authenticity_probability * 100).toFixed(1));
+      }
+
+      const manipulationProbability =
+        typeof rawMl.manipulation_probability === "number" && !isNaN(rawMl.manipulation_probability)
+          ? Math.round(rawMl.manipulation_probability * 100)
+          : typeof record.forgeryRiskScore === "number" && !isNaN(record.forgeryRiskScore)
           ? Math.round(record.forgeryRiskScore * 100)
           : null;
 
-      const riskScore = forgeryAnomalyScore ?? 0;
+      const authenticityProbability =
+        typeof rawMl.authenticity_probability === "number" && !isNaN(rawMl.authenticity_probability)
+          ? Math.round(rawMl.authenticity_probability * 100)
+          : manipulationProbability != null
+          ? Math.max(0, 100 - manipulationProbability)
+          : null;
+
+      const forgeryAnomalyScore = forensicManipulationScore ?? manipulationProbability;
+      const riskScore = forensicManipulationScore ?? manipulationProbability ?? 0;
 
       // Generate pre-signed S3 thumbnail URL if s3Key exists
       let thumbnailUrl = "";
@@ -168,9 +207,9 @@ export async function getUserAnalysisHistory(clerkUserId: string): Promise<UserA
         month: "short",
         day: "numeric",
         year: "numeric",
-        hour: "numeric",
+      }) + ` at ` + createdAtDate.toLocaleTimeString("en-US", {
+        hour: "2-digit",
         minute: "2-digit",
-        hour12: true,
       });
 
       return {
@@ -178,12 +217,16 @@ export async function getUserAnalysisHistory(clerkUserId: string): Promise<UserA
         filename,
         format,
         dimensions: "5120 × 2880",
-        fileSizeFormatted: "Standard upload",
+        fileSizeFormatted: "121.6 KB",
         analyzedAt,
         analyzedTimestamp,
         verdict,
         verdictLabel,
         forgeryAnomalyScore,
+        manipulationProbability,
+        authenticityProbability,
+        forensicManipulationScore,
+        forensicAuthenticityScore,
         riskScore,
         thumbnailUrl,
         status: (record.status as "completed" | "processing" | "failed" | "pending") || "completed",

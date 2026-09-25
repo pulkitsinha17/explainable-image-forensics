@@ -20,6 +20,7 @@ from app.config import (
     MAX_UPLOAD_BYTES,
     MPC_CHECKPOINT,
     PROPOSED_CHECKPOINT,
+    FORENSIC_BUNDLE_PATH,
 )
 from app.inference.model_loader import load_all_models, LoadedModels
 from app.inference.pipeline import run_inference
@@ -104,9 +105,11 @@ async def health():
         status="ok",
         model_loaded=_models is not None and _models.proposed_loaded,
         mpc_loaded=_models is not None and _models.mpc_loaded,
+        bundle_loaded=_models is not None and _models.bundle_loaded,
         device=str(device),
         proposed_checkpoint=str(PROPOSED_CHECKPOINT),
         mpc_checkpoint=str(MPC_CHECKPOINT),
+        bundle_path=str(FORENSIC_BUNDLE_PATH),
     )
 
 
@@ -130,7 +133,7 @@ async def analyze(
             status_code=503,
             detail=(
                 "Model not loaded. "
-                "Ensure best_multi_evidence_stage1.pth is present in ml_backend/models/."
+                "Ensure pixentra_forensic_classifier_bundle.pth is present in ml_backend/models/."
             ),
         )
 

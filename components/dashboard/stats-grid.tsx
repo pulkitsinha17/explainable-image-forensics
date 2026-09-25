@@ -47,7 +47,7 @@ export function StatsGrid({ stats }: StatsGridProps) {
       iconBg: "bg-rose-50 text-rose-600 border border-rose-100/60",
     },
     {
-      label: "Average Forgery Anomaly Score",
+      label: "Avg. Forensic Score",
       value:
         stats && stats.averageRiskScore !== null
           ? `${stats.averageRiskScore}%`

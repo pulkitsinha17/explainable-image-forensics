@@ -43,6 +43,7 @@ function getVerdictBadge(item: RecentAnalysisItem) {
 
   const isAuthentic =
     item.verdict === "authentic" ||
+    item.verdictLabel === "Authentic" ||
     item.verdictLabel === "Appears Authentic" ||
     item.verdictLabel === "Authenticated" ||
     item.verdictLabel === "Likely Authentic";
@@ -51,7 +52,7 @@ function getVerdictBadge(item: RecentAnalysisItem) {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200/70 whitespace-nowrap">
         <AlertTriangle className="w-3 h-3 text-rose-600 shrink-0" />
-        {item.verdictLabel || "Likely Manipulated"}
+        {item.verdictLabel || "Manipulated"}
       </span>
     );
   }
@@ -60,7 +61,7 @@ function getVerdictBadge(item: RecentAnalysisItem) {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/70 whitespace-nowrap">
         <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
-        {item.verdictLabel || "Appears Authentic"}
+        {item.verdictLabel || "Authentic"}
       </span>
     );
   }
@@ -133,12 +134,18 @@ export function RecentAnalyses({ analyses = [] }: RecentAnalysesProps) {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {analyses.map((item) => {
-                  const scoreDisplay =
-                    item.forgeryAnomalyScore !== null && item.forgeryAnomalyScore !== undefined
-                      ? `${item.forgeryAnomalyScore}%`
+                  const scoreVal =
+                    item.forensicManipulationScore !== null && item.forensicManipulationScore !== undefined
+                      ? item.forensicManipulationScore
+                      : item.manipulationProbability !== null && item.manipulationProbability !== undefined
+                      ? item.manipulationProbability
+                      : item.forgeryAnomalyScore !== null && item.forgeryAnomalyScore !== undefined
+                      ? item.forgeryAnomalyScore
                       : typeof item.riskScore === "number" && item.riskScore >= 0
-                      ? `${item.riskScore}%`
-                      : "—";
+                      ? item.riskScore
+                      : null;
+
+                  const scoreDisplay = scoreVal !== null ? `${scoreVal.toFixed(1)}%` : "—";
 
                   return (
                     <tr

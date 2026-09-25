@@ -66,7 +66,7 @@ export async function GET(
   const confPct = Math.round((record.confidence ?? 0) * 100);
   const mpcPct = Math.round((record.mpcRiskScore ?? 0) * 100);
   const locResult = (record.localizationResult as { forgery_pixel_fraction?: number }) || {};
-  const fracPct = Math.round((locResult.forgery_pixel_fraction ?? 0) * 100);
+  const fracPct = Number(((locResult.forgery_pixel_fraction ?? 0) * 100).toFixed(1));
 
   const rawEv = (record.evidenceResults as {
     compression?: number;
@@ -88,21 +88,28 @@ export async function GET(
     { label: string; description: string; verdict: ForensicAnalysisResult["verdict"] }
   > = {
     forged: {
-      verdict: "likely_manipulated",
-      label: "Likely Manipulated",
+      verdict: "manipulated",
+      label: "Manipulated",
+      description:
+        "Strong evidence of digital manipulation detected across multiple forensic channels. " +
+        "The model identified suspicious pixel patterns inconsistent with an authentic image.",
+    },
+    manipulated: {
+      verdict: "manipulated",
+      label: "Manipulated",
       description:
         "Strong evidence of digital manipulation detected across multiple forensic channels. " +
         "The model identified suspicious pixel patterns inconsistent with an authentic image.",
     },
     authentic: {
       verdict: "authentic",
-      label: "Appears Authentic",
+      label: "Authentic",
       description:
         "No significant evidence of manipulation found. The image is consistent with " +
         "an unmodified photograph across all forensic channels.",
     },
     inconclusive: {
-      verdict: "suspicious",
+      verdict: "inconclusive",
       label: "Inconclusive",
       description:
         "Mixed signals detected. Some forensic channels indicate possible manipulation " +
@@ -110,16 +117,76 @@ export async function GET(
     },
   };
 
-  const detectionKey = record.detectionResult || (riskPct >= 99 ? "forged" : confPct < 30 ? "inconclusive" : "authentic");
+  const rawMlResult = (record.mlRawResult as {
+    manipulation_probability?: number;
+    authenticity_probability?: number;
+    prediction_certainty?: number;
+    forensic_manipulation_score?: number;
+    forensic_authenticity_score?: number;
+    classifier_verdict?: string;
+    hybrid_verdict?: string;
+    localization_support?: boolean;
+    localization_support_reason?: string;
+  }) || {};
+
+  const detectionKey = rawMlResult.hybrid_verdict || record.detectionResult || (riskPct >= 50 ? "forged" : confPct < 30 ? "inconclusive" : "authentic");
   const mapped = verdictMap[detectionKey] ?? verdictMap.inconclusive;
 
-  const aiExplanation =
-    `The forensic model computed an overall forgery anomaly score of ${riskPct}% ` +
-    `with approximately ${fracPct.toFixed(1)}% of image area flagged as suspicious pixels. ` +
-    `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
-    `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
-    `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
-    `Model certainty: ${confPct}%.`;
+  const manipPct = rawMlResult.manipulation_probability != null
+    ? Math.round(rawMlResult.manipulation_probability * 100)
+    : riskPct;
+  const authPct = rawMlResult.authenticity_probability != null
+    ? Math.round(rawMlResult.authenticity_probability * 100)
+    : (100 - manipPct);
+  const certPct = rawMlResult.prediction_certainty != null
+    ? Math.round(rawMlResult.prediction_certainty * 100)
+    : confPct;
+  const forensicScorePct = rawMlResult.forensic_manipulation_score != null
+    ? Number((rawMlResult.forensic_manipulation_score * 100).toFixed(1))
+    : manipPct;
+  const forensicAuthPct = rawMlResult.forensic_authenticity_score != null
+    ? Number((rawMlResult.forensic_authenticity_score * 100).toFixed(1))
+    : Number(Math.max(0, 100 - forensicScorePct).toFixed(1));
+
+  let aiExplanation: string;
+  if (
+    (rawMlResult.classifier_verdict === "authentic" || rawMlResult.classifier_verdict === "authenticated" || rawMlResult.classifier_verdict === "inconclusive") &&
+    mapped.verdict === "manipulated" &&
+    rawMlResult.localization_support
+  ) {
+    aiExplanation =
+      `The calibrated image-level model estimated a manipulation probability of ${manipPct}% (authenticity probability: ${authPct}%). ` +
+      `The localization channel identified a concentrated suspicious region covering ${fracPct.toFixed(1)}% of the image. ` +
+      `The combined forensic assessment is Manipulated. ` +
+      `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
+      `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
+      `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
+      `Model certainty: ${certPct}%.`;
+  } else if (mapped.verdict === "authentic" || mapped.verdict === "authenticated") {
+    aiExplanation =
+      `The calibrated image-level model estimated a manipulation probability of ${manipPct}%. ` +
+      `The final forensic authenticity score is ${forensicAuthPct}%, with no coherent localized anomalies detected. ` +
+      `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
+      `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
+      `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
+      `Model certainty: ${certPct}%.`;
+  } else if (mapped.verdict === "inconclusive") {
+    aiExplanation =
+      `The calibrated image-level model produced a manipulation probability of ${manipPct}%, ` +
+      `but the available forensic evidence was not strong enough for a definitive assessment. ` +
+      `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
+      `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
+      `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
+      `Model certainty: ${certPct}%.`;
+  } else {
+    aiExplanation =
+      `The calibrated image-level model estimated a manipulation probability of ${manipPct}% (authenticity probability: ${authPct}%) ` +
+      `with approximately ${fracPct.toFixed(1)}% of image area flagged as suspicious pixels. ` +
+      `Diagnostic forensic evidence channels recorded: compression (${compScore}%), ` +
+      `frequency/noise (${freqNoiseScore}%), local statistics (${statsScore}%), ` +
+      `error level analysis (ELA) (${elaScore}%), and metadata (${metaScore}%). ` +
+      `Model certainty: ${certPct}%.`;
+  }
 
   // Calculate elapsed duration if timestamps exist
   let elapsedSeconds = 8;
@@ -134,9 +201,18 @@ export async function GET(
     verdict: mapped.verdict,
     verdictLabel: mapped.label,
     verdictDescription: mapped.description,
-    forgeryRiskScore: riskPct,
-    proposedRiskScore: riskPct,
-    confidence: confPct,
+    forgeryRiskScore: forensicScorePct,
+    manipulationProbability: manipPct,
+    authenticityProbability: authPct,
+    predictionCertainty: certPct,
+    forensicManipulationScore: forensicScorePct,
+    forensicAuthenticityScore: forensicAuthPct,
+    classifierVerdict: rawMlResult.classifier_verdict,
+    hybridVerdict: rawMlResult.hybrid_verdict ?? (mapped.verdict as string),
+    localizationSupport: rawMlResult.localization_support,
+    localizationSupportReason: rawMlResult.localization_support_reason,
+    proposedRiskScore: manipPct,
+    confidence: certPct,
     mpcRiskScore: mpcPct,
     forgeryPixelFraction: fracPct,
     evidence: {

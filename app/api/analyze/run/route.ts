@@ -29,12 +29,22 @@ import Analysis from "@/models/Analysis";
 const ML_BACKEND_URL =
   process.env.ML_BACKEND_URL ?? "http://localhost:8001";
 
-/** Shape of the ML backend /analyze JSON response body */
+/** Shape of the ML backend /analyze JSON response body (V2 + legacy compat) */
 interface MLAnalysis {
-  verdict: string;
-  risk_score: number;
-  proposed_risk_score?: number;
-  confidence: number;
+  verdict: string;                        // "manipulated" | "authentic" | "inconclusive"
+  risk_score: number;                     // calibrated manipulation_probability (V2) or p999 (legacy)
+  proposed_risk_score?: number;           // localization p999 (pixel-level)
+  confidence: number;                     // spatial entropy confidence
+  // V2 classifier fields
+  manipulation_probability?: number;      // 0–1 calibrated probability of manipulation
+  authenticity_probability?: number;      // 1 - manipulation_probability
+  prediction_certainty?: number;          // 2*|manip_prob - 0.5|
+  forensic_manipulation_score?: number;   // 0–1 deterministic forensic evidence score
+  forensic_authenticity_score?: number;   // 1 - forensic_manipulation_score
+  classifier_verdict?: string;
+  hybrid_verdict?: string;
+  localization_support?: boolean;
+  localization_support_reason?: string;
   localization: {
     mask_path: string | null;
     overlay_path: string | null;
@@ -184,17 +194,18 @@ export async function POST(req: NextRequest) {
   //    overlayPath and maskPath are stored server-side ONLY — never returned to client.
   try {
     const verdict = mlAnalysis.verdict;
+    // Accept both V2 'manipulated' and legacy 'forged' verdict values
+    const isManipulated = verdict === "manipulated" || verdict === "forged";
 
     record.status = "completed";
-    record.detectionResult =
-      verdict === "forged"
-        ? "forged"
-        : verdict === "authentic"
-          ? "authentic"
-          : "inconclusive";
-    record.forgeryRiskScore = mlAnalysis.risk_score;
+    record.detectionResult = isManipulated
+      ? "forged"
+      : verdict === "authentic"
+        ? "authentic"
+        : "inconclusive";
+    record.forgeryRiskScore = mlAnalysis.manipulation_probability ?? mlAnalysis.risk_score;
     record.proposedRiskScore = mlAnalysis.proposed_risk_score ?? mlAnalysis.risk_score;
-    record.confidence = mlAnalysis.confidence;
+    record.confidence = mlAnalysis.prediction_certainty ?? mlAnalysis.confidence;
     record.mpcRiskScore = mlAnalysis.mpc_risk_score;
     record.evidenceResults = mlAnalysis.evidence;
     record.localizationResult = {
@@ -224,8 +235,17 @@ export async function POST(req: NextRequest) {
     analysisId,
     result: {
       verdict: mlAnalysis.verdict,
-      risk_score: mlAnalysis.risk_score,
+      risk_score: mlAnalysis.manipulation_probability ?? mlAnalysis.risk_score,
       proposed_risk_score: mlAnalysis.proposed_risk_score ?? mlAnalysis.risk_score,
+      manipulation_probability: mlAnalysis.manipulation_probability ?? mlAnalysis.risk_score,
+      authenticity_probability: mlAnalysis.authenticity_probability ?? (1 - (mlAnalysis.manipulation_probability ?? mlAnalysis.risk_score)),
+      prediction_certainty: mlAnalysis.prediction_certainty ?? mlAnalysis.confidence,
+      forensic_manipulation_score: mlAnalysis.forensic_manipulation_score ?? (mlAnalysis.manipulation_probability ?? mlAnalysis.risk_score),
+      forensic_authenticity_score: mlAnalysis.forensic_authenticity_score ?? (1 - (mlAnalysis.forensic_manipulation_score ?? (mlAnalysis.manipulation_probability ?? mlAnalysis.risk_score))),
+      classifier_verdict: mlAnalysis.classifier_verdict ?? mlAnalysis.verdict,
+      hybrid_verdict: mlAnalysis.hybrid_verdict ?? mlAnalysis.verdict,
+      localization_support: mlAnalysis.localization_support,
+      localization_support_reason: mlAnalysis.localization_support_reason,
       confidence: mlAnalysis.confidence,
       mpc_risk_score: mlAnalysis.mpc_risk_score,
       evidence: mlAnalysis.evidence,

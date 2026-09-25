@@ -51,7 +51,7 @@ export function DashboardCharts({
     },
     {
       id: "authenticated",
-      label: "Authenticated",
+      label: "Authentic",
       count: authenticated,
       pct: authPct,
       color: "#10b981", // Emerald/Green

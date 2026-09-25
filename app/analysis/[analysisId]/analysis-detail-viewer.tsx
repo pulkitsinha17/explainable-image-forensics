@@ -95,7 +95,7 @@ export function AnalysisDetailViewer({ analysisId }: { analysisId: string }) {
 
       <AnalysisResults
         results={results}
-        onViewReport={() => window.open(`/report/${analysisId}`, "_blank")}
+        onViewReport={() => router.push(`/report/${analysisId}`)}
         onAnalyzeAnother={() => router.push("/analyze")}
       />
     </div>

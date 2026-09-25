@@ -202,20 +202,42 @@ export async function buildForensicPdfDoc(
   });
   const reportId = `PX-${(results.analysisId || Date.now().toString()).slice(-8).toUpperCase()}`;
 
-  // Verdict style & colors
-  const verdictColor =
-    results.verdict === "authentic"
-      ? COLORS.greenVerdict
-      : results.verdict === "suspicious"
-      ? COLORS.blueVerdict
-      : COLORS.redVerdict;
+  const forensicScore =
+    typeof results.forensicManipulationScore === "number"
+      ? results.forensicManipulationScore
+      : typeof results.forgeryRiskScore === "number"
+      ? results.forgeryRiskScore
+      : 0;
+  const forensicAuthScore =
+    typeof results.forensicAuthenticityScore === "number"
+      ? results.forensicAuthenticityScore
+      : Math.max(0, 100 - forensicScore);
+  const certVal =
+    typeof results.predictionCertainty === "number"
+      ? results.predictionCertainty
+      : typeof results.confidence === "number"
+      ? results.confidence
+      : 0;
+  const forgedArea =
+    typeof results.forgeryPixelFraction === "number"
+      ? results.forgeryPixelFraction
+      : 0;
 
-  const verdictUserDescription =
-    results.verdict === "likely_manipulated"
-      ? "Multiple forensic indicators show patterns consistent with digital manipulation."
-      : results.verdict === "authentic"
-      ? "No strong forensic indicators of digital manipulation were detected."
-      : "The analysis did not find sufficiently strong evidence to confidently classify the image as authentic or manipulated.";
+  const isAuth = results.verdict === "authenticated" || results.verdict === "authentic" || results.verdictLabel === "Authentic";
+  const isInconc = results.verdict === "inconclusive" || results.verdict === "suspicious" || results.verdictLabel === "Inconclusive";
+
+  // Verdict style & colors
+  const verdictColor = isAuth
+    ? COLORS.greenVerdict
+    : isInconc
+    ? COLORS.blueVerdict
+    : COLORS.redVerdict;
+
+  const verdictUserDescription = isAuth
+    ? "No significant forensic indicators of digital manipulation were detected across channels."
+    : isInconc
+    ? "The analysis did not find sufficiently decisive evidence to classify the image with high certainty."
+    : "Multiple forensic indicators show strong patterns consistent with digital manipulation.";
 
   // ═════════════════════════════════════════════════════════════════════════════
   // EXACT 1-PAGE A4 LAYOUT — BALANCED, CRISP & READABLE
@@ -305,9 +327,9 @@ export async function buildForensicPdfDoc(
 
   currentY += 4.5;
   const overviewCardH = 30;
-  const cardGap = 3;
-  const verdictW = 46;
-  const metricW = (contentWidth - verdictW - cardGap * 3) / 3; // ~44.5mm each
+  const cardGap = 2.5;
+  const verdictW = 42;
+  const metricW = (contentWidth - verdictW - cardGap * 4) / 4; // 34.5mm each
 
   // Verdict Card — Neutral border, white background
   resetCardStroke(doc);
@@ -320,87 +342,110 @@ export async function buildForensicPdfDoc(
   doc.text("VERDICT", marginX + 4, currentY + 6.5);
 
   // Clean Verdict Icon Badge
-  drawVerdictIcon(doc, marginX + 6.5, currentY + 13, 2.5, results.verdict, verdictColor);
+  drawVerdictIcon(doc, marginX + 6.5, currentY + 13, 2.5, isAuth ? "authentic" : isInconc ? "inconclusive" : "likely_manipulated", verdictColor);
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9.5);
   doc.setTextColor(verdictColor[0], verdictColor[1], verdictColor[2]);
-  doc.text(results.verdictLabel, marginX + 11.5, currentY + 14.2);
+  doc.text(results.verdictLabel || (isAuth ? "Authentic" : isInconc ? "Inconclusive" : "Manipulated"), marginX + 11.5, currentY + 14.2);
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(5.5);
+  doc.setFontSize(5.2);
   doc.setTextColor(COLORS.textSecondary[0], COLORS.textSecondary[1], COLORS.textSecondary[2]);
   const vDescLines = doc.splitTextToSize(verdictUserDescription, verdictW - 8);
-  doc.text(vDescLines, marginX + 4, currentY + 20.5);
+  doc.text(vDescLines, marginX + 4, currentY + 20.0);
 
-  // Score Card 1: Forgery Anomaly Score — Bold High-Contrast Text
+  // Score Card 1: Forensic Manipulation Score
   const m1X = marginX + verdictW + cardGap;
   resetCardStroke(doc);
   doc.setFillColor(COLORS.cardBg[0], COLORS.cardBg[1], COLORS.cardBg[2]);
   doc.roundedRect(m1X, currentY, metricW, overviewCardH, 2, 2, "FD");
 
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(7.2);
+  doc.setFontSize(6.4);
   doc.setTextColor(COLORS.navySlate[0], COLORS.navySlate[1], COLORS.navySlate[2]);
-  doc.text("Forgery Anomaly Score", m1X + metricW / 2, currentY + 5.5, { align: "center" });
+  doc.text("Forensic Manipulation", m1X + metricW / 2, currentY + 5.5, { align: "center" });
 
-  drawRadialMeter(doc, m1X + metricW / 2, currentY + 14.5, 6.2, results.forgeryRiskScore, COLORS.redVerdict);
+  drawRadialMeter(doc, m1X + metricW / 2, currentY + 14.5, 5.8, forensicScore, forensicScore >= 60 ? COLORS.redVerdict : forensicScore >= 35 ? COLORS.orangeAccent : COLORS.greenVerdict);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(9.5);
+  doc.setFontSize(8.5);
   doc.setTextColor(COLORS.navySlate[0], COLORS.navySlate[1], COLORS.navySlate[2]);
-  doc.text(`${results.forgeryRiskScore}%`, m1X + metricW / 2, currentY + 15.6, { align: "center" });
+  doc.text(`${forensicScore.toFixed(1)}%`, m1X + metricW / 2, currentY + 15.6, { align: "center" });
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(5.0);
+  doc.setFontSize(4.6);
   doc.setTextColor(COLORS.textSecondary[0], COLORS.textSecondary[1], COLORS.textSecondary[2]);
-  const s1Lines = doc.splitTextToSize("Derived from the peak response of the localization analysis. This is an anomaly score, not a probability of forgery.", metricW - 6);
+  const s1Lines = doc.splitTextToSize("Combined forensic score assessing manipulation signals.", metricW - 5);
   doc.text(s1Lines, m1X + metricW / 2, currentY + 23.5, { align: "center" });
 
-  // Score Card 2: Prediction Certainty — Bold High-Contrast Text
+  // Score Card 2: Forensic Authenticity Score
   const m2X = m1X + metricW + cardGap;
   resetCardStroke(doc);
   doc.setFillColor(COLORS.cardBg[0], COLORS.cardBg[1], COLORS.cardBg[2]);
   doc.roundedRect(m2X, currentY, metricW, overviewCardH, 2, 2, "FD");
 
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(7.2);
+  doc.setFontSize(6.4);
   doc.setTextColor(COLORS.navySlate[0], COLORS.navySlate[1], COLORS.navySlate[2]);
-  doc.text("Prediction Certainty", m2X + metricW / 2, currentY + 5.5, { align: "center" });
+  doc.text("Forensic Authenticity", m2X + metricW / 2, currentY + 5.5, { align: "center" });
 
-  drawRadialMeter(doc, m2X + metricW / 2, currentY + 14.5, 6.2, results.confidence, COLORS.blueAccent);
+  drawRadialMeter(doc, m2X + metricW / 2, currentY + 14.5, 5.8, forensicAuthScore, forensicAuthScore >= 60 ? COLORS.greenVerdict : forensicAuthScore >= 35 ? COLORS.orangeAccent : COLORS.redVerdict);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(9.5);
+  doc.setFontSize(8.5);
   doc.setTextColor(COLORS.navySlate[0], COLORS.navySlate[1], COLORS.navySlate[2]);
-  doc.text(`${results.confidence}%`, m2X + metricW / 2, currentY + 15.6, { align: "center" });
+  doc.text(`${forensicAuthScore.toFixed(1)}%`, m2X + metricW / 2, currentY + 15.6, { align: "center" });
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(5.0);
+  doc.setFontSize(4.6);
   doc.setTextColor(COLORS.textSecondary[0], COLORS.textSecondary[1], COLORS.textSecondary[2]);
-  const s2Lines = doc.splitTextToSize("Indicates how decisively the spatial analysis separates suspicious and non-suspicious regions.", metricW - 6);
+  const s2Lines = doc.splitTextToSize("Score indicating genuine photographic integrity.", metricW - 5);
   doc.text(s2Lines, m2X + metricW / 2, currentY + 23.5, { align: "center" });
 
-  // Score Card 3: Forged Area (Estimated) — Bold High-Contrast Text
+  // Score Card 3: Prediction Certainty
   const m3X = m2X + metricW + cardGap;
   resetCardStroke(doc);
   doc.setFillColor(COLORS.cardBg[0], COLORS.cardBg[1], COLORS.cardBg[2]);
   doc.roundedRect(m3X, currentY, metricW, overviewCardH, 2, 2, "FD");
 
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(7.2);
+  doc.setFontSize(6.4);
   doc.setTextColor(COLORS.navySlate[0], COLORS.navySlate[1], COLORS.navySlate[2]);
-  doc.text("Forged Area (Estimated)", m3X + metricW / 2, currentY + 5.5, { align: "center" });
+  doc.text("Prediction Certainty", m3X + metricW / 2, currentY + 5.5, { align: "center" });
 
-  drawRadialMeter(doc, m3X + metricW / 2, currentY + 14.5, 6.2, results.forgeryPixelFraction, [203, 213, 225]);
+  drawRadialMeter(doc, m3X + metricW / 2, currentY + 14.5, 5.8, certVal, COLORS.blueAccent);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(9.5);
+  doc.setFontSize(8.5);
   doc.setTextColor(COLORS.navySlate[0], COLORS.navySlate[1], COLORS.navySlate[2]);
-  doc.text(`${results.forgeryPixelFraction}%`, m3X + metricW / 2, currentY + 15.6, { align: "center" });
+  doc.text(`${certVal.toFixed(1)}%`, m3X + metricW / 2, currentY + 15.6, { align: "center" });
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(5.0);
+  doc.setFontSize(4.6);
   doc.setTextColor(COLORS.textSecondary[0], COLORS.textSecondary[1], COLORS.textSecondary[2]);
-  const s3Lines = doc.splitTextToSize("Percentage of image pixels flagged as potentially forged (at 0.38 localization threshold).", metricW - 6);
+  const s3Lines = doc.splitTextToSize("Confidence of the model in polarized decisions.", metricW - 5);
   doc.text(s3Lines, m3X + metricW / 2, currentY + 23.5, { align: "center" });
+
+  // Score Card 4: Forged Area (Estimated)
+  const m4X = m3X + metricW + cardGap;
+  resetCardStroke(doc);
+  doc.setFillColor(COLORS.cardBg[0], COLORS.cardBg[1], COLORS.cardBg[2]);
+  doc.roundedRect(m4X, currentY, metricW, overviewCardH, 2, 2, "FD");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.4);
+  doc.setTextColor(COLORS.navySlate[0], COLORS.navySlate[1], COLORS.navySlate[2]);
+  doc.text("Forged Area (Est.)", m4X + metricW / 2, currentY + 5.5, { align: "center" });
+
+  drawRadialMeter(doc, m4X + metricW / 2, currentY + 14.5, 5.8, forgedArea, [203, 213, 225]);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(COLORS.navySlate[0], COLORS.navySlate[1], COLORS.navySlate[2]);
+  doc.text(`${forgedArea.toFixed(1)}%`, m4X + metricW / 2, currentY + 15.6, { align: "center" });
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(4.6);
+  doc.setTextColor(COLORS.textSecondary[0], COLORS.textSecondary[1], COLORS.textSecondary[2]);
+  const s4Lines = doc.splitTextToSize("Percentage of image flagged as suspicious pixels.", metricW - 5);
+  doc.text(s4Lines, m4X + metricW / 2, currentY + 23.5, { align: "center" });
 
   // ── 2. IMAGE ANALYSIS & LOCALIZATION (y: 68 to 118mm, height: 50mm) ───────
   currentY += overviewCardH + 3.5;
@@ -618,9 +663,9 @@ export async function buildForensicPdfDoc(
   doc.roundedRect(marginX, currentY, contentWidth, aiExpH, 2, 2, "FD");
 
   // 3 user-friendly structured paragraphs
-  const p1 = `PIXENTRA analyzed the uploaded image for visual inconsistencies associated with digital manipulation. The analysis produced a Forgery Anomaly Score of ${results.forgeryRiskScore}% and the localization analysis flagged approximately ${results.forgeryPixelFraction}% of the image as suspicious. The prediction certainty is ${results.confidence}%, indicating that the model's spatial predictions are decisive across the image.`;
+  const p1 = results.aiExplanation || `PIXENTRA analyzed the uploaded image for visual and statistical inconsistencies associated with digital manipulation. The model computed a Forensic Manipulation Score of ${forensicScore.toFixed(1)}% (Forensic Authenticity Score: ${forensicAuthScore.toFixed(1)}%) and localization analysis flagged approximately ${forgedArea.toFixed(1)}% of the image as suspicious. Prediction certainty is ${certVal.toFixed(1)}%, indicating decisive model calibration.`;
   const p2 = `The multi-evidence analysis evaluated compression artifacts (${results.evidence.compression}%), frequency/noise patterns (${results.evidence.frequencyNoise}%), local statistics (${results.evidence.statistics}%), error-level discrepancies (${results.evidence.ela}%), and metadata (${results.evidence.metadata}%). These signals are analyzed together to assess manipulation risk rather than being treated as independent verdicts.`;
-  const p3 = `Overall, the image is classified as ${results.verdictLabel}. This result suggests ${verdictUserDescription.toLowerCase().replace(/\.$/, "")}. However, this is an automated forensic assessment and should be used as an investigative aid, not as absolute proof.`;
+  const p3 = `Overall, the image is classified as ${results.verdictLabel || (isAuth ? "Authentic" : isInconc ? "Inconclusive" : "Manipulated")}. This result suggests ${verdictUserDescription.toLowerCase().replace(/\.$/, "")}. However, this is an automated forensic assessment and should be used as an investigative aid, not as absolute proof.`;
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(6.8);
@@ -704,7 +749,7 @@ export async function buildForensicPdfDoc(
   doc.setFontSize(6.0);
   doc.setTextColor(COLORS.textSecondary[0], COLORS.textSecondary[1], COLORS.textSecondary[2]);
   const sciNote =
-    "The Forgery Anomaly Score is derived from the peak response of the localization analysis and represents an empirical anomaly score, not a statistical probability of forgery. Prediction Certainty indicates how decisively spatial predictions are polarized. Automated forensic findings serve as investigative assistance and should be corroborated with expert analysis.";
+    "The Forensic Manipulation Score integrates calibrated multi-evidence signals and localization anomalies into a unified assessment. Prediction Certainty indicates how decisively spatial predictions are polarized. Automated forensic findings serve as investigative assistance and should be corroborated with expert analysis.";
   const sciNoteLines = doc.splitTextToSize(sciNote, bottomCardW - 20);
   doc.text(sciNoteLines, noteCardX + 15, currentY + 11.5);
 

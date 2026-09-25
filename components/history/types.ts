@@ -9,8 +9,12 @@ export interface CompletedAnalysisRecord {
   analyzedAt: string; // e.g. "Sep 14, 2026 at 10:24 AM"
   analyzedTimestamp: number; // for sorting
   verdict: ForensicVerdict;
-  verdictLabel: string; // e.g. "Appears Authentic", "Likely Manipulated", "Inconclusive"
+  verdictLabel: string; // e.g. "Authentic", "Manipulated", "Inconclusive"
   forgeryAnomalyScore: number | null; // 0 to 100 or null if not available
+  manipulationProbability?: number | null; // 0 to 100
+  authenticityProbability?: number | null; // 0 to 100
+  forensicManipulationScore?: number | null; // 0 to 100
+  forensicAuthenticityScore?: number | null; // 0 to 100
   riskScore: number; // 0 to 100 for backward compatibility and sorting
   thumbnailUrl: string;
   status?: "completed" | "processing" | "failed" | "pending";
