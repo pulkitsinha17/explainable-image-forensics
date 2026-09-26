@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, MouseEvent, TouchEvent } from "react";
+import { useState, useEffect, useRef, useCallback, MouseEvent, TouchEvent } from "react";
 import Image from "next/image";
 import { ChevronsLeftRight, SplitSquareHorizontal, Layers, Image as ImageIcon } from "lucide-react";
 
@@ -18,7 +18,26 @@ export function ImageComparisonSlider({
   const [sliderPosition, setSliderPosition] = useState(50); // percentage 0 - 100
   const [isDragging, setIsDragging] = useState(false);
   const [viewMode, setViewMode] = useState<"split" | "side" | "heatmap" | "original">("split");
+  const [containerWidth, setContainerWidth] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    setContainerWidth(el.clientWidth);
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect) {
+          setContainerWidth(entry.contentRect.width);
+        }
+      }
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [viewMode]);
 
   const handleMove = useCallback((clientX: number) => {
     if (!containerRef.current) return;
@@ -35,6 +54,17 @@ export function ImageComparisonSlider({
     if (isDragging) {
       handleMove(e.clientX);
     }
+  };
+
+  const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    if (e.touches.length > 0) {
+      handleMove(e.touches[0].clientX);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
   };
 
   const handleTouchMove = (e: TouchEvent<HTMLDivElement>) => {
@@ -133,8 +163,10 @@ export function ImageComparisonSlider({
             onMouseMove={handleMouseMove}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             onTouchMove={handleTouchMove}
-            className="relative w-full aspect-4/3 sm:aspect-16/10 rounded-2xl overflow-hidden cursor-ew-resize select-none bg-gray-900 border border-gray-200/80 shadow-inner group"
+            className="relative w-full aspect-4/3 sm:aspect-16/10 rounded-2xl overflow-hidden cursor-ew-resize select-none bg-gray-900 border border-gray-200/80 shadow-inner group touch-none"
           >
             {/* Background Layer: Localization Heatmap */}
             <div className="absolute inset-0 w-full h-full">
@@ -149,7 +181,9 @@ export function ImageComparisonSlider({
               <div
                 className="absolute inset-0 h-full"
                 style={{
-                  width: containerRef.current
+                  width: containerWidth > 0
+                    ? `${containerWidth}px`
+                    : containerRef.current
                     ? `${containerRef.current.clientWidth}px`
                     : "100%",
                 }}
@@ -186,7 +220,7 @@ export function ImageComparisonSlider({
 
       {/* Side-by-Side Mode */}
       {viewMode === "side" && (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <div className="relative aspect-4/3 rounded-xl overflow-hidden border border-gray-200 bg-gray-900">
               <Image

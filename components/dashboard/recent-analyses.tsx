@@ -9,31 +9,6 @@ interface RecentAnalysesProps {
   analyses?: RecentAnalysisItem[];
 }
 
-function getRelativeTime(timestamp?: number): string {
-  if (!timestamp) return "";
-  const now = Date.now();
-  const diffMs = now - timestamp;
-  if (diffMs < 0) return "Just now";
-
-  const diffSec = Math.floor(diffMs / 1000);
-  if (diffSec < 60) return "Just now";
-
-  const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60) return `${diffMin} min${diffMin === 1 ? "" : "s"} ago`;
-
-  const diffHours = Math.floor(diffMin / 60);
-  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
-
-  const diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 30) return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
-
-  const diffMonths = Math.floor(diffDays / 30);
-  if (diffMonths < 12) return `${diffMonths} month${diffMonths === 1 ? "" : "s"} ago`;
-
-  const diffYears = Math.floor(diffDays / 365);
-  return `${diffYears} year${diffYears === 1 ? "" : "s"} ago`;
-}
-
 function getVerdictBadge(item: RecentAnalysisItem) {
   const isForged =
     item.verdict === "forged" ||
@@ -122,7 +97,7 @@ export function RecentAnalyses({ analyses = [] }: RecentAnalysesProps) {
           </div>
         ) : (
           /* Table of recent items */
-          <div className="w-full">
+          <div className="w-full overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <table className="w-full text-left text-xs sm:text-sm table-auto">
               <thead>
                 <tr className="border-b border-gray-100 text-gray-400 text-[11px] uppercase tracking-wider font-semibold">
@@ -146,6 +121,9 @@ export function RecentAnalyses({ analyses = [] }: RecentAnalysesProps) {
                       : null;
 
                   const scoreDisplay = scoreVal !== null ? `${scoreVal.toFixed(1)}%` : "—";
+                  const dateParts = item.analyzedAt ? item.analyzedAt.split(" at ") : [];
+                  const dateStr = dateParts[0] || (item.analyzedTimestamp ? "Recent" : "—");
+                  const timeStr = dateParts[1] || "";
 
                   return (
                     <tr
@@ -172,7 +150,7 @@ export function RecentAnalyses({ analyses = [] }: RecentAnalysesProps) {
                               </div>
                             )}
                           </div>
-                          <span className="font-medium text-gray-900 group-hover:text-[#1a7fc4] transition-colors truncate max-w-[110px] sm:max-w-[150px]">
+                          <span className="font-medium text-gray-900 group-hover:text-[#1a7fc4] transition-colors truncate max-w-[100px] sm:max-w-[150px]">
                             {item.filename}
                           </span>
                         </Link>
@@ -194,17 +172,16 @@ export function RecentAnalyses({ analyses = [] }: RecentAnalysesProps) {
                           href={`/report/${item.id}?from=dashboard`}
                           className="inline-block text-right"
                         >
-                          {item.analyzedTimestamp ? (
+                          {item.analyzedAt ? (
                             <>
                               <span className="block font-medium text-gray-700 text-xs whitespace-nowrap">
-                                {new Date(item.analyzedTimestamp).toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                })}
+                                {dateStr}
                               </span>
-                              <span className="block text-[10px] text-gray-400 font-normal whitespace-nowrap leading-none mt-0.5">
-                                {getRelativeTime(item.analyzedTimestamp)}
-                              </span>
+                              {timeStr && (
+                                <span className="block text-[10px] text-gray-400 font-normal whitespace-nowrap leading-none mt-0.5">
+                                  {timeStr}
+                                </span>
+                              )}
                             </>
                           ) : (
                             <span className="text-xs text-gray-400">—</span>

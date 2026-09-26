@@ -137,7 +137,7 @@ export function ReportViewer({ analysisId }: { analysisId: string }) {
         </div>
 
         {/* Action Buttons: [ Download PDF ] [ Share ] */}
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           <button
             type="button"
             onClick={handleDownloadClick}
@@ -186,14 +186,14 @@ export function ReportViewer({ analysisId }: { analysisId: string }) {
         ) : pdfBlobUrl ? (
           <div className="space-y-3">
             {/* Document Header Metadata inside Card */}
-            <div className="flex items-center justify-between px-2 py-1 text-xs text-gray-500 border-b border-gray-100 pb-2.5">
-              <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-blue-600" />
-                <span className="font-medium text-gray-800">
+            <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-1 text-xs text-gray-500 border-b border-gray-100 pb-2.5">
+              <div className="flex items-center gap-2 min-w-0 truncate">
+                <FileText className="w-4 h-4 text-blue-600 shrink-0" />
+                <span className="font-medium text-gray-800 truncate">
                   pixentra-forensic-report-{reportId}.pdf
                 </span>
               </div>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 text-gray-600">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 text-gray-600 shrink-0">
                 Page 1 of 1 (A4)
               </span>
             </div>
@@ -203,11 +203,7 @@ export function ReportViewer({ analysisId }: { analysisId: string }) {
               <iframe
                 src={`${pdfBlobUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
                 title="Forensic Analysis Report"
-                className="w-full bg-white border-0"
-                style={{
-                  height: "820px",
-                  minHeight: "75vh",
-                }}
+                className="w-full bg-white border-0 min-h-[500px] h-[65vh] sm:h-[820px]"
               />
             </div>
           </div>

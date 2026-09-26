@@ -192,7 +192,7 @@ export function AnalysisResults({
         </div>
 
         {/* Action Buttons: [ View Report ] [ Download Report ] [ Share ] */}
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           <button
             type="button"
             onClick={handleViewReport}

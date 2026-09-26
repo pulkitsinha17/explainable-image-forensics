@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <main>
+      <main className="flex-1 w-full max-w-full overflow-x-hidden">
         {/* 1. Hero */}
         <Hero />
         {/* 2. Capabilities / trust strip */}

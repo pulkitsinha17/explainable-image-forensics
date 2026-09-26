@@ -146,7 +146,7 @@ export function AnalysisHistoryCard({ analysis }: AnalysisHistoryCardProps) {
       </div>
 
       {/* Right section: Verdict Badge, Forensic Score, and Primary / Secondary Actions */}
-      <div className="flex items-center justify-between md:justify-end gap-5 sm:gap-7 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 shrink-0">
+      <div className="flex flex-wrap sm:flex-nowrap items-center justify-between md:justify-end gap-3 sm:gap-5 md:gap-7 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 shrink-0">
         {/* Verdict Badge */}
         <div className="min-w-[120px]">
           {isForged && (

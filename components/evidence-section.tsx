@@ -63,11 +63,11 @@ const rightCardVariants = {
 /* ------------------------------------------------------------------ */
 function CastleVisualization() {
   return (
-    <div className="relative w-[280px] sm:w-[320px] max-w-full mx-auto">
+    <div className="relative w-[260px] sm:w-[320px] max-w-[85vw] mx-auto overflow-hidden sm:overflow-visible p-3 sm:p-0">
       {/* Outer decorative ring */}
-      <div className="absolute inset-0 rounded-full border-2 border-blue-100/80 animate-spin-slow pointer-events-none" style={{ margin: '-24px' }} />
+      <div className="absolute inset-0 rounded-full border-2 border-blue-100/80 animate-spin-slow pointer-events-none" style={{ margin: '-16px' }} />
       {/* Inner ring */}
-      <div className="absolute inset-0 rounded-full border border-blue-200/50 animate-spin-slow-reverse pointer-events-none" style={{ margin: '-12px' }} />
+      <div className="absolute inset-0 rounded-full border border-blue-200/50 animate-spin-slow-reverse pointer-events-none" style={{ margin: '-8px' }} />
 
       {/* Castle image card */}
       <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/60 bg-gray-900">
@@ -162,7 +162,7 @@ export function EvidenceSection() {
   const prefersReducedMotion = useReducedMotion()
 
   return (
-    <section className="py-24 bg-gradient-to-b from-white to-blue-50/40" aria-label="Multi-evidence forensic analysis">
+    <section className="py-20 sm:py-24 bg-gradient-to-b from-white to-blue-50/40 overflow-hidden max-w-full" aria-label="Multi-evidence forensic analysis">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -228,7 +228,7 @@ export function EvidenceSection() {
           </motion.div>
 
           {/* Center: castle visualization */}
-          <div className="hidden lg:flex flex-col items-center justify-center py-8 w-full">
+          <div className="flex flex-col items-center justify-center py-6 lg:py-8 w-full my-2 lg:my-0">
             <motion.div
               className="w-full flex justify-center"
               initial={{ opacity: 0, scale: 0.96 }}

@@ -67,7 +67,7 @@ export function Navbar() {
               alt="PIXENTRA"
               width={200}
               height={100}
-              className="h-16 w-auto"
+              className="h-10 sm:h-12 md:h-16 w-auto object-contain"
               priority
             />
           </Link>
@@ -186,7 +186,7 @@ export function Navbar() {
 
           {/* Mobile hamburger */}
           <motion.button
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+            className="md:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors shrink-0"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
@@ -197,6 +197,7 @@ export function Navbar() {
               {mobileOpen ? (
                 <motion.span
                   key="close"
+                  className="flex items-center justify-center"
                   initial={{ opacity: 0, rotate: -45 }}
                   animate={{ opacity: 1, rotate: 0 }}
                   exit={{ opacity: 0, rotate: 45 }}
@@ -207,6 +208,7 @@ export function Navbar() {
               ) : (
                 <motion.span
                   key="menu"
+                  className="flex items-center justify-center"
                   initial={{ opacity: 0, rotate: 45 }}
                   animate={{ opacity: 1, rotate: 0 }}
                   exit={{ opacity: 0, rotate: -45 }}

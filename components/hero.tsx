@@ -349,7 +349,7 @@ export function Hero() {
     <section
       id="home"
       ref={containerRef}
-      className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-white"
+      className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-white max-w-full"
     >
       {/* Background subtle gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-white to-white pointer-events-none" />
@@ -378,7 +378,7 @@ export function Hero() {
             {/* Headline with animated 'Truth' */}
             <motion.h1
               variants={heroItemVariants}
-              className="text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6"
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6"
             >
               Uncover the{' '}
               <span className="relative inline-block">
@@ -534,18 +534,18 @@ export function Hero() {
                 <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5bb8f5]/60 to-transparent pointer-events-none z-30" />
 
                 {/* Header bar above slider */}
-                <div className="bg-gray-50/95 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-gray-200/80">
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-1.5">
+                <div className="bg-gray-50/95 backdrop-blur-md px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b border-gray-200/80 gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                    <div className="flex gap-1.5 shrink-0">
                       <div className="w-2.5 h-2.5 rounded-full bg-red-400/90 border border-red-500/20" />
                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/90 border border-yellow-500/20" />
                       <div className="w-2.5 h-2.5 rounded-full bg-green-400/90 border border-green-500/20" />
                     </div>
-                    <span className="text-[10px] text-gray-500 font-mono ml-1.5 font-medium">
+                    <span className="text-[10px] text-gray-500 font-mono ml-1 font-medium truncate max-w-[130px] sm:max-w-none">
                       mountain.jpg — Forensic Analysis
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full border border-green-200/60">
+                  <div className="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full border border-green-200/60 shrink-0">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                     <span className="text-[9px] text-green-700 font-semibold tracking-wide uppercase">
                       Analysis Complete
