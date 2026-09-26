@@ -18,9 +18,9 @@ const footerLinks = {
     { label: 'Get Started', href: '/sign-up' },
   ],
   Resources: [
-    { label: 'Documentation', href: '#' },
+    { label: 'Documentation', href: '/documentation' },
     { label: 'FAQ', href: '/faq' },
-    { label: 'Research', href: '#' },
+    { label: 'Research', href: '/research' },
   ],
   Legal: [
     { label: 'Privacy', href: '/privacy' },
