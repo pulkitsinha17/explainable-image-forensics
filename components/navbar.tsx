@@ -21,6 +21,8 @@ const navLinks = [
   { label: 'About', href: '/about', external: true },
 ]
 
+import { ThemeToggle } from './theme-toggle'
+
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -54,8 +56,8 @@ export function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100'
-          : 'bg-white/80 backdrop-blur-sm'
+          ? 'bg-white/95 dark:bg-[#0B0B0B]/95 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-slate-800/80'
+          : 'bg-white/80 dark:bg-[#0B0B0B]/80 backdrop-blur-sm'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -67,7 +69,15 @@ export function Navbar() {
               alt="PIXENTRA"
               width={200}
               height={100}
-              className="h-10 sm:h-12 md:h-16 w-auto object-contain"
+              className="h-10 sm:h-12 md:h-16 w-auto object-contain block dark:hidden"
+              priority
+            />
+            <Image
+              src="/pixentra-logo-dark.svg"
+              alt="PIXENTRA"
+              width={200}
+              height={100}
+              className="h-10 sm:h-12 md:h-16 w-auto object-contain hidden dark:block"
               priority
             />
           </Link>
@@ -84,7 +94,7 @@ export function Navbar() {
                 <span className="relative z-10">{link.label}</span>
               )
               const baseClass =
-                'relative px-4 py-2 text-sm font-medium text-gray-600 rounded-lg transition-colors duration-200 hover:text-[#1a7fc4] cursor-pointer'
+                'relative px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 rounded-lg transition-colors duration-200 hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] cursor-pointer'
 
               return link.external ? (
                 <Link
@@ -98,7 +108,7 @@ export function Navbar() {
                     {isHovered && (
                       <motion.span
                         layoutId="nav-hover-pill"
-                        className="absolute inset-0 rounded-lg bg-blue-50"
+                        className="absolute inset-0 rounded-lg bg-blue-50 dark:bg-blue-950/40"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -120,7 +130,7 @@ export function Navbar() {
                     {isHovered && (
                       <motion.span
                         layoutId="nav-hover-pill"
-                        className="absolute inset-0 rounded-lg bg-blue-50"
+                        className="absolute inset-0 rounded-lg bg-blue-50 dark:bg-blue-950/40"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -134,8 +144,10 @@ export function Navbar() {
             })}
           </nav>
 
-          {/* Desktop CTA */}
+          {/* Desktop CTA & Theme Toggle */}
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle variant="compact" />
+
             {isLoaded && isSignedIn ? (
               <>
                 <motion.div
@@ -164,7 +176,7 @@ export function Navbar() {
               <>
                 <Link
                   href="/sign-in"
-                  className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-[#1a7fc4] hover:bg-blue-50 transition-all duration-200"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-200 rounded-lg hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-all duration-200"
                 >
                   Sign In
                 </Link>
@@ -184,41 +196,44 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile hamburger */}
-          <motion.button
-            className="md:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors shrink-0"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileOpen}
-            whileTap={prefersReducedMotion ? {} : { scale: 0.92 }}
-            transition={SPRING_PRESS}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {mobileOpen ? (
-                <motion.span
-                  key="close"
-                  className="flex items-center justify-center"
-                  initial={{ opacity: 0, rotate: -45 }}
-                  animate={{ opacity: 1, rotate: 0 }}
-                  exit={{ opacity: 0, rotate: 45 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  <X className="w-5 h-5" />
-                </motion.span>
-              ) : (
-                <motion.span
-                  key="menu"
-                  className="flex items-center justify-center"
-                  initial={{ opacity: 0, rotate: 45 }}
-                  animate={{ opacity: 1, rotate: 0 }}
-                  exit={{ opacity: 0, rotate: -45 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  <Menu className="w-5 h-5" />
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </motion.button>
+          {/* Mobile Right Action Area: Theme Toggle + Hamburger */}
+          <div className="md:hidden flex items-center gap-1.5">
+            <ThemeToggle variant="compact" />
+            <motion.button
+              className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition-colors shrink-0"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileOpen}
+              whileTap={prefersReducedMotion ? {} : { scale: 0.92 }}
+              transition={SPRING_PRESS}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {mobileOpen ? (
+                  <motion.span
+                    key="close"
+                    className="flex items-center justify-center"
+                    initial={{ opacity: 0, rotate: -45 }}
+                    animate={{ opacity: 1, rotate: 0 }}
+                    exit={{ opacity: 0, rotate: 45 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <X className="w-5 h-5" />
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="menu"
+                    className="flex items-center justify-center"
+                    initial={{ opacity: 0, rotate: 45 }}
+                    animate={{ opacity: 1, rotate: 0 }}
+                    exit={{ opacity: 0, rotate: -45 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <Menu className="w-5 h-5" />
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
+          </div>
         </div>
       </div>
 
@@ -231,7 +246,7 @@ export function Navbar() {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={prefersReducedMotion ? { duration: 0 } : SPRING_PANEL}
-            className="md:hidden overflow-hidden bg-white/98 backdrop-blur-md border-b border-gray-100"
+            className="md:hidden overflow-hidden bg-white/98 dark:bg-[#0B0B0B]/98 backdrop-blur-md border-b border-gray-100 dark:border-slate-800/80"
           >
             <nav className="px-4 py-4 flex flex-col gap-1" aria-label="Mobile navigation">
               {navLinks.map((link) =>
@@ -239,7 +254,7 @@ export function Navbar() {
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:text-[#1a7fc4] hover:bg-blue-50 transition-all duration-200"
+                    className="px-4 py-3 text-sm font-medium text-gray-700 dark:text-slate-200 rounded-xl hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-all duration-200"
                     onClick={() => setMobileOpen(false)}
                   >
                     {link.label}
@@ -249,13 +264,13 @@ export function Navbar() {
                     key={link.label}
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href, link.external)}
-                    className="px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:text-[#1a7fc4] hover:bg-blue-50 transition-all duration-200"
+                    className="px-4 py-3 text-sm font-medium text-gray-700 dark:text-slate-200 rounded-xl hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-all duration-200"
                   >
                     {link.label}
                   </a>
                 )
               )}
-              <div className="pt-3 mt-2 border-t border-gray-100 flex flex-col gap-2">
+              <div className="pt-3 mt-2 border-t border-gray-100 dark:border-slate-800 flex flex-col gap-2">
                 {isLoaded && isSignedIn ? (
                   <div className="flex items-center justify-between px-2 py-2">
                     <Link
@@ -279,7 +294,7 @@ export function Navbar() {
                   <>
                     <Link
                       href="/sign-in"
-                      className="px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:text-[#1a7fc4] hover:bg-blue-50 transition-all duration-200 text-center"
+                      className="px-4 py-3 text-sm font-medium text-gray-700 dark:text-slate-200 rounded-xl hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-all duration-200 text-center"
                       onClick={() => setMobileOpen(false)}
                     >
                       Sign In

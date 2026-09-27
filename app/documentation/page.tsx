@@ -19,7 +19,6 @@ import {
   Compass,
   GraduationCap,
   ExternalLink,
-  ChevronRight,
   Info,
   Download,
   Share2,
@@ -29,7 +28,6 @@ import {
   RefreshCw,
   MessageSquareQuote,
   Eye,
-  Tag,
 } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -166,28 +164,28 @@ const docFaqs = [
 
 export default function DocumentationPage() {
   return (
-    <div className="min-h-screen bg-[#fcfdfd] text-gray-900 flex flex-col antialiased">
+    <div className="min-h-screen bg-[#fcfdfd] dark:bg-[#0B0B0B] text-gray-900 dark:text-gray-100 flex flex-col antialiased transition-colors duration-200">
       {/* Shared Public Navbar */}
       <Navbar />
 
       <main className="flex-1 pt-24 pb-20">
         {/* Hero Section */}
-        <section className="relative py-16 lg:py-20 bg-gradient-to-b from-blue-50/70 via-white to-[#fcfdfd] border-b border-gray-100/80">
+        <section className="relative py-16 lg:py-20 bg-gradient-to-b from-blue-50/70 via-white to-[#fcfdfd] dark:from-white/[0.02] dark:via-[#0B0B0B] dark:to-[#0B0B0B] border-b border-gray-100/80 dark:border-slate-800/80">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               {/* Eyebrow badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50/90 border border-blue-100 rounded-full mb-5 shadow-2xs">
-                <BookOpen className="w-3.5 h-3.5 text-[#1a7fc4]" />
-                <span className="text-xs font-semibold text-[#1a7fc4] tracking-wide uppercase">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50/90 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-800/60 rounded-full mb-5 shadow-2xs">
+                <BookOpen className="w-3.5 h-3.5 text-[#1a7fc4] dark:text-[#5bb8f5]" />
+                <span className="text-xs font-semibold text-[#1a7fc4] dark:text-[#5bb8f5] tracking-wide uppercase">
                   User Guide &amp; Knowledge Hub
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight leading-[1.15] mb-5">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.15] mb-5">
                 How to Use PIXENTRA &amp; Interpret Evidence
               </h1>
 
-              <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl mb-8">
+              <p className="text-base sm:text-lg text-gray-600 dark:text-slate-300 leading-relaxed max-w-2xl mb-8">
                 Learn how to upload images, evaluate pixel-level localization heatmaps, understand multi-evidence forensic channels, generate PDF reports, and explore trusted forensics resources.
               </p>
 
@@ -197,7 +195,7 @@ export default function DocumentationPage() {
                   <Link
                     key={item.id}
                     href={`#${item.id}`}
-                    className="px-3.5 py-1.5 bg-white border border-gray-200/90 hover:border-[#1a7fc4] hover:text-[#1a7fc4] rounded-xl text-xs font-semibold text-gray-700 transition-all shadow-2xs"
+                    className="px-3.5 py-1.5 bg-white dark:bg-slate-900 border border-gray-200/90 dark:border-slate-800 hover:border-[#1a7fc4] dark:hover:border-[#5bb8f5] hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] rounded-xl text-xs font-semibold text-gray-700 dark:text-slate-300 transition-all shadow-2xs"
                   >
                     {item.label}
                   </Link>
@@ -212,9 +210,9 @@ export default function DocumentationPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
             {/* Desktop Sticky In-Page Navigation Sidebar */}
             <aside className="hidden lg:block lg:col-span-3 sticky top-28 space-y-4 select-none">
-              <div className="bg-white rounded-2xl border border-gray-200/80 p-4 shadow-2xs">
-                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3 px-2 flex items-center gap-1.5">
-                  <Compass className="w-3.5 h-3.5 text-[#1a7fc4]" />
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 p-4 shadow-2xs">
+                <p className="text-[11px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-wider mb-3 px-2 flex items-center gap-1.5">
+                  <Compass className="w-3.5 h-3.5 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                   Documentation Index
                 </p>
                 <nav className="flex flex-col space-y-1">
@@ -222,7 +220,7 @@ export default function DocumentationPage() {
                     <Link
                       key={item.id}
                       href={`#${item.id}`}
-                      className="px-3 py-2 text-xs font-medium text-gray-600 hover:text-[#1a7fc4] hover:bg-blue-50/70 rounded-xl transition-all"
+                      className="px-3 py-2 text-xs font-medium text-gray-600 dark:text-slate-400 hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] hover:bg-blue-50/70 dark:hover:bg-blue-950/40 rounded-xl transition-all"
                     >
                       {item.label}
                     </Link>
@@ -231,17 +229,17 @@ export default function DocumentationPage() {
               </div>
 
               {/* Technical Hub Helper Card */}
-              <div className="bg-gradient-to-br from-blue-50/80 via-white to-blue-50/40 rounded-2xl border border-blue-100/90 p-4 shadow-2xs space-y-2.5">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4]">
+              <div className="bg-gradient-to-br from-blue-50/80 via-white to-blue-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/30 rounded-2xl border border-blue-100/90 dark:border-slate-800 p-4 shadow-2xs space-y-2.5">
+                <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5]">
                   <Cpu className="w-4 h-4" />
                   <span>Looking for Technical Specs?</span>
                 </div>
-                <p className="text-[11.5px] text-gray-500 leading-relaxed">
+                <p className="text-[11.5px] text-gray-500 dark:text-slate-400 leading-relaxed">
                   Explore our neural pipeline, multi-evidence fusion methodology, and validated CASIA/Columbia evaluation metrics on the Research page.
                 </p>
                 <Link
                   href="/research"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1a7fc4] hover:text-[#1565a8] pt-1"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1a7fc4] dark:text-[#5bb8f5] hover:text-[#1565a8] dark:hover:text-[#88ccfa] pt-1"
                 >
                   <span>Explore Research</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -255,17 +253,17 @@ export default function DocumentationPage() {
               {/* 1. GETTING STARTED                                   */}
               {/* ---------------------------------------------------- */}
               <section id="getting-started" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>Workflow Walkthrough</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     1. Getting Started with PIXENTRA
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-slate-300 leading-relaxed">
                   PIXENTRA transforms deep digital image forensics into a clear, explainable, step-by-step investigative process. Here is how an image flows from upload to insight:
                 </p>
 
@@ -325,18 +323,18 @@ export default function DocumentationPage() {
                     return (
                       <div
                         key={s.step}
-                        className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs hover:border-blue-200 hover:shadow-xs transition-all space-y-3"
+                        className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs hover:border-blue-200 dark:hover:border-blue-700/60 hover:shadow-xs transition-all space-y-3"
                       >
                         <div className="flex items-center justify-between">
-                          <div className="w-10 h-10 rounded-xl bg-blue-50/80 border border-blue-100 flex items-center justify-center text-[#1a7fc4]">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50/80 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center text-[#1a7fc4] dark:text-[#5bb8f5]">
                             <Icon className="w-5 h-5" />
                           </div>
-                          <span className="text-xs font-mono font-bold text-gray-400">
+                          <span className="text-xs font-mono font-bold text-gray-400 dark:text-slate-500">
                             STEP {s.step}
                           </span>
                         </div>
-                        <h3 className="text-base font-bold text-gray-900">{s.title}</h3>
-                        <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white">{s.title}</h3>
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 leading-relaxed">
                           {s.desc}
                         </p>
                       </div>
@@ -349,50 +347,50 @@ export default function DocumentationPage() {
               {/* 2. UNDERSTANDING RESULTS                             */}
               {/* ---------------------------------------------------- */}
               <section id="understanding-results" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Activity className="w-3.5 h-3.5" />
                     <span>Analytical Terminology</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     2. Understanding PIXENTRA Results
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-slate-300 leading-relaxed">
                   PIXENTRA clearly separates calibrated statistical classifier probabilities from fused forensic indicators and spatial localization evidence.
                 </p>
 
                 {/* Verdicts Explained */}
                 <div className="space-y-3">
-                  <h3 className="text-lg font-bold text-gray-900">The Three Forensic Verdicts</h3>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">The Three Forensic Verdicts</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-emerald-50/40 rounded-2xl p-5 border border-emerald-200/60 space-y-2">
-                      <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm">
+                    <div className="bg-emerald-50/40 dark:bg-emerald-950/30 rounded-2xl p-5 border border-emerald-200/60 dark:border-emerald-800/60 space-y-2">
+                      <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-sm">
                         <CheckCircle2 className="w-4 h-4" />
                         <span>Authentic</span>
                       </div>
-                      <p className="text-xs text-gray-600 leading-relaxed">
+                      <p className="text-xs text-gray-600 dark:text-slate-300 leading-relaxed">
                         The image exhibits consistent noise residuals, uniform compression grids, and natural frequency decay with minimal or zero localized spatial anomalies.
                       </p>
                     </div>
 
-                    <div className="bg-rose-50/40 rounded-2xl p-5 border border-rose-200/60 space-y-2">
-                      <div className="flex items-center gap-2 text-rose-700 font-bold text-sm">
+                    <div className="bg-rose-50/40 dark:bg-rose-950/30 rounded-2xl p-5 border border-rose-200/60 dark:border-rose-800/60 space-y-2">
+                      <div className="flex items-center gap-2 text-rose-700 dark:text-rose-400 font-bold text-sm">
                         <AlertTriangle className="w-4 h-4" />
                         <span>Manipulated</span>
                       </div>
-                      <p className="text-xs text-gray-600 leading-relaxed">
+                      <p className="text-xs text-gray-600 dark:text-slate-300 leading-relaxed">
                         Elevated forensic risk combined with spatial anomaly clusters, frequency interpolation peaks, or differential compression artifacts indicating tampering.
                       </p>
                     </div>
 
-                    <div className="bg-amber-50/40 rounded-2xl p-5 border border-amber-200/60 space-y-2">
-                      <div className="flex items-center gap-2 text-amber-700 font-bold text-sm">
+                    <div className="bg-amber-50/40 dark:bg-amber-950/30 rounded-2xl p-5 border border-amber-200/60 dark:border-amber-800/60 space-y-2">
+                      <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-bold text-sm">
                         <HelpCircle className="w-4 h-4" />
                         <span>Inconclusive</span>
                       </div>
-                      <p className="text-xs text-gray-600 leading-relaxed">
+                      <p className="text-xs text-gray-600 dark:text-slate-300 leading-relaxed">
                         Forensic channels conflict (e.g., optical bokeh inducing noise variance without compression tampering). Signals that manual expert review is recommended.
                       </p>
                     </div>
@@ -400,14 +398,14 @@ export default function DocumentationPage() {
                 </div>
 
                 {/* Metrics Definitions Table */}
-                <div className="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-2xs">
-                  <div className="px-5 py-3.5 bg-gray-50/70 border-b border-gray-100 flex items-center justify-between">
-                    <span className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 overflow-hidden shadow-2xs">
+                  <div className="px-5 py-3.5 bg-gray-50/70 dark:bg-slate-800/70 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
+                    <span className="text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wide">
                       Core Metrics &amp; Diagnostic Indicators
                     </span>
-                    <span className="text-[11px] font-mono text-gray-400">0% – 100% Normalized Scale</span>
+                    <span className="text-[11px] font-mono text-gray-400 dark:text-slate-400">0% – 100% Normalized Scale</span>
                   </div>
-                  <div className="divide-y divide-gray-100 text-xs sm:text-sm">
+                  <div className="divide-y divide-gray-100 dark:divide-slate-800 text-xs sm:text-sm">
                     {[
                       {
                         name: "Calibrated Classifier Probability",
@@ -447,10 +445,10 @@ export default function DocumentationPage() {
                     ].map((m) => (
                       <div key={m.name} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="space-y-0.5 max-w-xl">
-                          <p className="font-semibold text-gray-900">{m.name}</p>
-                          <p className="text-xs text-gray-500 leading-relaxed">{m.desc}</p>
+                          <p className="font-semibold text-gray-900 dark:text-white">{m.name}</p>
+                          <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">{m.desc}</p>
                         </div>
-                        <span className="inline-block self-start sm:self-center px-2.5 py-1 bg-blue-50 text-[#1a7fc4] rounded-lg text-[11px] font-medium font-mono whitespace-nowrap">
+                        <span className="inline-block self-start sm:self-center px-2.5 py-1 bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] rounded-lg text-[11px] font-medium font-mono whitespace-nowrap">
                           {m.category}
                         </span>
                       </div>
@@ -459,10 +457,10 @@ export default function DocumentationPage() {
                 </div>
 
                 {/* Important Conceptual Distinction Banner */}
-                <div className="p-4 sm:p-5 bg-blue-50/70 border border-blue-200/80 rounded-2xl flex items-start gap-3.5">
-                  <Info className="w-5 h-5 text-[#1a7fc4] shrink-0 mt-0.5" />
-                  <div className="text-xs sm:text-sm text-gray-700 leading-relaxed space-y-1">
-                    <p className="font-bold text-gray-900">
+                <div className="p-4 sm:p-5 bg-blue-50/70 dark:bg-slate-900 border border-blue-200/80 dark:border-slate-700 rounded-2xl flex items-start gap-3.5">
+                  <Info className="w-5 h-5 text-[#1a7fc4] dark:text-[#5bb8f5] shrink-0 mt-0.5" />
+                  <div className="text-xs sm:text-sm text-gray-700 dark:text-slate-300 leading-relaxed space-y-1">
+                    <p className="font-bold text-gray-900 dark:text-white">
                       Important Distinction: Scores vs. Probabilities vs. Spatial Evidence
                     </p>
                     <p>
@@ -478,53 +476,53 @@ export default function DocumentationPage() {
               {/* 3. USING THE ANALYSIS PAGE                           */}
               {/* ---------------------------------------------------- */}
               <section id="analysis-workspace" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Sliders className="w-3.5 h-3.5" />
                     <span>Interactive Workspace</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     3. Using the Analysis Page
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2.5">
-                    <div className="flex items-center gap-2 font-bold text-gray-900 text-sm">
-                      <UploadCloud className="w-4 h-4 text-[#1a7fc4]" />
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2.5">
+                    <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white text-sm">
+                      <UploadCloud className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                       <span>Supported Image Formats</span>
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 leading-relaxed">
                       Upload JPEG, JPG, PNG, or WebP files up to 10 MB. High-resolution photographs, document scans, and exported digital graphics are supported.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2.5">
-                    <div className="flex items-center gap-2 font-bold text-gray-900 text-sm">
-                      <Split className="w-4 h-4 text-[#1a7fc4]" />
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2.5">
+                    <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white text-sm">
+                      <Split className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                       <span>Split Slider &amp; Side-by-Side Comparison</span>
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 leading-relaxed">
                       Use the interactive split slider to compare the original image directly with the localized JET anomaly heatmap overlay in real time.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2.5">
-                    <div className="flex items-center gap-2 font-bold text-gray-900 text-sm">
-                      <Layers className="w-4 h-4 text-[#1a7fc4]" />
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2.5">
+                    <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white text-sm">
+                      <Layers className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                       <span>Evidence Breakdown Inspection</span>
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 leading-relaxed">
                       Inspect individual modality bars to examine whether compression, frequency, noise residuals, or local statistics contributed to the verdict.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2.5">
-                    <div className="flex items-center gap-2 font-bold text-gray-900 text-sm">
-                      <RefreshCw className="w-4 h-4 text-[#1a7fc4]" />
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2.5">
+                    <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white text-sm">
+                      <RefreshCw className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                       <span>Analyze Another Image</span>
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 leading-relaxed">
                       Seamlessly reset the upload workspace with a single click to analyze additional images while preserving your past evaluations in History.
                     </p>
                   </div>
@@ -535,31 +533,31 @@ export default function DocumentationPage() {
               {/* 4. UNDERSTANDING LOCALIZATION                        */}
               {/* ---------------------------------------------------- */}
               <section id="localization-guide" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Eye className="w-3.5 h-3.5" />
                     <span>Spatial Interpretation</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     4. Understanding Localization Heatmaps
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-slate-300 leading-relaxed">
                   The localization heatmap is an intuitive visual overlay that indicates where physical and statistical forensic signals deviate from the expected baseline.
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2">
-                    <h3 className="text-sm font-bold text-gray-900">What the Heatmap Shows</h3>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">What the Heatmap Shows</h3>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">
                       Continuous predictions are colorized using a JET colormap: warm regions (red, orange, yellow) indicate high anomaly concentration; cool regions (blue, cyan) indicate baseline consistency.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2">
-                    <h3 className="text-sm font-bold text-gray-900">Localized Anomaly vs. Forged Pixels</h3>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">Localized Anomaly vs. Forged Pixels</h3>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">
                       A localized anomaly indicates statistical inconsistency. While spliced or cloned objects create strong anomaly clusters, benign factors like extreme bokeh or high-ISO noise reduction can also induce localized variance.
                     </p>
                   </div>
@@ -570,47 +568,47 @@ export default function DocumentationPage() {
               {/* 5. REPORTS & HISTORY                                 */}
               {/* ---------------------------------------------------- */}
               <section id="reports-history" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <History className="w-3.5 h-3.5" />
                     <span>Audit Trail &amp; Export</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     5. Forensic Reports &amp; Analysis History
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-slate-300 leading-relaxed">
                   Every analysis you perform while signed in is saved in your private account history for permanent auditing and review.
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2">
-                    <div className="flex items-center gap-2 font-bold text-gray-900 text-sm">
-                      <FileText className="w-4 h-4 text-[#1a7fc4]" />
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+                    <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white text-sm">
+                      <FileText className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                       <span>View Full Report</span>
                     </div>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                    <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">
                       Open a clean, formatted web report displaying all evidence channels, localization maps, metadata, and natural-language summaries.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2">
-                    <div className="flex items-center gap-2 font-bold text-gray-900 text-sm">
-                      <Download className="w-4 h-4 text-[#1a7fc4]" />
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+                    <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white text-sm">
+                      <Download className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                       <span>Download PDF</span>
                     </div>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                    <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">
                       Export an immutable, publication-ready PDF document containing cryptographic analysis IDs for legal and investigative archiving.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2">
-                    <div className="flex items-center gap-2 font-bold text-gray-900 text-sm">
-                      <Share2 className="w-4 h-4 text-[#1a7fc4]" />
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+                    <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white text-sm">
+                      <Share2 className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                       <span>Share Analysis</span>
                     </div>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                    <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">
                       Share the unique analysis ID with colleagues or clients so they can review the identical forensic evidence record.
                     </p>
                   </div>
@@ -621,17 +619,17 @@ export default function DocumentationPage() {
               {/* 6. LEARNING RESOURCES (External links open in new tab) */}
               {/* ---------------------------------------------------- */}
               <section id="resources" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <GraduationCap className="w-3.5 h-3.5" />
                     <span>Curated External Resources</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     6. Learn More: Forensic Science Resources
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-slate-300 leading-relaxed">
                   Deepen your understanding of digital image forensics, noise residual extraction, Error Level Analysis, and contrastive representation learning with these reputable external resources.
                 </p>
 
@@ -642,29 +640,29 @@ export default function DocumentationPage() {
                       href={res.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs hover:border-[#1a7fc4] hover:shadow-md transition-all flex flex-col justify-between"
+                      className="group bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs hover:border-[#1a7fc4] dark:hover:border-[#5bb8f5] hover:shadow-md transition-all flex flex-col justify-between"
                     >
                       <div className="space-y-2.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold text-[#1a7fc4] bg-blue-50 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                          <span className="text-[10px] font-bold text-[#1a7fc4] dark:text-[#5bb8f5] bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md uppercase tracking-wider">
                             {res.category}
                           </span>
-                          <span className="text-[10px] font-mono text-gray-400">
+                          <span className="text-[10px] font-mono text-gray-400 dark:text-slate-400">
                             {res.type}
                           </span>
                         </div>
-                        <h3 className="text-sm font-bold text-gray-900 group-hover:text-[#1a7fc4] transition-colors leading-snug">
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-[#1a7fc4] dark:group-hover:text-[#5bb8f5] transition-colors leading-snug">
                           {res.title}
                         </h3>
-                        <p className="text-xs font-medium text-gray-600">
+                        <p className="text-xs font-medium text-gray-600 dark:text-slate-300">
                           {res.author}
                         </p>
-                        <p className="text-xs text-gray-500 leading-relaxed line-clamp-3">
+                        <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed line-clamp-3">
                           {res.description}
                         </p>
                       </div>
 
-                      <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-[#1a7fc4]">
+                      <div className="pt-4 mt-2 border-t border-gray-100 dark:border-slate-800 flex items-center justify-between text-xs font-semibold text-[#1a7fc4] dark:text-[#5bb8f5]">
                         <span>Open Resource</span>
                         <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </div>
@@ -677,12 +675,12 @@ export default function DocumentationPage() {
               {/* 7. PRACTICAL FAQ                                     */}
               {/* ---------------------------------------------------- */}
               <section id="faq" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <HelpCircle className="w-3.5 h-3.5" />
                     <span>Frequently Asked Questions</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     7. Practical FAQ
                   </h2>
                 </div>
@@ -691,12 +689,12 @@ export default function DocumentationPage() {
                   {docFaqs.map((faq, i) => (
                     <div
                       key={i}
-                      className="bg-white rounded-2xl border border-gray-200/80 p-5 sm:p-6 shadow-2xs space-y-2"
+                      className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-2"
                     >
-                      <h3 className="text-sm sm:text-base font-bold text-gray-900">
+                      <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
                         {faq.q}
                       </h3>
-                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-slate-300 leading-relaxed">
                         {faq.a}
                       </p>
                     </div>
@@ -705,19 +703,19 @@ export default function DocumentationPage() {
               </section>
 
               {/* Callout Footer Banner */}
-              <div className="p-8 bg-gradient-to-r from-blue-50/90 via-blue-50/50 to-white rounded-3xl border border-blue-100 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
+              <div className="p-8 bg-gradient-to-r from-blue-50/90 via-blue-50/50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/30 rounded-3xl border border-blue-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
                 <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-gray-900">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                     Ready to analyze an image?
                   </h3>
-                  <p className="text-xs sm:text-sm text-gray-500">
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">
                     Test an image with PIXENTRA&apos;s explainable forensic pipeline today.
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <Link
                     href="/research"
-                    className="px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 text-xs sm:text-sm font-semibold hover:border-[#1a7fc4] hover:text-[#1a7fc4] transition-colors whitespace-nowrap shadow-2xs"
+                    className="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-200 text-xs sm:text-sm font-semibold hover:border-[#1a7fc4] dark:hover:border-[#5bb8f5] hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] transition-colors whitespace-nowrap shadow-2xs"
                   >
                     View Research
                   </Link>

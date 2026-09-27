@@ -125,17 +125,17 @@ export function ImageComparisonSlider({
     <div className="flex flex-col h-full space-y-3">
       {/* View Mode Switcher Pills (Header actions) */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
           Interactive Comparison
         </span>
-        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
+        <div className="flex items-center gap-1 bg-gray-100 dark:bg-slate-800 p-1 rounded-xl">
           <button
             type="button"
             onClick={() => setViewMode("split")}
             className={`px-2.5 py-1 text-[11px] font-medium rounded-lg transition-all ${
               viewMode === "split"
-                ? "bg-white text-[#1a7fc4] shadow-xs font-semibold"
-                : "text-gray-500 hover:text-gray-900"
+                ? "bg-white dark:bg-slate-700 text-[#1a7fc4] dark:text-[#5bb8f5] shadow-xs font-semibold"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             }`}
           >
             Split Slider
@@ -145,8 +145,8 @@ export function ImageComparisonSlider({
             onClick={() => setViewMode("side")}
             className={`px-2.5 py-1 text-[11px] font-medium rounded-lg transition-all ${
               viewMode === "side"
-                ? "bg-white text-[#1a7fc4] shadow-xs font-semibold"
-                : "text-gray-500 hover:text-gray-900"
+                ? "bg-white dark:bg-slate-700 text-[#1a7fc4] dark:text-[#5bb8f5] shadow-xs font-semibold"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             }`}
           >
             Side by Side
@@ -166,7 +166,7 @@ export function ImageComparisonSlider({
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onTouchMove={handleTouchMove}
-            className="relative w-full aspect-4/3 sm:aspect-16/10 rounded-2xl overflow-hidden cursor-ew-resize select-none bg-gray-900 border border-gray-200/80 shadow-inner group touch-none"
+            className="relative w-full aspect-4/3 sm:aspect-16/10 rounded-2xl overflow-hidden cursor-ew-resize select-none bg-gray-900 border border-gray-200/80 dark:border-slate-700 shadow-inner group touch-none"
           >
             {/* Background Layer: Localization Heatmap */}
             <div className="absolute inset-0 w-full h-full">
@@ -204,14 +204,14 @@ export function ImageComparisonSlider({
               style={{ left: `${sliderPosition}%` }}
             >
               {/* Circular Drag Handle */}
-              <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-gray-800 shadow-md border border-gray-200 flex items-center justify-center pointer-events-auto transition-transform group-hover:scale-110 active:scale-95">
-                <ChevronsLeftRight className="w-4 h-4 text-gray-700" />
+              <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 shadow-md border border-gray-200 dark:border-slate-600 flex items-center justify-center pointer-events-auto transition-transform group-hover:scale-110 active:scale-95">
+                <ChevronsLeftRight className="w-4 h-4 text-gray-700 dark:text-gray-300" />
               </div>
             </div>
           </div>
 
           {/* Subtitle labels matching reference image */}
-          <div className="flex items-center justify-between px-2 text-xs font-semibold text-gray-600">
+          <div className="flex items-center justify-between px-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
             <span>Original Image</span>
             <span>Localization Map</span>
           </div>
@@ -222,7 +222,7 @@ export function ImageComparisonSlider({
       {viewMode === "side" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <div className="relative aspect-4/3 rounded-xl overflow-hidden border border-gray-200 bg-gray-900">
+            <div className="relative aspect-4/3 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 bg-gray-900">
               <Image
                 src={originalImage}
                 alt="Original Image"
@@ -231,16 +231,16 @@ export function ImageComparisonSlider({
                 className="object-cover"
               />
             </div>
-            <p className="text-center text-xs font-semibold text-gray-600">
+            <p className="text-center text-xs font-semibold text-gray-600 dark:text-gray-400">
               Original Image
             </p>
           </div>
 
           <div className="space-y-1.5">
-            <div className="relative aspect-4/3 rounded-xl overflow-hidden border border-gray-200 bg-gray-900">
+            <div className="relative aspect-4/3 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 bg-gray-900">
               {renderHeatmapContent()}
             </div>
-            <p className="text-center text-xs font-semibold text-gray-600">
+            <p className="text-center text-xs font-semibold text-gray-600 dark:text-gray-400">
               Localization Map
             </p>
           </div>
@@ -249,3 +249,4 @@ export function ImageComparisonSlider({
     </div>
   );
 }
+

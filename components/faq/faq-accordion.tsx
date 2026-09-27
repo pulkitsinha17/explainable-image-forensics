@@ -86,10 +86,10 @@ export function FaqAccordion() {
         return (
           <div
             key={item.id}
-            className={`rounded-2xl border transition-all duration-200 bg-white ${
+            className={`rounded-2xl border transition-all duration-200 bg-white dark:bg-slate-900 ${
               isOpen
-                ? "border-[#1a7fc4] shadow-md shadow-blue-50/60"
-                : "border-gray-200 hover:border-blue-200 hover:shadow-sm"
+                ? "border-[#1a7fc4] dark:border-[#5bb8f5] shadow-md shadow-blue-50/60 dark:shadow-none"
+                : "border-gray-200 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-700/80 hover:shadow-xs"
             }`}
           >
             <button
@@ -99,17 +99,19 @@ export function FaqAccordion() {
               aria-expanded={isOpen}
               aria-controls={`answer-${item.id}`}
             >
-              <span className="text-base sm:text-lg font-semibold text-gray-900 leading-snug">
+              <span className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white leading-snug">
                 {item.question}
               </span>
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-200 ${
-                  isOpen ? "bg-blue-50 text-[#1a7fc4]" : "bg-gray-50 text-gray-400"
+                  isOpen
+                    ? "bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5]"
+                    : "bg-gray-50 dark:bg-slate-800 text-gray-400 dark:text-slate-400"
                 }`}
               >
                 <ChevronDown
                   className={`w-5 h-5 transition-transform duration-200 ease-in-out ${
-                    isOpen ? "rotate-180 text-[#1a7fc4]" : "text-gray-500"
+                    isOpen ? "rotate-180 text-[#1a7fc4] dark:text-[#5bb8f5]" : "text-gray-500 dark:text-slate-400"
                   }`}
                 />
               </div>
@@ -121,7 +123,7 @@ export function FaqAccordion() {
                 isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
               }`}
             >
-              <div className="px-5 pb-5 sm:px-6 sm:pb-6 pt-0 text-sm sm:text-base text-gray-600 leading-relaxed border-t border-gray-100/80 mt-1">
+              <div className="px-5 pb-5 sm:px-6 sm:pb-6 pt-0 text-sm sm:text-base text-gray-600 dark:text-slate-300 leading-relaxed border-t border-gray-100/80 dark:border-slate-800 mt-1">
                 <div className="pt-4">{item.answer}</div>
               </div>
             </div>

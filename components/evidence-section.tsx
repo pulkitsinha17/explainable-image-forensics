@@ -65,12 +65,12 @@ function CastleVisualization() {
   return (
     <div className="relative w-[260px] sm:w-[320px] max-w-[85vw] mx-auto overflow-hidden sm:overflow-visible p-3 sm:p-0">
       {/* Outer decorative ring */}
-      <div className="absolute inset-0 rounded-full border-2 border-blue-100/80 animate-spin-slow pointer-events-none" style={{ margin: '-16px' }} />
+      <div className="absolute inset-0 rounded-full border-2 border-blue-100/80 dark:border-blue-900/40 animate-spin-slow pointer-events-none" style={{ margin: '-16px' }} />
       {/* Inner ring */}
-      <div className="absolute inset-0 rounded-full border border-blue-200/50 animate-spin-slow-reverse pointer-events-none" style={{ margin: '-8px' }} />
+      <div className="absolute inset-0 rounded-full border border-blue-200/50 dark:border-blue-800/30 animate-spin-slow-reverse pointer-events-none" style={{ margin: '-8px' }} />
 
       {/* Castle image card */}
-      <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/60 bg-gray-900">
+      <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/60 dark:border-slate-700/60 bg-gray-900">
         {/* Layer 1: Original castle */}
         <Image
           src="/images/castle.png"
@@ -98,55 +98,60 @@ function CastleVisualization() {
         <div
           className="absolute rounded-full blur-xl pointer-events-none"
           style={{
-            width: '70px',
-            height: '65px',
-            background: 'radial-gradient(circle, rgba(234,88,12,0.55) 0%, transparent 70%)',
-            top: '50%',
-            right: '15%',
+            width: '60px',
+            height: '60px',
+            background: 'radial-gradient(circle, rgba(234,88,12,0.80) 0%, transparent 70%)',
+            top: '22%',
+            left: '26%',
           }}
         />
 
-        {/* Layer 4: Scan line (noise analysis) */}
-        <div className="absolute inset-x-0 h-0.5 bg-[#1a7fc4]/40 animate-scan pointer-events-none" />
-
-        {/* Analysis badge */}
+        {/* Scan lines effect overlay */}
         <div
-          className="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[9px] font-bold z-10"
+          className="absolute inset-0 pointer-events-none opacity-20"
           style={{
-            background: 'rgba(220,38,38,0.15)',
-            border: '1px solid rgba(220,38,38,0.4)',
-            color: '#fca5a5',
-            backdropFilter: 'blur(6px)',
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(26,127,196,0.3) 3px, rgba(26,127,196,0.3) 4px)',
           }}
+        />
+
+        {/* Hotspot indicator badge */}
+        <div
+          className="absolute px-2 py-0.5 bg-red-600/90 backdrop-blur-xs rounded text-[9px] font-mono font-bold text-white tracking-wider flex items-center gap-1 shadow-md pointer-events-none"
+          style={{ top: '15%', left: '16%' }}
         >
-          Suspicious
+          <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+          ANOMALY DETECTED
         </div>
 
-        {/* Layer labels */}
-        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3 z-10">
-          <div className="flex flex-wrap gap-1">
-            {['Spatial', 'Frequency', 'Noise', 'ELA', 'Statistical'].map((layer) => (
-              <span
-                key={layer}
-                className="text-[8px] font-semibold text-white/90 px-1.5 py-0.5 rounded"
-                style={{ background: 'rgba(26,127,196,0.5)' }}
-              >
-                {layer}
-              </span>
-            ))}
+        {/* Bottom indicator strip */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4">
+          <div className="flex items-center justify-between text-white/90">
+            <div>
+              <p className="text-[11px] font-mono font-semibold">castle.png</p>
+              <p className="text-[9px] text-white/60">Multi-evidence scan</p>
+            </div>
+            <div className="text-right">
+              <span className="text-[11px] font-mono font-bold text-red-400">79.2% Manipulated</span>
+              <p className="text-[9px] text-white/60">High Certainty</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Subtle staggered dot indicators around the card */}
-      {[0, 60, 120, 180, 240, 300].map((deg, i) => (
+      {/* Floating evidence nodes */}
+      {[
+        { label: 'ELA: 82%', top: '12%', left: '-8px', color: '#dc2626' },
+        { label: 'Freq: 74%', top: '45%', right: '-8px', color: '#ea580c' },
+        { label: 'Noise: 68%', bottom: '20%', left: '-8px', color: '#ca8a04' },
+      ].map((node, i) => (
         <motion.div
-          key={i}
-          className="absolute w-3 h-3 rounded-full bg-[#1a7fc4] border-2 border-white shadow"
+          key={node.label}
+          className="absolute px-2.5 py-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm rounded-lg shadow-md border border-gray-100 dark:border-slate-700 text-[10px] font-mono font-bold pointer-events-none"
           style={{
-            top: `${parseFloat((50 - 52 * Math.cos((deg * Math.PI) / 180)).toFixed(2))}%`,
-            left: `${parseFloat((50 + 52 * Math.sin((deg * Math.PI) / 180)).toFixed(2))}%`,
-            transform: 'translate(-50%, -50%)',
+            top: node.top,
+            left: node.left,
+            right: (node as { right?: string }).right,
+            color: node.color,
           }}
           initial={{ opacity: 0, scale: 0 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -162,7 +167,7 @@ export function EvidenceSection() {
   const prefersReducedMotion = useReducedMotion()
 
   return (
-    <section className="py-20 sm:py-24 bg-gradient-to-b from-white to-blue-50/40 overflow-hidden max-w-full" aria-label="Multi-evidence forensic analysis">
+    <section className="py-20 sm:py-24 bg-gradient-to-b from-white to-blue-50/40 dark:from-[#0B0B0B] dark:to-[#121212] overflow-hidden max-w-full transition-colors duration-200" aria-label="Multi-evidence forensic analysis">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -172,15 +177,15 @@ export function EvidenceSection() {
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.55, ease: EASE_OUT }}
         >
-          <p className="text-xs font-semibold text-[#1a7fc4] uppercase tracking-widest mb-3">
+          <p className="text-xs font-semibold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-widest mb-3">
             Powered by Explainable AI
           </p>
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
             More Than a Prediction.
             <br className="hidden sm:block" />
-            <span className="text-[#1a7fc4]"> A Forensic Explanation.</span>
+            <span className="text-[#1a7fc4] dark:text-[#5bb8f5]"> A Forensic Explanation.</span>
           </h2>
-          <p className="text-gray-500 max-w-2xl mx-auto text-base leading-relaxed">
+          <p className="text-gray-500 dark:text-slate-400 max-w-2xl mx-auto text-base leading-relaxed">
             PIXENTRA combines pixel-level localization with complementary forensic evidence to provide a more interpretable view of potential image manipulation.
           </p>
         </motion.div>
@@ -211,15 +216,15 @@ export function EvidenceSection() {
                         }
                   }
                   transition={SPRING_GENTLE}
-                  className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-default"
+                  className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-100 dark:border-slate-800 shadow-xs cursor-default transition-colors duration-200"
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-[#1a7fc4] transition-colors duration-200">
-                      <Icon className="w-4 h-4 text-[#1a7fc4]" />
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-800 mb-1">{card.title}</h3>
-                      <p className="text-xs text-gray-500 leading-relaxed">{card.description}</p>
+                      <h3 className="text-sm font-semibold text-gray-800 dark:text-slate-100 mb-1">{card.title}</h3>
+                      <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">{card.description}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -242,7 +247,7 @@ export function EvidenceSection() {
             >
               <CastleVisualization />
             </motion.div>
-            <p className="mt-6 text-xs text-gray-400 text-center font-medium">
+            <p className="mt-6 text-xs text-gray-400 dark:text-slate-500 text-center font-medium">
               Multi-signal convergence
             </p>
           </div>
@@ -271,15 +276,15 @@ export function EvidenceSection() {
                         }
                   }
                   transition={SPRING_GENTLE}
-                  className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-default"
+                  className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-100 dark:border-slate-800 shadow-xs cursor-default transition-colors duration-200"
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-4 h-4 text-[#1a7fc4]" />
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-800 mb-1">{card.title}</h3>
-                      <p className="text-xs text-gray-500 leading-relaxed">{card.description}</p>
+                      <h3 className="text-sm font-semibold text-gray-800 dark:text-slate-100 mb-1">{card.title}</h3>
+                      <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">{card.description}</p>
                     </div>
                   </div>
                 </motion.div>

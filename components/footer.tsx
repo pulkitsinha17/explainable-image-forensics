@@ -30,7 +30,7 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-100" aria-label="Site footer">
+    <footer className="bg-white dark:bg-[#080808] border-t border-gray-100 dark:border-slate-800/80 transition-colors duration-200" aria-label="Site footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main footer */}
         <motion.div
@@ -42,17 +42,24 @@ export function Footer() {
         >
           {/* Brand column */}
           <motion.div variants={fadeUpItem} className="lg:col-span-2">
-            <Link href="/" aria-label="PIXENTRA home">
+            <Link href="/" aria-label="PIXENTRA home" className="inline-block mb-4">
               <Image
                 src="/pixentra-logo.svg"
                 alt="PIXENTRA"
                 width={140}
                 height={70}
-                className="h-10 w-auto mb-4"
+                className="h-10 w-auto block dark:hidden"
+              />
+              <Image
+                src="/pixentra-logo-dark.svg"
+                alt="PIXENTRA"
+                width={140}
+                height={70}
+                className="h-10 w-auto hidden dark:block"
               />
             </Link>
-            <p className="text-sm font-semibold text-gray-700 mb-1">See Beyond the Pixels</p>
-            <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
+            <p className="text-sm font-semibold text-gray-700 dark:text-slate-200 mb-1">See Beyond the Pixels</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed max-w-xs">
               Explainable multi-evidence image forgery detection and localization.
             </p>
           </motion.div>
@@ -60,7 +67,7 @@ export function Footer() {
           {/* Nav columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <motion.div key={category} variants={fadeUpItem}>
-              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-4">
+              <h3 className="text-xs font-bold text-gray-900 dark:text-slate-100 uppercase tracking-wider mb-4">
                 {category}
               </h3>
               <ul className="space-y-2.5">
@@ -68,7 +75,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-500 hover:text-[#1a7fc4] transition-colors duration-200"
+                      className="text-sm text-gray-500 dark:text-slate-400 hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] transition-colors duration-200"
                     >
                       {link.label}
                     </Link>
@@ -81,13 +88,13 @@ export function Footer() {
 
         {/* Bottom bar */}
         <motion.div
-          className="py-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4"
+          className="py-6 border-t border-gray-100 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.2 }}
         >
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-slate-500">
             © 2026 PIXENTRA. All rights reserved.
           </p>
         </motion.div>

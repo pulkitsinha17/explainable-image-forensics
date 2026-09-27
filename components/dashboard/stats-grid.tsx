@@ -32,8 +32,8 @@ export function StatsGrid({ stats }: StatsGridProps) {
       icon: FileText,
       accentColor: "#1a7fc4",
       topBarClass: "bg-gradient-to-r from-[#1a7fc4] via-blue-400 to-transparent",
-      iconBg: "bg-blue-50 text-[#1a7fc4] border border-blue-100/90 group-hover:bg-blue-500 group-hover:text-white",
-      hoverRing: "group-hover:border-blue-200/90 group-hover:shadow-[0_8px_30px_rgba(26,127,196,0.08)]",
+      iconBg: "bg-blue-50 dark:bg-blue-950/50 text-[#1a7fc4] dark:text-[#5bb8f5] border border-blue-100/90 dark:border-blue-900/50 group-hover:bg-blue-500 group-hover:text-white",
+      hoverRing: "group-hover:border-blue-200/90 dark:group-hover:border-blue-700/60 group-hover:shadow-[0_8px_30px_rgba(26,127,196,0.08)]",
     },
     {
       id: "analyses-month",
@@ -44,8 +44,8 @@ export function StatsGrid({ stats }: StatsGridProps) {
       icon: BarChart3,
       accentColor: "#10b981",
       topBarClass: "bg-gradient-to-r from-emerald-500 via-teal-400 to-transparent",
-      iconBg: "bg-emerald-50 text-emerald-600 border border-emerald-100/90 group-hover:bg-emerald-500 group-hover:text-white",
-      hoverRing: "group-hover:border-emerald-200/90 group-hover:shadow-[0_8px_30px_rgba(16,185,129,0.08)]",
+      iconBg: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-100/90 dark:border-emerald-900/50 group-hover:bg-emerald-500 group-hover:text-white",
+      hoverRing: "group-hover:border-emerald-200/90 dark:group-hover:border-emerald-700/60 group-hover:shadow-[0_8px_30px_rgba(16,185,129,0.08)]",
     },
     {
       id: "manipulated-detected",
@@ -56,8 +56,8 @@ export function StatsGrid({ stats }: StatsGridProps) {
       icon: AlertTriangle,
       accentColor: "#f43f5e",
       topBarClass: "bg-gradient-to-r from-rose-500 via-pink-400 to-transparent",
-      iconBg: "bg-rose-50 text-rose-600 border border-rose-100/90 group-hover:bg-rose-500 group-hover:text-white",
-      hoverRing: "group-hover:border-rose-200/90 group-hover:shadow-[0_8px_30px_rgba(244,63,94,0.08)]",
+      iconBg: "bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-100/90 dark:border-rose-900/50 group-hover:bg-rose-500 group-hover:text-white",
+      hoverRing: "group-hover:border-rose-200/90 dark:group-hover:border-rose-700/60 group-hover:shadow-[0_8px_30px_rgba(244,63,94,0.08)]",
     },
     {
       id: "avg-score",
@@ -74,8 +74,8 @@ export function StatsGrid({ stats }: StatsGridProps) {
       icon: Percent,
       accentColor: "#8b5cf6",
       topBarClass: "bg-gradient-to-r from-purple-500 via-indigo-400 to-transparent",
-      iconBg: "bg-purple-50 text-purple-600 border border-purple-100/90 group-hover:bg-purple-500 group-hover:text-white",
-      hoverRing: "group-hover:border-purple-200/90 group-hover:shadow-[0_8px_30px_rgba(139,92,246,0.08)]",
+      iconBg: "bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 border border-purple-100/90 dark:border-purple-900/50 group-hover:bg-purple-500 group-hover:text-white",
+      hoverRing: "group-hover:border-purple-200/90 dark:group-hover:border-purple-700/60 group-hover:shadow-[0_8px_30px_rgba(139,92,246,0.08)]",
     },
   ];
 
@@ -90,7 +90,7 @@ export function StatsGrid({ stats }: StatsGridProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: idx * 0.05 }}
             whileHover={shouldReduceMotion ? undefined : { y: -3 }}
-            className={`group relative bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-xs transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-default ${card.hoverRing}`}
+            className={`group relative bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-xs transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-default ${card.hoverRing}`}
           >
             {/* Top Micro Accent Line */}
             <div
@@ -99,7 +99,7 @@ export function StatsGrid({ stats }: StatsGridProps) {
 
             {/* Top Row: Metric Label + Icon Badge */}
             <div className="flex items-center justify-between gap-3">
-              <span className="text-xs font-semibold text-slate-500 tracking-wide uppercase">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide uppercase">
                 {card.label}
               </span>
               <div
@@ -111,24 +111,24 @@ export function StatsGrid({ stats }: StatsGridProps) {
 
             {/* Middle Row: Large Stat Value + Percentage Pill */}
             <div className="my-3.5 flex items-baseline gap-2.5 flex-wrap">
-              <span className="text-3xl sm:text-[32px] font-black text-slate-900 tracking-tight leading-none font-mono">
+              <span className="text-3xl sm:text-[32px] font-black text-slate-900 dark:text-white tracking-tight leading-none font-mono">
                 {card.value}
               </span>
 
               {card.change !== null && card.change !== undefined && card.change > 0 && (
-                <span className="inline-flex items-center gap-0.5 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70 shadow-2xs">
-                  <ArrowUpRight className="w-3 h-3 text-emerald-600 stroke-[2.5]" />
+                <span className="inline-flex items-center gap-0.5 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-900/50 shadow-2xs">
+                  <ArrowUpRight className="w-3 h-3 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
                   <span>{card.change}%</span>
                 </span>
               )}
             </div>
 
             {/* Bottom Row: Context Description */}
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-              <span className="text-slate-400 font-medium truncate">
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+              <span className="text-slate-400 dark:text-slate-500 font-medium truncate">
                 {card.subtext}
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover:bg-slate-400 transition-colors" />
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover:bg-slate-400 dark:group-hover:bg-slate-500 transition-colors" />
             </div>
           </motion.div>
         );

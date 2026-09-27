@@ -56,20 +56,20 @@ export function AnalysisDetailViewer({ analysisId }: { analysisId: string }) {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 gap-3 text-gray-500 bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-        <p className="text-sm font-semibold text-gray-700">Loading analysis results...</p>
-        <p className="text-xs text-gray-400">Retrieving multi-evidence forensic data</p>
+      <div className="flex flex-col items-center justify-center py-24 gap-3 text-gray-500 dark:text-gray-400 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm p-8">
+        <Loader2 className="w-8 h-8 animate-spin text-[#1a7fc4] dark:text-[#5bb8f5]" />
+        <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Loading analysis results...</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500">Retrieving multi-evidence forensic data</p>
       </div>
     );
   }
 
   if (error || !results) {
     return (
-      <div className="bg-white rounded-2xl border border-red-100 shadow-sm p-8 text-center space-y-4 max-w-lg mx-auto">
-        <AlertCircle className="w-10 h-10 text-red-500 mx-auto" />
-        <h3 className="text-base font-bold text-gray-900">Unable to load analysis</h3>
-        <p className="text-xs text-gray-500">{error || "The requested analysis could not be found."}</p>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-red-100 dark:border-rose-900/50 shadow-sm p-8 text-center space-y-4 max-w-lg mx-auto">
+        <AlertCircle className="w-10 h-10 text-red-500 dark:text-rose-400 mx-auto" />
+        <h3 className="text-base font-bold text-gray-900 dark:text-white">Unable to load analysis</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{error || "The requested analysis could not be found."}</p>
         <Link
           href="/analyze"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-xs font-semibold text-white transition-colors"
@@ -86,7 +86,7 @@ export function AnalysisDetailViewer({ analysisId }: { analysisId: string }) {
       <div className="flex items-center justify-between pb-2">
         <Link
           href="/analyze"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Analyze</span>
@@ -101,3 +101,4 @@ export function AnalysisDetailViewer({ analysisId }: { analysisId: string }) {
     </div>
   );
 }
+

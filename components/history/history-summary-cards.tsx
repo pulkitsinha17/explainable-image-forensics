@@ -37,11 +37,11 @@ export function HistorySummaryCards({
       value: total.toLocaleString(),
       subtext: "All completed records",
       icon: FileText,
-      iconBg: "bg-slate-50 text-slate-700",
-      iconBorder: "border-slate-200/80",
-      activeBorder: "border-[#1a7fc4] ring-2 ring-[#1a7fc4]/15 bg-blue-50/20",
+      iconBg: "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200",
+      iconBorder: "border-slate-200/80 dark:border-slate-700",
+      activeBorder: "border-[#1a7fc4] ring-2 ring-[#1a7fc4]/15 bg-blue-50/20 dark:bg-blue-950/20",
       accentBar: "bg-blue-500",
-      pillBg: "bg-slate-100 text-slate-700",
+      pillBg: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
       pctText: "100%",
     },
     {
@@ -51,11 +51,11 @@ export function HistorySummaryCards({
       value: authenticated.toLocaleString(),
       subtext: `${authPercentage}% of all analyses`,
       icon: CheckCircle2,
-      iconBg: "bg-emerald-50 text-emerald-600",
-      iconBorder: "border-emerald-200/70",
-      activeBorder: "border-emerald-500 ring-2 ring-emerald-500/15 bg-emerald-50/20",
+      iconBg: "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400",
+      iconBorder: "border-emerald-200/70 dark:border-emerald-800/50",
+      activeBorder: "border-emerald-500 ring-2 ring-emerald-500/15 bg-emerald-50/20 dark:bg-emerald-950/20",
       accentBar: "bg-emerald-500",
-      pillBg: "bg-emerald-50 text-emerald-700 border-emerald-200/60",
+      pillBg: "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/50",
       pctText: `${authPercentage}%`,
     },
     {
@@ -65,11 +65,11 @@ export function HistorySummaryCards({
       value: manipulated.toLocaleString(),
       subtext: `${manipPercentage}% of all analyses`,
       icon: AlertTriangle,
-      iconBg: "bg-rose-50 text-rose-600",
-      iconBorder: "border-rose-200/70",
-      activeBorder: "border-rose-500 ring-2 ring-rose-500/15 bg-rose-50/20",
+      iconBg: "bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400",
+      iconBorder: "border-rose-200/70 dark:border-rose-800/50",
+      activeBorder: "border-rose-500 ring-2 ring-rose-500/15 bg-rose-50/20 dark:bg-rose-950/20",
       accentBar: "bg-rose-500",
-      pillBg: "bg-rose-50 text-rose-700 border-rose-200/60",
+      pillBg: "bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/50",
       pctText: `${manipPercentage}%`,
     },
     {
@@ -79,11 +79,11 @@ export function HistorySummaryCards({
       value: inconclusive.toLocaleString(),
       subtext: `${inconclusivePercentage}% of all analyses`,
       icon: AlertCircle,
-      iconBg: "bg-sky-50 text-sky-600",
-      iconBorder: "border-sky-200/70",
-      activeBorder: "border-sky-500 ring-2 ring-sky-500/15 bg-sky-50/20",
+      iconBg: "bg-sky-50 dark:bg-blue-950/60 text-sky-600 dark:text-[#5bb8f5]",
+      iconBorder: "border-sky-200/70 dark:border-blue-800/50",
+      activeBorder: "border-sky-500 ring-2 ring-sky-500/15 bg-sky-50/20 dark:bg-blue-950/20",
       accentBar: "bg-sky-500",
-      pillBg: "bg-sky-50 text-sky-700 border-sky-200/60",
+      pillBg: "bg-sky-50 dark:bg-blue-950/60 text-sky-700 dark:text-[#5bb8f5] border-sky-200/60 dark:border-blue-800/50",
       pctText: `${inconclusivePercentage}%`,
     },
   ];
@@ -134,10 +134,10 @@ export function HistorySummaryCards({
                 }
               }
             }}
-            className={`group bg-white rounded-2xl border p-4 shadow-2xs hover:shadow-sm transition-all duration-200 ease-out relative overflow-hidden flex flex-col justify-between cursor-pointer ${
+            className={`group bg-white dark:bg-slate-900 rounded-2xl border p-4 shadow-2xs hover:shadow-sm transition-all duration-200 ease-out relative overflow-hidden flex flex-col justify-between cursor-pointer ${
               isSelected
                 ? card.activeBorder
-                : "border-slate-200/80 hover:border-slate-300 hover:-translate-y-0.5"
+                : "border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:-translate-y-0.5"
             }`}
           >
             {/* Top Accent Edge */}
@@ -149,12 +149,12 @@ export function HistorySummaryCards({
 
             {/* Header Row: Label & Micro Badge */}
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 {card.title}
               </span>
               <span
                 className={`text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all ${
-                  isSelected ? "bg-white shadow-2xs " + card.pillBg : card.pillBg
+                  isSelected ? "bg-white dark:bg-slate-800 shadow-2xs " + card.pillBg : card.pillBg
                 }`}
               >
                 {card.pctText}
@@ -164,10 +164,10 @@ export function HistorySummaryCards({
             {/* Bottom Row: Large Metric Value & Icon */}
             <div className="flex items-end justify-between gap-3 mt-3">
               <div>
-                <p className="text-2xl sm:text-[28px] font-black text-slate-900 tracking-tight leading-none">
+                <p className="text-2xl sm:text-[28px] font-black text-slate-900 dark:text-white tracking-tight leading-none">
                   {card.value}
                 </p>
-                <p className="text-[11px] text-slate-500 font-medium mt-1">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1">
                   {card.subtext}
                 </p>
               </div>
@@ -184,3 +184,4 @@ export function HistorySummaryCards({
     </motion.div>
   );
 }
+

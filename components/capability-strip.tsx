@@ -67,11 +67,8 @@ export function CapabilityStrip() {
 
   return (
     <section
-      className="relative py-16 overflow-hidden"
+      className="relative py-16 overflow-hidden bg-gradient-to-br from-[#f0f7ff] via-[#f8f9ff] to-[#f0f4f8] dark:from-[#121212] dark:via-[#0E0E0E] dark:to-[#121212] transition-colors duration-200"
       aria-label="Core capabilities"
-      style={{
-        background: 'linear-gradient(135deg, #f0f7ff 0%, #f8f9ff 40%, #f0f4f8 100%)',
-      }}
     >
       {/* Subtle top + bottom border lines */}
       <div
@@ -85,19 +82,18 @@ export function CapabilityStrip() {
 
       {/* Ambient background blobs */}
       <div
-        className="absolute -top-20 -left-20 w-64 h-64 rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(26,127,196,0.07) 0%, transparent 70%)' }}
+        className="absolute -top-20 -left-20 w-64 h-64 rounded-full pointer-events-none opacity-40 dark:opacity-20"
+        style={{ background: 'radial-gradient(circle, rgba(26,127,196,0.12) 0%, transparent 70%)' }}
       />
       <div
-        className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 70%)' }}
+        className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full pointer-events-none opacity-40 dark:opacity-20"
+        style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%)' }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Eyebrow label */}
         <motion.p
-          className="text-center text-[11px] font-semibold uppercase tracking-[0.2em] mb-8"
-          style={{ color: '#1a7fc4' }}
+          className="text-center text-[11px] font-semibold uppercase tracking-[0.2em] mb-8 text-[#1a7fc4] dark:text-[#5bb8f5]"
           initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
@@ -130,14 +126,7 @@ export function CapabilityStrip() {
                 }
                 whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
                 transition={SPRING_GENTLE}
-                className="relative flex flex-col items-center text-center gap-4 p-5 rounded-2xl cursor-default"
-                style={{
-                  background: 'rgba(255,255,255,0.85)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(0,0,0,0.06)',
-                  boxShadow: '0 4px 16px -4px rgba(0,0,0,0.04), 0 1px 4px -1px rgba(0,0,0,0.04)',
-                }}
+                className="relative flex flex-col items-center text-center gap-4 p-5 rounded-2xl cursor-default bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border border-black/6 dark:border-white/10 shadow-xs transition-colors duration-200"
               >
                 {/* Top accent bar */}
                 <div
@@ -148,22 +137,17 @@ export function CapabilityStrip() {
                 {/* Icon container */}
                 <motion.div
                   className="relative w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: `${cap.accent}12` }}
+                  style={{ background: `${cap.accent}15` }}
                   whileHover={
                     prefersReducedMotion
                       ? {}
                       : {
                           scale: 1.08,
-                          background: `${cap.accent}20`,
+                          background: `${cap.accent}25`,
                         }
                   }
                   transition={SPRING_PRESS}
                 >
-                  {/* Glow behind icon */}
-                  <div
-                    className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100"
-                    style={{ background: `radial-gradient(circle, ${cap.glow} 0%, transparent 70%)` }}
-                  />
                   <Icon
                     className="w-5 h-5 relative z-10"
                     style={{ color: cap.accent }}
@@ -173,8 +157,8 @@ export function CapabilityStrip() {
 
                 {/* Text */}
                 <div className="space-y-1">
-                  <p className="text-[13px] font-semibold text-gray-800 leading-tight">{cap.title}</p>
-                  <p className="text-[11.5px] text-gray-500 leading-relaxed">{cap.description}</p>
+                  <p className="text-[13px] font-semibold text-gray-800 dark:text-slate-100 leading-tight">{cap.title}</p>
+                  <p className="text-[11.5px] text-gray-500 dark:text-slate-400 leading-relaxed">{cap.description}</p>
                 </div>
               </motion.div>
             )

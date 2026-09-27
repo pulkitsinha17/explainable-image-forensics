@@ -93,7 +93,7 @@ export function StatsSection() {
   const prefersReducedMotion = useReducedMotion()
 
   return (
-    <section className="py-20 bg-gradient-to-b from-blue-50/60 to-white" aria-label="Platform capabilities">
+    <section className="py-20 bg-gradient-to-b from-blue-50/60 to-white dark:from-[#121212] dark:to-[#0B0B0B] transition-colors duration-200" aria-label="Platform capabilities">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -103,13 +103,13 @@ export function StatsSection() {
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p className="text-xs font-semibold text-[#1a7fc4] uppercase tracking-widest mb-3">
+          <p className="text-xs font-semibold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-widest mb-3">
             Platform Architecture
           </p>
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
             What Makes PIXENTRA Different
           </h2>
-          <p className="text-gray-500 max-w-xl mx-auto">
+          <p className="text-gray-500 dark:text-slate-400 max-w-xl mx-auto">
             These numbers describe PIXENTRA&apos;s system architecture and forensic capabilities — not benchmark accuracy claims.
           </p>
         </motion.div>
@@ -137,10 +137,10 @@ export function StatsSection() {
                     }
               }
               transition={SPRING_GENTLE}
-              className="relative bg-white rounded-2xl p-6 border border-gray-100 shadow-sm cursor-default"
+              className="relative bg-white dark:bg-slate-900 rounded-2xl p-6 border border-gray-100 dark:border-slate-800 shadow-xs cursor-default transition-colors duration-200"
             >
               <div
-                className="text-2xl lg:text-3xl font-extrabold text-gray-900 mb-1"
+                className="text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white mb-1"
                 aria-label={`${stat.value} ${stat.label}`}
               >
                 {stat.isNumeric && stat.numericPart !== null && hasAnimated ? (
@@ -149,10 +149,10 @@ export function StatsSection() {
                   stat.value
                 )}
               </div>
-              <div className="text-sm font-semibold text-gray-700 leading-tight mb-1">
+              <div className="text-sm font-semibold text-gray-700 dark:text-slate-200 leading-tight mb-1">
                 {stat.label}
               </div>
-              <div className="text-xs text-gray-400">{stat.note}</div>
+              <div className="text-xs text-gray-400 dark:text-slate-500">{stat.note}</div>
             </motion.div>
           ))}
         </motion.div>

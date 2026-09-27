@@ -119,19 +119,19 @@ export function ReportViewer({ analysisId }: { analysisId: string }) {
   return (
     <div className="space-y-4">
       {/* Top Header Row with Breadcrumb Link, Page Title, and PIXENTRA Standard Action Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-gray-100 dark:border-slate-800">
         <div>
           <Link
             href={backHref}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors mb-1 cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-1 cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>{backLabel}</span>
           </Link>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             Forensic Report
           </h1>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
             Detailed Multi-Evidence Analysis Report • Report ID: {reportId}
           </p>
         </div>
@@ -142,21 +142,21 @@ export function ReportViewer({ analysisId }: { analysisId: string }) {
             type="button"
             onClick={handleDownloadClick}
             disabled={isDownloading || !analysisResult}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-60 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-60 text-gray-700 dark:text-slate-200 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer disabled:cursor-not-allowed"
           >
-            <Download className={`w-3.5 h-3.5 text-gray-600 ${isDownloading ? "animate-pulse" : ""}`} />
+            <Download className={`w-3.5 h-3.5 text-gray-600 dark:text-slate-400 ${isDownloading ? "animate-pulse" : ""}`} />
             <span>{isDownloading ? "Downloading..." : "Download PDF"}</span>
           </button>
 
           <button
             type="button"
             onClick={handleShareClick}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer"
           >
             {copied ? (
-              <Check className="w-3.5 h-3.5 text-emerald-600" />
+              <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             ) : (
-              <Share2 className="w-3.5 h-3.5 text-gray-600" />
+              <Share2 className="w-3.5 h-3.5 text-gray-600 dark:text-slate-400" />
             )}
             <span>{copied ? "Analysis link copied" : "Share"}</span>
           </button>
@@ -164,21 +164,21 @@ export function ReportViewer({ analysisId }: { analysisId: string }) {
       </div>
 
       {/* Main Report Content Container — Clean PIXENTRA White Card */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 space-y-3">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm p-4 sm:p-6 space-y-3">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-3 text-gray-500">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-            <p className="text-sm font-semibold text-gray-700">Rendering forensic analysis report...</p>
-            <p className="text-xs text-gray-400">Preparing single-page PDF preview</p>
+          <div className="flex flex-col items-center justify-center py-24 gap-3 text-gray-500 dark:text-slate-400">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600 dark:text-[#5bb8f5]" />
+            <p className="text-sm font-semibold text-gray-700 dark:text-slate-300">Rendering forensic analysis report...</p>
+            <p className="text-xs text-gray-400 dark:text-slate-500">Preparing single-page PDF preview</p>
           </div>
         ) : error ? (
-          <div className="border border-red-100 bg-red-50/40 rounded-2xl p-6 text-center space-y-3 max-w-md mx-auto">
-            <AlertCircle className="w-8 h-8 text-red-500 mx-auto" />
-            <h3 className="text-base font-bold text-gray-900">Failed to load report</h3>
-            <p className="text-xs text-red-600">{error}</p>
+          <div className="border border-red-100 dark:border-rose-900/50 bg-red-50/40 dark:bg-rose-950/30 rounded-2xl p-6 text-center space-y-3 max-w-md mx-auto">
+            <AlertCircle className="w-8 h-8 text-red-500 dark:text-rose-400 mx-auto" />
+            <h3 className="text-base font-bold text-gray-900 dark:text-white">Failed to load report</h3>
+            <p className="text-xs text-red-600 dark:text-rose-400">{error}</p>
             <Link
               href={backHref}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-xs font-semibold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-2xs"
             >
               <ArrowLeft className="w-3.5 h-3.5" /> {errorBackLabel}
             </Link>
@@ -186,20 +186,20 @@ export function ReportViewer({ analysisId }: { analysisId: string }) {
         ) : pdfBlobUrl ? (
           <div className="space-y-3">
             {/* Document Header Metadata inside Card */}
-            <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-1 text-xs text-gray-500 border-b border-gray-100 pb-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-1 text-xs text-gray-500 dark:text-slate-400 border-b border-gray-100 dark:border-slate-800 pb-2.5">
               <div className="flex items-center gap-2 min-w-0 truncate">
-                <FileText className="w-4 h-4 text-blue-600 shrink-0" />
-                <span className="font-medium text-gray-800 truncate">
+                <FileText className="w-4 h-4 text-blue-600 dark:text-[#5bb8f5] shrink-0" />
+                <span className="font-medium text-gray-800 dark:text-slate-200 truncate">
                   pixentra-forensic-report-{reportId}.pdf
                 </span>
               </div>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 text-gray-600 shrink-0">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 shrink-0">
                 Page 1 of 1 (A4)
               </span>
             </div>
 
             {/* Embedded PDF Viewer */}
-            <div className="w-full rounded-xl overflow-hidden border border-gray-200/80 bg-gray-50/50 shadow-inner">
+            <div className="w-full rounded-xl overflow-hidden border border-gray-200/80 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-950/60 shadow-inner">
               <iframe
                 src={`${pdfBlobUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
                 title="Forensic Analysis Report"

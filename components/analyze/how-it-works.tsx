@@ -20,9 +20,9 @@ export function HowItWorks() {
       description: "Select and upload an image from your device.",
       icon: UploadCloud,
       color: {
-        iconBg: "bg-blue-50 text-[#1a7fc4] border-blue-150 group-hover:bg-blue-100/70",
-        cardBg: "bg-blue-50/20 hover:bg-blue-50/40 border-blue-100/60 hover:border-blue-300/70",
-        badge: "text-blue-600 bg-blue-100/50 border-blue-200/50",
+        iconBg: "bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] border-blue-150 dark:border-blue-900/50 group-hover:bg-blue-100/70 dark:group-hover:bg-blue-900/40",
+        cardBg: "bg-blue-50/20 dark:bg-slate-800/40 hover:bg-blue-50/40 dark:hover:bg-slate-800/80 border-blue-100/60 dark:border-slate-700/60 hover:border-blue-300/70 dark:hover:border-blue-500/40",
+        badge: "text-blue-600 dark:text-[#5bb8f5] bg-blue-100/50 dark:bg-blue-950/70 border-blue-200/50 dark:border-blue-800/50",
         dot: "bg-blue-500",
       },
     },
@@ -32,9 +32,9 @@ export function HowItWorks() {
       description: "PIXENTRA examines the image using multiple forensic techniques.",
       icon: Cpu,
       color: {
-        iconBg: "bg-indigo-50 text-indigo-600 border-indigo-150 group-hover:bg-indigo-100/70",
-        cardBg: "bg-indigo-50/20 hover:bg-indigo-50/40 border-indigo-100/60 hover:border-indigo-300/70",
-        badge: "text-indigo-600 bg-indigo-100/50 border-indigo-200/50",
+        iconBg: "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-150 dark:border-indigo-900/50 group-hover:bg-indigo-100/70 dark:group-hover:bg-indigo-900/40",
+        cardBg: "bg-indigo-50/20 dark:bg-slate-800/40 hover:bg-indigo-50/40 dark:hover:bg-slate-800/80 border-indigo-100/60 dark:border-slate-700/60 hover:border-indigo-300/70 dark:hover:border-indigo-500/40",
+        badge: "text-indigo-600 dark:text-indigo-400 bg-indigo-100/50 dark:bg-indigo-950/70 border-indigo-200/50 dark:border-indigo-800/50",
         dot: "bg-indigo-500",
       },
     },
@@ -44,9 +44,9 @@ export function HowItWorks() {
       description: "Get localization maps, evidence scores and AI explanations.",
       icon: Layers,
       color: {
-        iconBg: "bg-amber-50 text-amber-600 border-amber-150 group-hover:bg-amber-100/70",
-        cardBg: "bg-amber-50/20 hover:bg-amber-50/40 border-amber-100/60 hover:border-amber-300/70",
-        badge: "text-amber-600 bg-amber-100/50 border-amber-200/50",
+        iconBg: "bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border-amber-150 dark:border-amber-900/50 group-hover:bg-amber-100/70 dark:group-hover:bg-amber-900/40",
+        cardBg: "bg-amber-50/20 dark:bg-slate-800/40 hover:bg-amber-50/40 dark:hover:bg-slate-800/80 border-amber-100/60 dark:border-slate-700/60 hover:border-amber-300/70 dark:hover:border-amber-500/40",
+        badge: "text-amber-600 dark:text-amber-400 bg-amber-100/50 dark:bg-amber-950/70 border-amber-200/50 dark:border-amber-800/50",
         dot: "bg-amber-500",
       },
     },
@@ -56,9 +56,9 @@ export function HowItWorks() {
       description: "View, download or share your forensic report.",
       icon: FileCheck2,
       color: {
-        iconBg: "bg-emerald-50 text-emerald-600 border-emerald-150 group-hover:bg-emerald-100/70",
-        cardBg: "bg-emerald-50/20 hover:bg-emerald-50/40 border-emerald-100/60 hover:border-emerald-300/70",
-        badge: "text-emerald-600 bg-emerald-100/50 border-emerald-200/50",
+        iconBg: "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-150 dark:border-emerald-900/50 group-hover:bg-emerald-100/70 dark:group-hover:bg-emerald-900/40",
+        cardBg: "bg-emerald-50/20 dark:bg-slate-800/40 hover:bg-emerald-50/40 dark:hover:bg-slate-800/80 border-emerald-100/60 dark:border-slate-700/60 hover:border-emerald-300/70 dark:hover:border-emerald-500/40",
+        badge: "text-emerald-600 dark:text-emerald-400 bg-emerald-100/50 dark:bg-emerald-950/70 border-emerald-200/50 dark:border-emerald-800/50",
         dot: "bg-emerald-500",
       },
     },
@@ -88,14 +88,14 @@ export function HowItWorks() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-7 shadow-xs space-y-5"
+      className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-7 shadow-xs space-y-5"
     >
       {/* Clean, unbloated header */}
       <div>
-        <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+        <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
           How PIXENTRA Works
         </h3>
-        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
           A multi-evidence approach to image forensics.
         </p>
       </div>
@@ -130,22 +130,22 @@ export function HowItWorks() {
                       {step.stepNumber}
                     </span>
                     {!isLast && (
-                      <ArrowRight className="hidden lg:block w-3.5 h-3.5 text-slate-300 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all" />
+                      <ArrowRight className="hidden lg:block w-3.5 h-3.5 text-slate-300 dark:text-slate-600 group-hover:text-slate-400 dark:group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all" />
                     )}
                   </div>
                 </div>
 
                 {/* Step Title & Description */}
-                <h4 className="text-sm font-bold text-slate-900 mb-1">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1">
                   {step.title}
                 </h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   {step.description}
                 </p>
               </div>
 
               {/* Bottom Dot Indicator */}
-              <div className="mt-3 pt-2 border-t border-slate-200/40 flex items-center justify-end">
+              <div className="mt-3 pt-2 border-t border-slate-200/40 dark:border-slate-700/60 flex items-center justify-end">
                 <span className={`w-1.5 h-1.5 rounded-full ${step.color.dot}`} />
               </div>
             </motion.div>
@@ -155,3 +155,4 @@ export function HowItWorks() {
     </motion.section>
   );
 }
+

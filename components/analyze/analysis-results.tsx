@@ -170,23 +170,23 @@ export function AnalysisResults({
     circumference - (Math.min(100, Math.max(0, forensicScore)) / 100) * circumference;
 
   const gaugeColor = forensicScore >= 60 ? "text-red-500" : forensicScore >= 40 ? "text-amber-500" : "text-emerald-500";
-  const gaugeTrack = forensicScore >= 60 ? "text-red-100" : forensicScore >= 40 ? "text-amber-100" : "text-emerald-100";
+  const gaugeTrack = forensicScore >= 60 ? "text-red-100 dark:text-red-950/60" : forensicScore >= 40 ? "text-amber-100 dark:text-amber-950/60" : "text-emerald-100 dark:text-emerald-950/60";
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 space-y-4 animate-fade-in">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm p-5 sm:p-6 space-y-4 animate-fade-in">
       {/* Header Row: Title, Status, Completed Time, Action Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2.5">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
               Analysis Results
             </h2>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
               <CheckCircle2 className="w-3.5 h-3.5" />
               Completed
             </span>
           </div>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             Completed in {results.elapsedSeconds} seconds
           </p>
         </div>
@@ -196,9 +196,9 @@ export function AnalysisResults({
           <button
             type="button"
             onClick={handleViewReport}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer"
           >
-            <FileText className="w-3.5 h-3.5 text-gray-600" />
+            <FileText className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
             <span>View Report</span>
           </button>
 
@@ -206,21 +206,21 @@ export function AnalysisResults({
             type="button"
             onClick={handleDownloadClick}
             disabled={isGeneratingPdf}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-60 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-60 text-gray-700 dark:text-gray-200 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer disabled:cursor-not-allowed"
           >
-            <Download className={`w-3.5 h-3.5 text-gray-600 ${isGeneratingPdf ? "animate-pulse" : ""}`} />
+            <Download className={`w-3.5 h-3.5 text-gray-600 dark:text-gray-300 ${isGeneratingPdf ? "animate-pulse" : ""}`} />
             <span>{isGeneratingPdf ? "Generating PDF..." : "Download Report"}</span>
           </button>
 
           <button
             type="button"
             onClick={handleShareClick}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer"
           >
             {copied ? (
-              <Check className="w-3.5 h-3.5 text-emerald-600" />
+              <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             ) : (
-              <Share2 className="w-3.5 h-3.5 text-gray-600" />
+              <Share2 className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
             )}
             <span>{copied ? "Analysis link copied" : "Share"}</span>
           </button>
@@ -241,9 +241,9 @@ export function AnalysisResults({
               <button
                 type="button"
                 onClick={onAnalyzeAnother}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-xs sm:text-sm font-semibold text-gray-700 hover:text-gray-900 transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-750 hover:border-gray-300 dark:hover:border-slate-600 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
               >
-                <ArrowLeft className="w-4 h-4 text-gray-500" />
+                <ArrowLeft className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                 <span>Analyze Another Image</span>
               </button>
             </div>
@@ -253,19 +253,19 @@ export function AnalysisResults({
         {/* Right Column: Verdict, Forgery Risk, Evidence Breakdown & AI Explanation */}
         <div className="lg:col-span-6 space-y-3.5">
           {/* Top Row: Verdict + Forensic Manipulation Score Gauge */}
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-2xl bg-gray-50/70 border border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-2xl bg-gray-50/70 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800">
             {/* Verdict */}
             <div className="sm:col-span-7 flex flex-col justify-center space-y-1 sm:pr-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                 Verdict
               </span>
               <div
                 className={`flex items-center gap-2 ${
                   isAuth
-                    ? "text-[#16a34a]"
+                    ? "text-[#16a34a] dark:text-emerald-400"
                     : isInconc
-                    ? "text-[#2563eb]"
-                    : "text-[#dc2626]"
+                    ? "text-[#2563eb] dark:text-[#5bb8f5]"
+                    : "text-[#dc2626] dark:text-rose-400"
                 }`}
               >
                 {isAuth ? (
@@ -277,14 +277,14 @@ export function AnalysisResults({
                   {results.verdictLabel}
                 </span>
               </div>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-gray-600 dark:text-gray-300">
                 {results.verdictDescription}
               </p>
             </div>
 
             {/* Forensic Manipulation Score Circular Radial Meter */}
-            <div className="sm:col-span-5 flex flex-col items-center justify-center pt-2 sm:pt-0 sm:pl-3 sm:border-l sm:border-gray-200/60">
-              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1 whitespace-nowrap text-center">
+            <div className="sm:col-span-5 flex flex-col items-center justify-center pt-2 sm:pt-0 sm:pl-3 sm:border-l sm:border-gray-200/60 dark:sm:border-slate-700/60">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1 whitespace-nowrap text-center">
                 Forensic Manipulation Score
               </span>
               <div className="relative w-18 h-18 flex items-center justify-center">
@@ -312,7 +312,7 @@ export function AnalysisResults({
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-base font-black text-gray-900 tracking-tight">
+                  <span className="text-base font-black text-gray-900 dark:text-white tracking-tight">
                     {forensicScore.toFixed(1)}%
                   </span>
                 </div>
@@ -321,34 +321,34 @@ export function AnalysisResults({
           </div>
 
           {/* ML Metrics Row: Prediction Certainty + Authenticity + Detected Forged Area + Speed */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-2xl bg-blue-50/50 border border-blue-100/80">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-2xl bg-blue-50/50 dark:bg-blue-950/30 border border-blue-100/80 dark:border-blue-900/40">
             <div className="flex flex-col items-center gap-0.5 text-center">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Certainty</span>
-              <span className="text-base sm:text-lg font-black text-[#1a7fc4]">{certVal}%</span>
-              <span className="text-[10px] text-gray-500">Model certainty</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">Certainty</span>
+              <span className="text-base sm:text-lg font-black text-[#1a7fc4] dark:text-[#5bb8f5]">{certVal}%</span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400">Model certainty</span>
             </div>
-            <div className="flex flex-col items-center gap-0.5 text-center sm:border-l sm:border-blue-100">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Authenticity</span>
-              <span className={`text-base sm:text-lg font-black ${forensicAuthScore >= 60 ? "text-emerald-600" : forensicAuthScore >= 40 ? "text-amber-500" : "text-red-500"}`}>
+            <div className="flex flex-col items-center gap-0.5 text-center sm:border-l sm:border-blue-100 dark:sm:border-blue-900/40">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">Authenticity</span>
+              <span className={`text-base sm:text-lg font-black ${forensicAuthScore >= 60 ? "text-emerald-600 dark:text-emerald-400" : forensicAuthScore >= 40 ? "text-amber-500 dark:text-amber-400" : "text-red-500 dark:text-rose-400"}`}>
                 {forensicAuthScore.toFixed(1)}%
               </span>
-              <span className="text-[10px] text-gray-500">Forensic Authenticity Score</span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400">Forensic Authenticity Score</span>
             </div>
-            <div className="flex flex-col items-center gap-0.5 text-center sm:border-l sm:border-blue-100">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+            <div className="flex flex-col items-center gap-0.5 text-center sm:border-l sm:border-blue-100 dark:sm:border-blue-900/40">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                 {isAuth || isInconc ? "Anomaly Area" : "Forged Area"}
               </span>
-              <span className="text-base sm:text-lg font-black text-orange-500">
+              <span className="text-base sm:text-lg font-black text-orange-500 dark:text-orange-400">
                 {typeof results.forgeryPixelFraction === "number" ? results.forgeryPixelFraction.toFixed(1) : results.forgeryPixelFraction}%
               </span>
-              <span className="text-[10px] text-gray-500">
+              <span className="text-[10px] text-gray-500 dark:text-gray-400">
                 {isAuth || isInconc ? "Localized anomaly" : "Detected pixels"}
               </span>
             </div>
-            <div className="flex flex-col items-center gap-0.5 text-center sm:border-l sm:border-blue-100">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Speed</span>
-              <span className="text-base sm:text-lg font-black text-emerald-600">{results.elapsedSeconds}s</span>
-              <span className="text-[10px] text-gray-500">Analysis time</span>
+            <div className="flex flex-col items-center gap-0.5 text-center sm:border-l sm:border-blue-100 dark:sm:border-blue-900/40">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">Speed</span>
+              <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">{results.elapsedSeconds}s</span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400">Analysis time</span>
             </div>
           </div>
 
@@ -356,20 +356,20 @@ export function AnalysisResults({
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-start">
             {/* Evidence Breakdown */}
             <div className="sm:col-span-6 space-y-2.5">
-              <h4 className="text-xs font-bold text-gray-900">
+              <h4 className="text-xs font-bold text-gray-900 dark:text-white">
                 Evidence Breakdown
               </h4>
 
               <div className="space-y-2">
                 {evidenceItems.map((item) => (
                   <div key={item.name} className="space-y-0.5">
-                    <div className="flex items-center justify-between text-xs font-medium text-gray-700">
+                    <div className="flex items-center justify-between text-xs font-medium text-gray-700 dark:text-gray-300">
                       <span className="truncate pr-2 text-[11px]">{item.name}</span>
-                      <span className="font-semibold text-gray-900 shrink-0 text-[11px]">
+                      <span className="font-semibold text-gray-900 dark:text-white shrink-0 text-[11px]">
                         {item.score}%
                       </span>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-gray-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
                       <div
                         className={`${item.color} h-full rounded-full transition-all duration-700 ease-out`}
                         style={{ width: `${item.score}%` }}
@@ -383,14 +383,14 @@ export function AnalysisResults({
             {/* AI Explanation */}
             <div className="sm:col-span-6 space-y-2.5">
               <div className="flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5 text-[#1a7fc4]" />
-                <h4 className="text-xs font-bold text-gray-900">
+                <FileText className="w-3.5 h-3.5 text-[#1a7fc4] dark:text-[#5bb8f5]" />
+                <h4 className="text-xs font-bold text-gray-900 dark:text-white">
                   AI Explanation
                 </h4>
               </div>
 
-              <div className="p-3 bg-gray-50/80 rounded-xl border border-gray-100">
-                <p className="text-[11px] sm:text-xs text-gray-600 leading-relaxed">
+              <div className="p-3 bg-gray-50/80 dark:bg-slate-800/60 rounded-xl border border-gray-100 dark:border-slate-800">
+                <p className="text-[11px] sm:text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                   {results.aiExplanation}
                 </p>
               </div>
@@ -400,14 +400,14 @@ export function AnalysisResults({
       </div>
 
       {/* Feedback Section — Large rounded horizontal card */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gray-50/70 border border-gray-100 space-y-3">
+      <div className="p-4 sm:p-5 rounded-2xl bg-gray-50/70 dark:bg-slate-800/40 border border-gray-100 dark:border-slate-800 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h4 className="text-xs sm:text-sm font-bold text-gray-900">Was this analysis useful?</h4>
-            <p className="text-[11px] sm:text-xs text-gray-500">Your feedback helps us improve our system.</p>
+            <h4 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">Was this analysis useful?</h4>
+            <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">Your feedback helps us improve our system.</p>
           </div>
           {feedbackSubmitted && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100 animate-fade-in">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-lg border border-emerald-100 dark:border-emerald-800 animate-fade-in">
               <CheckCircle2 className="w-4 h-4" />
               Thanks for your feedback!
             </span>
@@ -423,11 +423,11 @@ export function AnalysisResults({
                 onClick={() => setFeedbackRating("useful")}
                 className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
                   feedbackRating === "useful"
-                    ? "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-xs"
-                    : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                    ? "bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 shadow-xs"
+                    : "bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700"
                 }`}
               >
-                <ThumbsUp className={`w-3.5 h-3.5 ${feedbackRating === "useful" ? "text-emerald-600" : "text-gray-500"}`} />
+                <ThumbsUp className={`w-3.5 h-3.5 ${feedbackRating === "useful" ? "text-emerald-600 dark:text-emerald-400" : "text-gray-500 dark:text-gray-400"}`} />
                 <span>Useful</span>
               </button>
 
@@ -436,11 +436,11 @@ export function AnalysisResults({
                 onClick={() => setFeedbackRating("not_useful")}
                 className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
                   feedbackRating === "not_useful"
-                    ? "bg-red-50 border-red-300 text-red-700 shadow-xs"
-                    : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                    ? "bg-red-50 dark:bg-rose-950/60 border-red-300 dark:border-rose-700 text-red-700 dark:text-rose-300 shadow-xs"
+                    : "bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700"
                 }`}
               >
-                <ThumbsDown className={`w-3.5 h-3.5 ${feedbackRating === "not_useful" ? "text-red-600" : "text-gray-500"}`} />
+                <ThumbsDown className={`w-3.5 h-3.5 ${feedbackRating === "not_useful" ? "text-red-600 dark:text-rose-400" : "text-gray-500 dark:text-gray-400"}`} />
                 <span>Not Useful</span>
               </button>
             </div>
@@ -453,7 +453,7 @@ export function AnalysisResults({
                 onChange={(e) => setFeedbackComment(e.target.value)}
                 placeholder="Tell us your feedback (optional)..."
                 maxLength={1000}
-                className="w-full px-4 py-2 text-xs rounded-xl border border-gray-200 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-2xs"
+                className="w-full px-4 py-2 text-xs rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-2xs"
               />
             </div>
 
@@ -472,3 +472,4 @@ export function AnalysisResults({
     </div>
   );
 }
+

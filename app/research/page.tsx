@@ -210,28 +210,28 @@ const technicalReferences = [
 
 export default function ResearchPage() {
   return (
-    <div className="min-h-screen bg-[#fcfdfd] text-gray-900 flex flex-col antialiased">
+    <div className="min-h-screen bg-[#fcfdfd] dark:bg-[#0B0B0B] text-gray-900 dark:text-gray-100 flex flex-col antialiased">
       {/* Shared Public Navbar */}
       <Navbar />
 
       <main className="flex-1 pt-24 pb-20">
         {/* Hero Section */}
-        <section className="relative py-16 lg:py-20 bg-gradient-to-b from-blue-50/70 via-white to-[#fcfdfd] border-b border-gray-100/80">
+        <section className="relative py-16 lg:py-20 bg-gradient-to-b from-blue-50/70 via-white to-[#fcfdfd] dark:from-white/[0.02] dark:via-[#0B0B0B] dark:to-[#0B0B0B] border-b border-gray-100/80 dark:border-slate-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               {/* Eyebrow badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50/90 border border-blue-100 rounded-full mb-5 shadow-2xs">
-                <Cpu className="w-3.5 h-3.5 text-[#1a7fc4]" />
-                <span className="text-xs font-semibold text-[#1a7fc4] tracking-wide uppercase">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50/90 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/50 rounded-full mb-5 shadow-2xs">
+                <Cpu className="w-3.5 h-3.5 text-[#1a7fc4] dark:text-[#5bb8f5]" />
+                <span className="text-xs font-semibold text-[#1a7fc4] dark:text-[#5bb8f5] tracking-wide uppercase">
                   Technical Architecture &amp; Methodology
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight leading-[1.15] mb-5">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.15] mb-5">
                 Scientific Foundations of PIXENTRA
               </h1>
 
-              <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl mb-8">
+              <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl mb-8">
                 An in-depth technical examination of PIXENTRA&apos;s multi-evidence neural fusion, MPC foundation backbone, 270-dimensional calibrated classification, and empirical dataset evaluations.
               </p>
 
@@ -241,7 +241,7 @@ export default function ResearchPage() {
                   <Link
                     key={item.id}
                     href={`#${item.id}`}
-                    className="px-3.5 py-1.5 bg-white border border-gray-200/90 hover:border-[#1a7fc4] hover:text-[#1a7fc4] rounded-xl text-xs font-semibold text-gray-700 transition-all shadow-2xs"
+                    className="px-3.5 py-1.5 bg-white dark:bg-slate-900 border border-gray-200/90 dark:border-slate-800 hover:border-[#1a7fc4] dark:hover:border-[#5bb8f5] hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-300 transition-all shadow-2xs"
                   >
                     {item.label}
                   </Link>
@@ -256,9 +256,9 @@ export default function ResearchPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
             {/* Desktop Sticky In-Page Navigation Sidebar */}
             <aside className="hidden lg:block lg:col-span-3 sticky top-28 space-y-4 select-none">
-              <div className="bg-white rounded-2xl border border-gray-200/80 p-4 shadow-2xs">
-                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3 px-2 flex items-center gap-1.5">
-                  <Compass className="w-3.5 h-3.5 text-[#1a7fc4]" />
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 p-4 shadow-2xs">
+                <p className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-2 flex items-center gap-1.5">
+                  <Compass className="w-3.5 h-3.5 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                   Research Index
                 </p>
                 <nav className="flex flex-col space-y-1">
@@ -266,7 +266,7 @@ export default function ResearchPage() {
                     <Link
                       key={item.id}
                       href={`#${item.id}`}
-                      className="px-3 py-2 text-xs font-medium text-gray-600 hover:text-[#1a7fc4] hover:bg-blue-50/70 rounded-xl transition-all"
+                      className="px-3 py-2 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] hover:bg-blue-50/70 dark:hover:bg-blue-950/30 rounded-xl transition-all"
                     >
                       {item.label}
                     </Link>
@@ -275,17 +275,17 @@ export default function ResearchPage() {
               </div>
 
               {/* User Guide Helper Card */}
-              <div className="bg-gradient-to-br from-blue-50/80 via-white to-blue-50/40 rounded-2xl border border-blue-100/90 p-4 shadow-2xs space-y-2.5">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4]">
+              <div className="bg-gradient-to-br from-blue-50/80 via-white to-blue-50/40 dark:from-slate-900 dark:via-slate-900/80 dark:to-blue-950/30 rounded-2xl border border-blue-100/90 dark:border-slate-800 p-4 shadow-2xs space-y-2.5">
+                <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5]">
                   <BookOpen className="w-4 h-4" />
                   <span>Looking for the User Guide?</span>
                 </div>
-                <p className="text-[11.5px] text-gray-500 leading-relaxed">
+                <p className="text-[11.5px] text-gray-500 dark:text-gray-400 leading-relaxed">
                   Need practical guidance on uploading images or understanding results? Visit our Documentation page.
                 </p>
                 <Link
                   href="/documentation"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1a7fc4] hover:text-[#1565a8] pt-1"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1a7fc4] dark:text-[#5bb8f5] hover:text-[#1565a8] dark:hover:text-blue-300 pt-1"
                 >
                   <span>Open Documentation</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -299,21 +299,21 @@ export default function ResearchPage() {
               {/* 1. RESEARCH OVERVIEW                                 */}
               {/* ---------------------------------------------------- */}
               <section id="overview" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Target className="w-3.5 h-3.5" />
                     <span>Scientific Motivation</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     1. Research Overview &amp; Motivation
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   Digital image manipulation detection benefits significantly from combining global image-level classification with spatial pixel-level localization and multiple complementary physical forensic signals.
                 </p>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   Traditional standalone deep networks often act as opaque black-box classifiers. While they may memorize semantic patterns within specific training splits, they frequently fail to generalize across unseen camera sensors or explain why an image was deemed suspicious. PIXENTRA is designed as an <strong>explainable multi-evidence image forensics system</strong> that couples contrastive deep representation learning with explicit signal-domain forensic extractors.
                 </p>
               </section>
@@ -322,40 +322,40 @@ export default function ResearchPage() {
               {/* 2. SYSTEM PIPELINE                                   */}
               {/* ---------------------------------------------------- */}
               <section id="system-pipeline" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <GitBranch className="w-3.5 h-3.5" />
                     <span>System Architecture</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     2. Conceptual System Pipeline
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   PIXENTRA executes an integrated multi-stage pipeline where spatial pixel localization and image-level classification operate as related but distinct analytical outputs:
                 </p>
 
-                <div className="bg-white rounded-2xl border border-gray-200/80 p-5 sm:p-6 shadow-2xs space-y-4">
-                  <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-bold text-gray-700">
-                    <span className="px-2.5 py-1 bg-blue-50 text-[#1a7fc4] rounded-lg">Input Image</span>
-                    <span className="text-gray-400">&rarr;</span>
-                    <span className="px-2.5 py-1 bg-gray-100 rounded-lg">Preprocessing</span>
-                    <span className="text-gray-400">&rarr;</span>
-                    <span className="px-2.5 py-1 bg-gray-100 rounded-lg">MPC / Deep Forensic Extraction</span>
-                    <span className="text-gray-400">&rarr;</span>
-                    <span className="px-2.5 py-1 bg-gray-100 rounded-lg">Multi-Evidence Processing</span>
-                    <span className="text-gray-400">&rarr;</span>
-                    <span className="px-2.5 py-1 bg-gray-100 rounded-lg">Feature Fusion</span>
-                    <span className="text-gray-400">&rarr;</span>
-                    <span className="px-2.5 py-1 bg-blue-50 text-[#1a7fc4] rounded-lg">Localization &amp; 270-D Classification</span>
-                    <span className="text-gray-400">&rarr;</span>
-                    <span className="px-2.5 py-1 bg-gray-100 rounded-lg">Calibration</span>
-                    <span className="text-gray-400">&rarr;</span>
-                    <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg">Hybrid Assessment &amp; Report</span>
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-4">
+                  <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-bold text-gray-700 dark:text-gray-300">
+                    <span className="px-2.5 py-1 bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] rounded-lg">Input Image</span>
+                    <span className="text-gray-400 dark:text-gray-500">&rarr;</span>
+                    <span className="px-2.5 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg">Preprocessing</span>
+                    <span className="text-gray-400 dark:text-gray-500">&rarr;</span>
+                    <span className="px-2.5 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg">MPC / Deep Forensic Extraction</span>
+                    <span className="text-gray-400 dark:text-gray-500">&rarr;</span>
+                    <span className="px-2.5 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg">Multi-Evidence Processing</span>
+                    <span className="text-gray-400 dark:text-gray-500">&rarr;</span>
+                    <span className="px-2.5 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg">Feature Fusion</span>
+                    <span className="text-gray-400 dark:text-gray-500">&rarr;</span>
+                    <span className="px-2.5 py-1 bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] rounded-lg">Localization &amp; 270-D Classification</span>
+                    <span className="text-gray-400 dark:text-gray-500">&rarr;</span>
+                    <span className="px-2.5 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg">Calibration</span>
+                    <span className="text-gray-400 dark:text-gray-500">&rarr;</span>
+                    <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 rounded-lg">Hybrid Assessment &amp; Report</span>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-gray-500 leading-relaxed pt-2">
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-relaxed pt-2">
                     <strong>Separate Output Heads:</strong> The pixel localization head reconstructs fine-grained spatial anomaly maps via feature pyramid skip connections, while the classification head aggregates a rich 270-dimensional feature vector to determine global manipulation likelihood.
                   </p>
                 </div>
@@ -365,23 +365,23 @@ export default function ResearchPage() {
               {/* 3. MPC FOUNDATION                                    */}
               {/* ---------------------------------------------------- */}
               <section id="mpc-foundation" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Cpu className="w-3.5 h-3.5" />
                     <span>Contrastive Representation</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     3. Multi-Pixel Contrastive (MPC) Foundation
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   PIXENTRA incorporates deep learned forensic representations derived from the <strong>Multi-Pixel Contrastive (MPC)</strong> backbone foundation. Contrastive pre-training teaches the network to pull features from authentic pixel patches together in latent space while pushing tampered pixel boundaries apart.
                 </p>
 
-                <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-3">
-                  <h3 className="text-sm font-bold text-gray-900">Role in PIXENTRA</h3>
-                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-3">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">Role in PIXENTRA</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                     The MPC foundation provides a high-level spatial prior that captures boundary discontinuity. PIXENTRA fuses this deep prior with explicit signal-domain evidence extractors (noise residuals, DCT frequency spectra, ELA, and statistical variance) to ensure both high spatial precision and physical interpretability.
                   </p>
                 </div>
@@ -391,17 +391,17 @@ export default function ResearchPage() {
               {/* 4. MULTI-EVIDENCE CHANNELS                           */}
               {/* ---------------------------------------------------- */}
               <section id="evidence-channels" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Layers className="w-3.5 h-3.5" />
                     <span>Domain Evidence Streams</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     4. The Five Multi-Evidence Channels
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   In accordance with the project notebooks, PIXENTRA extracts five dedicated forensic evidence channels:
                 </p>
 
@@ -411,35 +411,35 @@ export default function ResearchPage() {
                     return (
                       <div
                         key={ch.name}
-                        className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-3"
+                        className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-3"
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div className="flex items-center gap-2.5">
-                            <div className="w-9 h-9 rounded-xl bg-blue-50/80 border border-blue-100 flex items-center justify-center text-[#1a7fc4]">
+                            <div className="w-9 h-9 rounded-xl bg-blue-50/80 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center text-[#1a7fc4] dark:text-[#5bb8f5]">
                               <Icon className="w-4.5 h-4.5" />
                             </div>
-                            <h3 className="text-sm sm:text-base font-bold text-gray-900">
+                            <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
                               {ch.name}
                             </h3>
                           </div>
-                          <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-gray-50 text-gray-600 border border-gray-200">
+                          <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700">
                             {ch.badge}
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm text-gray-600">
-                          <div className="p-3 bg-gray-50/70 rounded-xl border border-gray-100 space-y-1">
-                            <p className="font-bold text-gray-800">What It Examines:</p>
-                            <p className="text-gray-500">{ch.examines}</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                          <div className="p-3 bg-gray-50/70 dark:bg-slate-800/60 rounded-xl border border-gray-100 dark:border-slate-700/60 space-y-1">
+                            <p className="font-bold text-gray-800 dark:text-gray-200">What It Examines:</p>
+                            <p className="text-gray-500 dark:text-gray-400">{ch.examines}</p>
                           </div>
-                          <div className="p-3 bg-gray-50/70 rounded-xl border border-gray-100 space-y-1">
-                            <p className="font-bold text-gray-800">Forensic Inconsistency Revealed:</p>
-                            <p className="text-gray-500">{ch.inconsistency}</p>
+                          <div className="p-3 bg-gray-50/70 dark:bg-slate-800/60 rounded-xl border border-gray-100 dark:border-slate-700/60 space-y-1">
+                            <p className="font-bold text-gray-800 dark:text-gray-200">Forensic Inconsistency Revealed:</p>
+                            <p className="text-gray-500 dark:text-gray-400">{ch.inconsistency}</p>
                           </div>
                         </div>
 
-                        <p className="text-xs text-gray-500 leading-relaxed bg-blue-50/40 p-3 rounded-xl border border-blue-100">
-                          <strong className="text-[#1a7fc4]">Forensic Role:</strong> {ch.role}
+                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed bg-blue-50/40 dark:bg-blue-950/20 p-3 rounded-xl border border-blue-100 dark:border-blue-900/40">
+                          <strong className="text-[#1a7fc4] dark:text-[#5bb8f5]">Forensic Role:</strong> {ch.role}
                         </p>
                       </div>
                     );
@@ -451,36 +451,36 @@ export default function ResearchPage() {
               {/* 5. FEATURE FUSION & LOCALIZATION                     */}
               {/* ---------------------------------------------------- */}
               <section id="localization" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Search className="w-3.5 h-3.5" />
                     <span>Spatial Decoding</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     5. Feature Fusion &amp; Spatial Localization
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   The Multi-Evidence model fuses the deep forensic representation with explicit evidence channels across multiple spatial resolution scales.
                 </p>
 
-                <div className="bg-white rounded-2xl border border-gray-200/80 p-5 sm:p-6 shadow-2xs space-y-4">
-                  <h3 className="text-sm font-bold text-gray-900">Validated 0.38 Operating Threshold</h3>
-                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-4">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">Validated 0.38 Operating Threshold</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                     The final localization evaluation in the project uses an established <strong>operating evaluation threshold of 0.38</strong> (identified as an operational decision threshold rather than an uncalibrated probability threshold) to generate binary masks from the continuous localization map.
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-                    <div className="p-3.5 bg-gray-50 rounded-xl border border-gray-100">
-                      <p className="font-bold text-gray-900 text-xs">Continuous Anomaly Heatmap</p>
-                      <p className="text-[11px] text-gray-500 mt-1">
+                    <div className="p-3.5 bg-gray-50 dark:bg-slate-800/70 rounded-xl border border-gray-100 dark:border-slate-700/60">
+                      <p className="font-bold text-gray-900 dark:text-white text-xs">Continuous Anomaly Heatmap</p>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
                         Pixel anomaly intensity across all coordinate positions mapped with JET colormap visualization.
                       </p>
                     </div>
-                    <div className="p-3.5 bg-gray-50 rounded-xl border border-gray-100">
-                      <p className="font-bold text-gray-900 text-xs">Thresholded Binary Mask (τ = 0.38)</p>
-                      <p className="text-[11px] text-gray-500 mt-1">
+                    <div className="p-3.5 bg-gray-50 dark:bg-slate-800/70 rounded-xl border border-gray-100 dark:border-slate-700/60">
+                      <p className="font-bold text-gray-900 dark:text-white text-xs">Thresholded Binary Mask (τ = 0.38)</p>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
                         Binarized mask for calculating precision, recall, F1, IoU, and forged area percentage.
                       </p>
                     </div>
@@ -492,55 +492,55 @@ export default function ResearchPage() {
               {/* 6. 270-D CLASSIFICATION & CALIBRATION                */}
               {/* ---------------------------------------------------- */}
               <section id="classification" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Shield className="w-3.5 h-3.5" />
                     <span>Feature Representation</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     6. 270-Dimensional Classification &amp; Calibration
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   In the final project architecture, the image-level classifier operates on a comprehensive <strong>270-dimensional feature vector</strong> structured into three conceptual groups:
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2">
-                    <span className="text-[11px] font-mono font-bold text-[#1a7fc4] bg-blue-50 px-2 py-0.5 rounded-md">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+                    <span className="text-[11px] font-mono font-bold text-[#1a7fc4] dark:text-[#5bb8f5] bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md">
                       Group 1
                     </span>
-                    <h3 className="text-sm font-bold text-gray-900">Global Pooled Deep Features</h3>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">Global Pooled Deep Features</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                       High-level semantic representations pooled across encoder layers capturing global structural coherence.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2">
-                    <span className="text-[11px] font-mono font-bold text-[#1a7fc4] bg-blue-50 px-2 py-0.5 rounded-md">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+                    <span className="text-[11px] font-mono font-bold text-[#1a7fc4] dark:text-[#5bb8f5] bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md">
                       Group 2
                     </span>
-                    <h3 className="text-sm font-bold text-gray-900">Localization Statistics</h3>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">Localization Statistics</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                       Spatial anomaly metrics including peak heatmap intensity, spatial dispersion, boundary gradients, and cluster area fraction.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2">
-                    <span className="text-[11px] font-mono font-bold text-[#1a7fc4] bg-blue-50 px-2 py-0.5 rounded-md">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+                    <span className="text-[11px] font-mono font-bold text-[#1a7fc4] dark:text-[#5bb8f5] bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md">
                       Group 3
                     </span>
-                    <h3 className="text-sm font-bold text-gray-900">Evidence Channel Contributions</h3>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">Evidence Channel Contributions</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                       Normalized scalar contributions extracted from compression, frequency/noise, local statistics, and ELA pipelines.
                     </p>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-gray-200/80 p-5 sm:p-6 shadow-2xs space-y-3">
-                  <h3 className="text-sm font-bold text-gray-900">Probability Calibration</h3>
-                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-3">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">Probability Calibration</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                     Raw logits are calibrated conceptually so that output values accurately reflect empirical manipulation probabilities, yielding calibrated manipulation probabilities, authenticity probabilities, and prediction certainty scores.
                   </p>
                 </div>
@@ -550,38 +550,38 @@ export default function ResearchPage() {
               {/* 7. HYBRID FORENSIC ASSESSMENT                        */}
               {/* ---------------------------------------------------- */}
               <section id="hybrid-assessment" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Zap className="w-3.5 h-3.5" />
                     <span>Decision Fusion</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     7. Hybrid Forensic Assessment
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   PIXENTRA synthesizes image-level classification with localized spatial evidence to determine the final assessment:
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-emerald-50/40 rounded-2xl p-5 border border-emerald-200/60 space-y-2">
-                    <span className="text-xs font-bold text-emerald-700">Authentic</span>
-                    <p className="text-xs text-gray-600 leading-relaxed">
+                  <div className="bg-emerald-50/40 dark:bg-emerald-950/20 rounded-2xl p-5 border border-emerald-200/60 dark:border-emerald-900/50 space-y-2">
+                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Authentic</span>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                       Concordant low classifier risk and clean spatial localization (minimal spatial anomaly fraction).
                     </p>
                   </div>
 
-                  <div className="bg-rose-50/40 rounded-2xl p-5 border border-rose-200/60 space-y-2">
-                    <span className="text-xs font-bold text-rose-700">Manipulated</span>
-                    <p className="text-xs text-gray-600 leading-relaxed">
+                  <div className="bg-rose-50/40 dark:bg-rose-950/20 rounded-2xl p-5 border border-rose-200/60 dark:border-rose-900/50 space-y-2">
+                    <span className="text-xs font-bold text-rose-700 dark:text-rose-400">Manipulated</span>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                       Concordant high classifier risk and contiguous localized anomaly clusters exceeding the operating threshold.
                     </p>
                   </div>
 
-                  <div className="bg-amber-50/40 rounded-2xl p-5 border border-amber-200/60 space-y-2">
-                    <span className="text-xs font-bold text-amber-700">Inconclusive</span>
-                    <p className="text-xs text-gray-600 leading-relaxed">
+                  <div className="bg-amber-50/40 dark:bg-amber-950/20 rounded-2xl p-5 border border-amber-200/60 dark:border-amber-900/50 space-y-2">
+                    <span className="text-xs font-bold text-amber-700 dark:text-amber-400">Inconclusive</span>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                       Triggered when channels conflict (e.g., elevated localized anomaly area with low global classifier risk).
                     </p>
                   </div>
@@ -592,17 +592,17 @@ export default function ResearchPage() {
               {/* 8. EVALUATED DATASETS                                */}
               {/* ---------------------------------------------------- */}
               <section id="datasets" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Database className="w-3.5 h-3.5" />
                     <span>Benchmark Corpora</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     8. Evaluated Datasets
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   As established in the project notebooks, the final classifier was developed using a training pool consisting of <strong>CASIA2 + Columbia + IMD2020</strong>, while <strong>COVERAGE</strong> was reserved strictly as an external benchmark.
                 </p>
 
@@ -635,17 +635,17 @@ export default function ResearchPage() {
                   ].map((ds) => (
                     <div
                       key={ds.name}
-                      className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2.5 flex flex-col justify-between"
+                      className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2.5 flex flex-col justify-between"
                     >
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-base font-bold text-gray-900">{ds.name}</h3>
-                          <span className="text-[10px] font-mono font-semibold px-2 py-0.5 bg-blue-50 text-[#1a7fc4] rounded-md">
+                          <h3 className="text-base font-bold text-gray-900 dark:text-white">{ds.name}</h3>
+                          <span className="text-[10px] font-mono font-semibold px-2 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] rounded-md">
                             {ds.type}
                           </span>
                         </div>
-                        <p className="text-xs font-semibold text-gray-700">{ds.role}</p>
-                        <p className="text-xs text-gray-500 leading-relaxed">{ds.desc}</p>
+                        <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">{ds.role}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{ds.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -656,109 +656,109 @@ export default function ResearchPage() {
               {/* 9. CLASSIFICATION EVALUATION                         */}
               {/* ---------------------------------------------------- */}
               <section id="classification-eval" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <FileSpreadsheet className="w-3.5 h-3.5" />
                     <span>Quantitative Validation</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     9. Image-Level Classification Evaluation
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   Validated classification results from the final notebook on canonical held-out test data and external IMD2020 generalization data:
                 </p>
 
                 {/* Canonical Held-Out Test Table */}
-                <div className="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-2xs">
-                  <div className="px-5 py-3.5 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
-                    <span className="text-xs font-bold text-gray-800 uppercase">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 overflow-hidden shadow-2xs">
+                  <div className="px-5 py-3.5 bg-gray-50 dark:bg-slate-800/80 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
+                    <span className="text-xs font-bold text-gray-800 dark:text-gray-200 uppercase">
                       Canonical Held-Out Test Evaluation
                     </span>
-                    <span className="text-[11px] font-mono text-gray-400">Final Classifier Notebook</span>
+                    <span className="text-[11px] font-mono text-gray-400 dark:text-gray-500">Final Classifier Notebook</span>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-5 divide-x divide-y sm:divide-y-0 divide-gray-100 text-center p-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-5 divide-x divide-y sm:divide-y-0 divide-gray-100 dark:divide-slate-800 text-center p-2">
                     <div className="p-3.5 space-y-1">
-                      <p className="text-xl sm:text-2xl font-black text-gray-900 font-mono">0.9975</p>
-                      <p className="text-xs font-semibold text-gray-600">ROC-AUC</p>
+                      <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-mono">0.9975</p>
+                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">ROC-AUC</p>
                     </div>
                     <div className="p-3.5 space-y-1">
-                      <p className="text-xl sm:text-2xl font-black text-gray-900 font-mono">0.9981</p>
-                      <p className="text-xs font-semibold text-gray-600">PR-AUC</p>
+                      <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-mono">0.9981</p>
+                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">PR-AUC</p>
                     </div>
                     <div className="p-3.5 space-y-1">
-                      <p className="text-xl sm:text-2xl font-black text-gray-900 font-mono">97.30%</p>
-                      <p className="text-xs font-semibold text-gray-600">Accuracy</p>
+                      <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-mono">97.30%</p>
+                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">Accuracy</p>
                     </div>
                     <div className="p-3.5 space-y-1">
-                      <p className="text-xl sm:text-2xl font-black text-gray-900 font-mono">97.44%</p>
-                      <p className="text-xs font-semibold text-gray-600">Bal. Accuracy</p>
+                      <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-mono">97.44%</p>
+                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">Bal. Accuracy</p>
                     </div>
                     <div className="p-3.5 space-y-1">
-                      <p className="text-xl sm:text-2xl font-black text-gray-900 font-mono">97.60%</p>
-                      <p className="text-xs font-semibold text-gray-600">F1-Score</p>
+                      <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-mono">97.60%</p>
+                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">F1-Score</p>
                     </div>
                   </div>
 
-                  <div className="px-5 py-3 bg-gray-50/50 border-t border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                  <div className="px-5 py-3 bg-gray-50/50 dark:bg-slate-800/40 border-t border-gray-100 dark:border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                     <div>
-                      <span className="text-gray-400">Precision:</span>{" "}
-                      <strong className="text-gray-800 font-mono">98.78%</strong>
+                      <span className="text-gray-400 dark:text-gray-500">Precision:</span>{" "}
+                      <strong className="text-gray-800 dark:text-gray-200 font-mono">98.78%</strong>
                     </div>
                     <div>
-                      <span className="text-gray-400">Recall:</span>{" "}
-                      <strong className="text-gray-800 font-mono">96.44%</strong>
+                      <span className="text-gray-400 dark:text-gray-500">Recall:</span>{" "}
+                      <strong className="text-gray-800 dark:text-gray-200 font-mono">96.44%</strong>
                     </div>
                     <div>
-                      <span className="text-gray-400">Brier Score:</span>{" "}
-                      <strong className="text-gray-800 font-mono">0.0205</strong>
+                      <span className="text-gray-400 dark:text-gray-500">Brier Score:</span>{" "}
+                      <strong className="text-gray-800 dark:text-gray-200 font-mono">0.0205</strong>
                     </div>
                     <div>
-                      <span className="text-gray-400">Selective Accuracy:</span>{" "}
-                      <strong className="text-emerald-700 font-mono">98.96% (94.65% cov)</strong>
+                      <span className="text-gray-400 dark:text-gray-500">Selective Accuracy:</span>{" "}
+                      <strong className="text-emerald-700 dark:text-emerald-400 font-mono">98.96% (94.65% cov)</strong>
                     </div>
                   </div>
                 </div>
 
                 {/* External IMD2020 Table */}
-                <div className="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-2xs">
-                  <div className="px-5 py-3.5 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
-                    <span className="text-xs font-bold text-gray-800 uppercase">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 overflow-hidden shadow-2xs">
+                  <div className="px-5 py-3.5 bg-gray-50 dark:bg-slate-800/80 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
+                    <span className="text-xs font-bold text-gray-800 dark:text-gray-200 uppercase">
                       External IMD2020 Generalization Benchmark
                     </span>
-                    <span className="text-[11px] font-mono text-gray-400">In-The-Wild Evaluation</span>
+                    <span className="text-[11px] font-mono text-gray-400 dark:text-gray-500">In-The-Wild Evaluation</span>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-gray-100 text-center p-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-gray-100 dark:divide-slate-800 text-center p-2">
                     <div className="p-3.5 space-y-1">
-                      <p className="text-xl sm:text-2xl font-black text-gray-900 font-mono">0.9487</p>
-                      <p className="text-xs font-semibold text-gray-600">ROC-AUC</p>
+                      <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-mono">0.9487</p>
+                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">ROC-AUC</p>
                     </div>
                     <div className="p-3.5 space-y-1">
-                      <p className="text-xl sm:text-2xl font-black text-gray-900 font-mono">0.8470</p>
-                      <p className="text-xs font-semibold text-gray-600">PR-AUC</p>
+                      <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-mono">0.8470</p>
+                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">PR-AUC</p>
                     </div>
                     <div className="p-3.5 space-y-1">
-                      <p className="text-xl sm:text-2xl font-black text-gray-900 font-mono">91.45%</p>
-                      <p className="text-xs font-semibold text-gray-600">Accuracy</p>
+                      <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-mono">91.45%</p>
+                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">Accuracy</p>
                     </div>
                     <div className="p-3.5 space-y-1">
-                      <p className="text-xl sm:text-2xl font-black text-gray-900 font-mono">81.91%</p>
-                      <p className="text-xs font-semibold text-gray-600">F1-Score</p>
+                      <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-mono">81.91%</p>
+                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">F1-Score</p>
                     </div>
                   </div>
-                  <div className="px-5 py-3 bg-gray-50/50 border-t border-gray-100 flex flex-wrap gap-4 text-xs">
+                  <div className="px-5 py-3 bg-gray-50/50 dark:bg-slate-800/40 border-t border-gray-100 dark:border-slate-800 flex flex-wrap gap-4 text-xs">
                     <div>
-                      <span className="text-gray-400">Balanced Accuracy:</span>{" "}
-                      <strong className="text-gray-800 font-mono">87.89%</strong>
+                      <span className="text-gray-400 dark:text-gray-500">Balanced Accuracy:</span>{" "}
+                      <strong className="text-gray-800 dark:text-gray-200 font-mono">87.89%</strong>
                     </div>
                     <div>
-                      <span className="text-gray-400">Precision:</span>{" "}
-                      <strong className="text-gray-800 font-mono">82.76%</strong>
+                      <span className="text-gray-400 dark:text-gray-500">Precision:</span>{" "}
+                      <strong className="text-gray-800 dark:text-gray-200 font-mono">82.76%</strong>
                     </div>
                     <div>
-                      <span className="text-gray-400">Recall:</span>{" "}
-                      <strong className="text-gray-800 font-mono">81.08%</strong>
+                      <span className="text-gray-400 dark:text-gray-500">Recall:</span>{" "}
+                      <strong className="text-gray-800 dark:text-gray-200 font-mono">81.08%</strong>
                     </div>
                   </div>
                 </div>
@@ -768,68 +768,68 @@ export default function ResearchPage() {
               {/* 10. LOCALIZATION EVALUATION                          */}
               {/* ---------------------------------------------------- */}
               <section id="localization-eval" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Grid className="w-3.5 h-3.5" />
                     <span>Pixel-Level Benchmarks</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     10. Spatial Localization Evaluation
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   Pixel-level localization results evaluated on dedicated external benchmark datasets using ground-truth binary masks:
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Columbia */}
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-3">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-base font-bold text-gray-900">Columbia Splicing Dataset</h3>
-                      <span className="text-[10px] font-mono px-2 py-0.5 bg-blue-50 text-[#1a7fc4] rounded-md font-bold">
+                      <h3 className="text-base font-bold text-gray-900 dark:text-white">Columbia Splicing Dataset</h3>
+                      <span className="text-[10px] font-mono px-2 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] rounded-md font-bold">
                         180 Spliced Images
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-center py-2">
-                      <div className="p-2.5 bg-gray-50 rounded-xl">
-                        <p className="text-lg font-black text-gray-900 font-mono">94.42%</p>
-                        <p className="text-[11px] text-gray-500">Pixel Precision</p>
+                      <div className="p-2.5 bg-gray-50 dark:bg-slate-800/70 rounded-xl">
+                        <p className="text-lg font-black text-gray-900 dark:text-white font-mono">94.42%</p>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400">Pixel Precision</p>
                       </div>
-                      <div className="p-2.5 bg-gray-50 rounded-xl">
-                        <p className="text-lg font-black text-gray-900 font-mono">87.29%</p>
-                        <p className="text-[11px] text-gray-500">Pixel Recall</p>
+                      <div className="p-2.5 bg-gray-50 dark:bg-slate-800/70 rounded-xl">
+                        <p className="text-lg font-black text-gray-900 dark:text-white font-mono">87.29%</p>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400">Pixel Recall</p>
                       </div>
-                      <div className="p-2.5 bg-gray-50 rounded-xl">
-                        <p className="text-lg font-black text-gray-900 font-mono">89.53%</p>
-                        <p className="text-[11px] text-gray-500">Pixel F1-Score</p>
+                      <div className="p-2.5 bg-gray-50 dark:bg-slate-800/70 rounded-xl">
+                        <p className="text-lg font-black text-gray-900 dark:text-white font-mono">89.53%</p>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400">Pixel F1-Score</p>
                       </div>
-                      <div className="p-2.5 bg-gray-50 rounded-xl">
-                        <p className="text-lg font-black text-gray-900 font-mono">86.43%</p>
-                        <p className="text-[11px] text-gray-500">Pixel IoU</p>
+                      <div className="p-2.5 bg-gray-50 dark:bg-slate-800/70 rounded-xl">
+                        <p className="text-lg font-black text-gray-900 dark:text-white font-mono">86.43%</p>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400">Pixel IoU</p>
                       </div>
                     </div>
                   </div>
 
                   {/* COVERAGE */}
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-3">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-base font-bold text-gray-900">COVERAGE Copy-Move Dataset</h3>
-                      <span className="text-[10px] font-mono px-2 py-0.5 bg-blue-50 text-[#1a7fc4] rounded-md font-bold">
+                      <h3 className="text-base font-bold text-gray-900 dark:text-white">COVERAGE Copy-Move Dataset</h3>
+                      <span className="text-[10px] font-mono px-2 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] rounded-md font-bold">
                         100 Paired Tampered
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-center py-2">
-                      <div className="p-3 bg-gray-50 rounded-xl">
-                        <p className="text-xl font-black text-gray-900 font-mono">0.4152</p>
-                        <p className="text-xs text-gray-500">Pixel-Level F1</p>
+                      <div className="p-3 bg-gray-50 dark:bg-slate-800/70 rounded-xl">
+                        <p className="text-xl font-black text-gray-900 dark:text-white font-mono">0.4152</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Pixel-Level F1</p>
                       </div>
-                      <div className="p-3 bg-gray-50 rounded-xl">
-                        <p className="text-xl font-black text-gray-900 font-mono">0.3472</p>
-                        <p className="text-xs text-gray-500">Pixel-Level IoU</p>
+                      <div className="p-3 bg-gray-50 dark:bg-slate-800/70 rounded-xl">
+                        <p className="text-xl font-black text-gray-900 dark:text-white font-mono">0.3472</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Pixel-Level IoU</p>
                       </div>
                     </div>
-                    <p className="text-[11.5px] text-gray-500 leading-relaxed">
+                    <p className="text-[11.5px] text-gray-500 dark:text-gray-400 leading-relaxed">
                       Evaluated on challenging copy-move images featuring authentic duplicate objects with similar texture characteristics.
                     </p>
                   </div>
@@ -840,23 +840,23 @@ export default function ResearchPage() {
               {/* 11. ABLATION STUDY                                   */}
               {/* ---------------------------------------------------- */}
               <section id="ablation-study" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Table className="w-3.5 h-3.5" />
                     <span>Evidence Channel Ablation</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     11. Evidence Contribution &amp; Ablation Analysis
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   The purpose of the ablation study is <strong>to examine the contribution of individual forensic evidence channels to localization performance</strong>.
                 </p>
 
-                <div className="bg-white rounded-2xl border border-gray-200/80 p-5 sm:p-6 shadow-2xs space-y-3">
-                  <h3 className="text-sm font-bold text-gray-900">Key Finding</h3>
-                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-3">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">Key Finding</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                     Ablation experiments in the notebook confirm that fusing physical signal channels (Noise Residuals, DCT Frequency, ELA, and Local Statistics) with the deep MPC prior provides superior boundary sensitivity compared to relying on any single modality or pure RGB features alone.
                   </p>
                 </div>
@@ -866,41 +866,41 @@ export default function ResearchPage() {
               {/* 12. KNOWN LIMITATIONS                                */}
               {/* ---------------------------------------------------- */}
               <section id="limitations" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <Lock className="w-3.5 h-3.5" />
                     <span>Scientific Boundaries</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     12. Known Limitations &amp; Operational Boundaries
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2">
-                    <h3 className="text-sm font-bold text-gray-900">External-Domain Variation</h3>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">External-Domain Variation</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                       Images subject to extreme multi-round social media compression or resizing can exhibit attenuated frequency artifacts, leading to reduced sensitivity.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2">
-                    <h3 className="text-sm font-bold text-gray-900">Localization False Positives on Authentic Images</h3>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">Localization False Positives on Authentic Images</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                       Strong optical depth-of-field blur, high-ISO noise reduction, or extreme lighting contrast can induce localized variance on authentic photos.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2">
-                    <h3 className="text-sm font-bold text-gray-900">Copy-Move Global Pooling Limitations</h3>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">Copy-Move Global Pooling Limitations</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                       Copy-move manipulation (where content is cloned from within the same image) produces identical noise profiles, making it more challenging for global image classifiers than splicing.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-2">
-                    <h3 className="text-sm font-bold text-gray-900">Inconclusive Conflicting Signals</h3>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs space-y-2">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">Inconclusive Conflicting Signals</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                       When forensic evidence channels yield contradictory indicators, the system reserves the Inconclusive verdict to prevent ungrounded predictions.
                     </p>
                   </div>
@@ -911,17 +911,17 @@ export default function ResearchPage() {
               {/* 13. TECHNICAL REFERENCES (External links open new tab)*/}
               {/* ---------------------------------------------------- */}
               <section id="references" className="scroll-mt-28 space-y-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] uppercase tracking-wider mb-1">
+                <div className="border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-wider mb-1">
                     <BookOpen className="w-3.5 h-3.5" />
                     <span>Academic Literature &amp; Datasets</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                     13. Technical References &amp; External Reading
                   </h2>
                 </div>
 
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                   Published research papers, dataset repositories, and digital forensics standards that inform PIXENTRA&apos;s methodology. All external links open in a new tab:
                 </p>
 
@@ -932,29 +932,29 @@ export default function ResearchPage() {
                       href={ref.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs hover:border-[#1a7fc4] hover:shadow-md transition-all flex flex-col justify-between block"
+                      className="group bg-white dark:bg-slate-900 rounded-2xl p-5 border border-gray-200/80 dark:border-slate-800 shadow-2xs hover:border-[#1a7fc4] dark:hover:border-[#5bb8f5] hover:shadow-md transition-all flex flex-col justify-between block"
                     >
                       <div className="space-y-2">
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <span className="text-xs font-mono font-bold text-[#1a7fc4] bg-blue-50 px-2 py-0.5 rounded-md">
+                          <span className="text-xs font-mono font-bold text-[#1a7fc4] dark:text-[#5bb8f5] bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md">
                             {ref.category}
                           </span>
-                          <span className="text-[11px] font-mono text-gray-400">
+                          <span className="text-[11px] font-mono text-gray-400 dark:text-gray-500">
                             {ref.venue}
                           </span>
                         </div>
-                        <h3 className="text-sm font-bold text-gray-900 group-hover:text-[#1a7fc4] transition-colors leading-snug">
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-[#1a7fc4] dark:group-hover:text-[#5bb8f5] transition-colors leading-snug">
                           {ref.title}
                         </h3>
-                        <p className="text-xs font-medium text-gray-600">
+                        <p className="text-xs font-medium text-gray-600 dark:text-gray-300">
                           {ref.authors}
                         </p>
-                        <p className="text-xs text-gray-500 leading-relaxed">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                           {ref.description}
                         </p>
                       </div>
 
-                      <div className="pt-3 mt-2 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-[#1a7fc4]">
+                      <div className="pt-3 mt-2 border-t border-gray-100 dark:border-slate-800 flex items-center justify-between text-xs font-semibold text-[#1a7fc4] dark:text-[#5bb8f5]">
                         <span>Visit Source / Paper</span>
                         <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </div>
@@ -964,19 +964,19 @@ export default function ResearchPage() {
               </section>
 
               {/* Callout Footer Banner */}
-              <div className="p-8 bg-gradient-to-r from-blue-50/90 via-blue-50/50 to-white rounded-3xl border border-blue-100 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
+              <div className="p-8 bg-gradient-to-r from-blue-50/90 via-blue-50/50 to-white dark:from-slate-900 dark:via-blue-950/30 dark:to-slate-900 rounded-3xl border border-blue-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
                 <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-gray-900">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                     Explore PIXENTRA in action
                   </h3>
-                  <p className="text-xs sm:text-sm text-gray-500">
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     Upload an image to inspect live multi-evidence channels and localization heatmaps.
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <Link
                     href="/documentation"
-                    className="px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 text-xs sm:text-sm font-semibold hover:border-[#1a7fc4] hover:text-[#1a7fc4] transition-colors whitespace-nowrap shadow-2xs"
+                    className="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-semibold hover:border-[#1a7fc4] dark:hover:border-[#5bb8f5] hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] transition-colors whitespace-nowrap shadow-2xs"
                   >
                     User Guide
                   </Link>

@@ -89,37 +89,52 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0B0B0B;
+  --foreground: #f5f5f5;
+  --card: #121212;
+  --card-foreground: #f5f5f5;
+  --popover: #121212;
+  --popover-foreground: #f5f5f5;
+  --primary: #f5f5f5;
+  --primary-foreground: #0B0B0B;
+  --secondary: #181818;
+  --secondary-foreground: #f5f5f5;
+  --muted: #181818;
+  --muted-foreground: #a3a3a3;
+  --accent: #181818;
+  --accent-foreground: #f5f5f5;
+  --destructive: #ef4444;
+  --border: #262626;
+  --input: #262626;
+  --ring: #525252;
+  --sidebar: #0B0B0B;
+  --sidebar-foreground: #f5f5f5;
+  --sidebar-primary: #1a7fc4;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #181818;
+  --sidebar-accent-foreground: #f5f5f5;
+  --sidebar-border: #262626;
+  --sidebar-ring: #525252;
+
+  /* Neutral true dark gray overrides in Dark Mode (replaces blue/navy slate) */
+  --color-slate-950: #080808;
+  --color-slate-900: #121212;
+  --color-slate-850: #151515;
+  --color-slate-800: #181818;
+  --color-slate-700: #262626;
+  --color-slate-600: #383838;
+  --color-slate-500: #737373;
+  --color-slate-400: #a3a3a3;
+  --color-slate-300: #d4d4d4;
+  --color-slate-200: #e5e5e5;
+  --color-slate-100: #f5f5f5;
+  --color-slate-50: #fafafa;
+
+  /* Neutral dark overrides for secondary containers and icon badges */
+  --color-blue-950: #161616;
+  --color-blue-900: #262626;
+  --color-indigo-950: #161616;
+  --color-indigo-900: #262626;
 }
 
 @layer base {
@@ -237,4 +252,191 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+/* ============================================
+   Clerk Dark Mode Theme Synchronisation (Neutral Palette)
+   ============================================ */
+.dark .cl-card,
+.dark .cl-cardBox,
+.dark .cl-rootBox {
+  background-color: #121212 !important;
+  color: #f5f5f5 !important;
+  border-color: #262626 !important;
+}
+
+.dark .cl-modalBackdrop {
+  background-color: rgba(11, 11, 11, 0.85);
+  backdrop-filter: blur(4px);
+}
+
+.dark .cl-userButtonPopoverCard,
+.dark .cl-userProfile-root,
+.dark .cl-userProfile-navbar,
+.dark .cl-userProfile-content,
+.dark .cl-userButtonPopoverMain,
+.dark .cl-userButtonPopoverRoot {
+  background-color: #121212 !important;
+  color: #f5f5f5 !important;
+  border-color: #262626 !important;
+}
+
+.dark .cl-headerTitle {
+  color: #ffffff !important;
+}
+
+.dark .cl-headerSubtitle {
+  color: #a3a3a3 !important;
+}
+
+.dark .cl-socialButtonsBlockButton {
+  background-color: #181818 !important;
+  border-color: #262626 !important;
+  color: #f5f5f5 !important;
+}
+
+.dark .cl-socialButtonsBlockButton:hover {
+  background-color: #222222 !important;
+}
+
+.dark .cl-socialButtonsBlockButtonText {
+  color: #f5f5f5 !important;
+}
+
+.dark .cl-dividerLine {
+  background-color: #262626 !important;
+}
+
+.dark .cl-dividerText {
+  color: #737373 !important;
+}
+
+.dark .cl-formFieldLabel {
+  color: #d4d4d4 !important;
+}
+
+.dark .cl-formFieldInput {
+  background-color: #181818 !important;
+  border-color: #262626 !important;
+  color: #ffffff !important;
+}
+
+.dark .cl-formFieldInput::placeholder {
+  color: #737373 !important;
+}
+
+.dark .cl-formFieldInput:focus {
+  border-color: #5bb8f5 !important;
+  box-shadow: 0 0 0 2px rgba(91, 184, 245, 0.25) !important;
+}
+
+.dark .cl-footer,
+.dark .cl-footerAction,
+.dark .cl-footerPages,
+.dark .cl-footerPagesLink,
+.dark .cl-userButtonPopoverFooter,
+.dark .cl-userButtonPopoverFooterPages,
+.dark .cl-userProfile-footer,
+.dark [class*="cl-footer"],
+.dark [class*="footerAction"],
+.dark [class*="userButtonPopoverFooter"] {
+  background-color: #121212 !important;
+  background-image: none !important;
+  color: #a3a3a3 !important;
+  border-color: #262626 !important;
+}
+
+.dark .cl-card > :last-child,
+.dark .cl-cardBox > :last-child,
+.dark .cl-rootBox > :last-child,
+.dark .cl-userButtonPopoverCard > :last-child,
+.dark .cl-userButtonPopoverRoot > :last-child {
+  background-color: #121212 !important;
+  border-color: #262626 !important;
+}
+
+.dark .cl-badge,
+.dark [class*="badge"],
+.dark [class*="Badge"] {
+  background-color: #181818 !important;
+  color: #a3a3a3 !important;
+  border-color: #262626 !important;
+}
+
+.dark .cl-developmentModeBadge,
+.dark [class*="developmentMode"] {
+  background-color: #181818 !important;
+  color: #f59e0b !important;
+  border-color: #78350f !important;
+}
+
+.dark .cl-footerActionText,
+.dark [class*="footerActionText"] {
+  color: #a3a3a3 !important;
+}
+
+.dark .cl-footerActionLink,
+.dark [class*="footerActionLink"] {
+  color: #5bb8f5 !important;
+}
+
+.dark .cl-footerActionLink:hover,
+.dark [class*="footerActionLink"]:hover {
+  color: #8cd0f8 !important;
+}
+
+.dark .cl-identityPreviewText {
+  color: #f5f5f5 !important;
+}
+
+.dark .cl-identityPreviewEditButtonIcon {
+  color: #5bb8f5 !important;
+}
+
+.dark .cl-userPreviewMainIdentifier {
+  color: #ffffff !important;
+}
+
+.dark .cl-userPreviewSecondaryIdentifier {
+  color: #a3a3a3 !important;
+}
+
+.dark .cl-userButtonPopoverActionButton {
+  color: #d4d4d4 !important;
+}
+
+.dark .cl-userButtonPopoverActionButton:hover {
+  background-color: #181818 !important;
+  color: #ffffff !important;
+}
+
+.dark .cl-userButtonPopoverActionButtonIcon {
+  color: #a3a3a3 !important;
+}
+
+.dark .cl-userButtonPopoverFooter {
+  border-top: 1px solid #262626 !important;
+  background-color: #121212 !important;
+}
+
+.dark .cl-internal-b3fm6y,
+.dark .cl-footer span,
+.dark .cl-footer p,
+.dark .cl-userButtonPopoverFooter span,
+.dark .cl-userButtonPopoverFooter p,
+.dark [data-localization-key*="securedBy"],
+.dark [class*="securedBy"],
+.dark [class*="footerPagesLink"],
+.dark [class*="footer"] span,
+.dark [class*="footer"] p {
+  color: #a3a3a3 !important;
+  opacity: 1 !important;
+}
+
+.dark .cl-footer svg,
+.dark .cl-userButtonPopoverFooter svg,
+.dark [class*="footer"] svg,
+.dark [data-localization-key*="securedBy"] svg {
+  color: #d4d4d4 !important;
+  fill: #d4d4d4 !important;
 }

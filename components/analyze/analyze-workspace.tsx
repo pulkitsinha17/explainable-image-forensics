@@ -453,10 +453,10 @@ export function AnalyzeWorkspace({
       {/* Page Header (hidden when results card is active to preserve viewport height) */}
       {!forensicResult && (
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
             Analyze an Image
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 max-w-3xl">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 max-w-3xl">
             Upload an image to perform deep multi-evidence forensic analysis and uncover the truth behind its pixels.
           </p>
         </div>
@@ -492,8 +492,8 @@ export function AnalyzeWorkspace({
 
       {/* 3. Error State (upload or analysis) */}
       {anyError && errorMessage && (
-        <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200/80 rounded-xl text-xs sm:text-sm text-red-800 animate-fade-in">
-          <svg className="w-4 h-4 text-red-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-rose-950/40 border border-red-200/80 dark:border-rose-900/50 rounded-xl text-xs sm:text-sm text-red-800 dark:text-rose-300 animate-fade-in">
+          <svg className="w-4 h-4 text-red-600 dark:text-rose-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
           <div className="flex-1 space-y-2">
@@ -501,7 +501,7 @@ export function AnalyzeWorkspace({
             <button
               type="button"
               onClick={handleClearImage}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 hover:text-red-900 underline underline-offset-2"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 dark:text-rose-400 hover:text-red-900 dark:hover:text-rose-300 underline underline-offset-2"
             >
               Try again with a different image
             </button>

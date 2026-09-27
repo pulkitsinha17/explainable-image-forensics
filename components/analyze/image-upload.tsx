@@ -142,12 +142,12 @@ export function ImageUpload({
           triggerFileInput();
         }
       }}
-      className={`relative flex flex-col justify-center items-center h-full min-h-[300px] bg-white rounded-2xl border-2 border-dashed transition-all duration-200 p-6 sm:p-8 text-center group focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/40 ${
+      className={`relative flex flex-col justify-center items-center h-full min-h-[300px] bg-white dark:bg-slate-900 rounded-2xl border-2 border-dashed transition-all duration-200 p-6 sm:p-8 text-center group focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/40 ${
         isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
       } ${
         isDragging
-          ? "border-[#1a7fc4] bg-blue-50/40 shadow-md ring-4 ring-[#1a7fc4]/10"
-          : "border-[#bfdbfe]/80 hover:border-[#1a7fc4] hover:bg-blue-50/15"
+          ? "border-[#1a7fc4] dark:border-[#5bb8f5] bg-blue-50/40 dark:bg-blue-950/40 shadow-md ring-4 ring-[#1a7fc4]/10 dark:ring-[#5bb8f5]/10"
+          : "border-[#bfdbfe]/80 dark:border-slate-700 hover:border-[#1a7fc4] dark:hover:border-[#5bb8f5] hover:bg-blue-50/15 dark:hover:bg-slate-800/50"
       }`}
     >
       <input
@@ -161,18 +161,18 @@ export function ImageUpload({
 
       {/* Upload Icon & Text Prompts */}
       <div className="flex flex-col items-center justify-center pointer-events-none select-none">
-        <div className="w-14 h-14 rounded-2xl bg-[#eef6fc] text-[#1a7fc4] flex items-center justify-center mb-3.5 transition-transform group-hover:scale-105 shadow-2xs">
+        <div className="w-14 h-14 rounded-2xl bg-[#eef6fc] dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] flex items-center justify-center mb-3.5 transition-transform group-hover:scale-105 shadow-2xs">
           <Upload className="w-6 h-6 stroke-[2.2]" />
         </div>
 
-        <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">
+        <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1">
           Drag &amp; drop your image here
         </h3>
-        <p className="text-xs sm:text-sm text-gray-500 mb-4">
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-4">
           or click to browse from your device
         </p>
 
-        <p className="text-[11px] text-gray-400">
+        <p className="text-[11px] text-gray-400 dark:text-gray-500">
           Supports JPG, PNG, WebP (max 10MB)
         </p>
       </div>
@@ -181,11 +181,11 @@ export function ImageUpload({
       {selectedImage && (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="mt-5 w-full bg-white rounded-xl border border-gray-200/80 shadow-xs p-3 sm:p-3.5 flex items-center justify-between gap-3 text-left cursor-default animate-fade-in"
+          className="mt-5 w-full bg-white dark:bg-slate-800 rounded-xl border border-gray-200/80 dark:border-slate-700 shadow-xs p-3 sm:p-3.5 flex items-center justify-between gap-3 text-left cursor-default animate-fade-in"
         >
           {/* Left: Thumbnail + Metadata */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 shrink-0 shadow-2xs">
+            <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 shrink-0 shadow-2xs">
               <Image
                 src={selectedImage.previewUrl}
                 alt={selectedImage.name}
@@ -197,14 +197,14 @@ export function ImageUpload({
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <p className="text-xs sm:text-sm font-semibold text-gray-900 truncate">
+                <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white truncate">
                   {selectedImage.name}
                 </p>
                 <button
                   type="button"
                   onClick={onClearImage}
                   disabled={isDisabled}
-                  className="p-0.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors shrink-0"
+                  className="p-0.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors shrink-0"
                   title="Remove image"
                   aria-label="Remove image"
                 >
@@ -212,17 +212,17 @@ export function ImageUpload({
                 </button>
               </div>
 
-              <p className="text-[11px] sm:text-xs text-gray-500 mt-0.5 flex items-center gap-1.5 font-medium truncate">
+              <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1.5 font-medium truncate">
                 <span>{selectedImage.sizeFormatted}</span>
-                <span className="text-gray-300">•</span>
+                <span className="text-gray-300 dark:text-gray-600">•</span>
                 <span>{selectedImage.dimensions}</span>
-                <span className="text-gray-300">•</span>
+                <span className="text-gray-300 dark:text-gray-600">•</span>
                 <span className="uppercase">{selectedImage.format}</span>
               </p>
 
               {/* Hint: sample images can't be uploaded — user must pick real file */}
               {isSampleImage && (
-                <p className="flex items-center gap-1 mt-1 text-[11px] text-amber-700 font-medium truncate">
+                <p className="flex items-center gap-1 mt-1 text-[11px] text-amber-700 dark:text-amber-400 font-medium truncate">
                   <Info className="w-3 h-3 shrink-0" />
                   Select an image from your device to enable upload.
                 </p>
@@ -247,6 +247,7 @@ export function ImageUpload({
       )}
     </div>
   );
+
 
   return (
     <div className="space-y-4">
@@ -397,15 +398,15 @@ export function ImageUpload({
 
       {/* Validation Error Alert */}
       {errorMessage && (
-        <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200/80 rounded-xl text-xs sm:text-sm text-red-800 animate-fade-in">
-          <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-rose-950/40 border border-red-200/80 dark:border-rose-900/50 rounded-xl text-xs sm:text-sm text-red-800 dark:text-rose-300 animate-fade-in">
+          <AlertCircle className="w-4 h-4 text-red-600 dark:text-rose-400 shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="font-medium">{errorMessage}</p>
           </div>
           <button
             type="button"
             onClick={() => setErrorMessage(null)}
-            className="text-red-500 hover:text-red-800 p-0.5"
+            className="text-red-500 hover:text-red-800 dark:text-rose-400 dark:hover:text-rose-200 p-0.5"
             aria-label="Dismiss error"
           >
             <X className="w-4 h-4" />
@@ -415,3 +416,4 @@ export function ImageUpload({
     </div>
   );
 }
+

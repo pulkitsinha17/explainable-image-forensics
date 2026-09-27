@@ -93,14 +93,14 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       {/* Desktop Sidebar (Collapsible: 260px Expanded / 72px Collapsed) */}
       {/* ───────────────────────────────────────────────────────────── */}
       <aside
-        className={`hidden lg:flex shrink-0 border-r border-slate-200/80 bg-white flex-col sticky top-0 h-screen z-30 select-none ${
+        className={`hidden lg:flex shrink-0 border-r border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#121212] flex-col sticky top-0 h-screen z-30 select-none ${
           prefersReducedMotion ? "" : "transition-[width] duration-300 ease-in-out"
         } ${isCollapsed ? "w-[72px]" : "w-[260px]"}`}
       >
-        <div className="flex flex-col h-full bg-white">
+        <div className="flex flex-col h-full bg-white dark:bg-[#121212]">
           {/* Header & Brand Section */}
           <div
-            className={`border-b border-slate-100 flex items-center transition-all duration-300 ${
+            className={`border-b border-slate-100 dark:border-slate-800/80 flex items-center transition-all duration-300 ${
               isCollapsed ? "px-3 py-4 flex-col gap-3 justify-center" : "px-5 py-5 justify-between"
             }`}
           >
@@ -111,13 +111,21 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
               title="PIXENTRA Dashboard"
             >
               {isCollapsed ? (
-                <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-center group-hover:border-blue-200 group-hover:bg-blue-50/50 transition-colors shadow-2xs">
+                <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-center group-hover:border-blue-200 dark:group-hover:border-blue-800 group-hover:bg-blue-50/50 dark:group-hover:bg-blue-950/30 transition-colors shadow-2xs">
                   <Image
                     src="/pixentra-icon.svg"
                     alt="PIXENTRA"
                     width={26}
                     height={26}
-                    className="w-6.5 h-6.5 object-contain"
+                    className="w-6.5 h-6.5 object-contain block dark:hidden"
+                    priority
+                  />
+                  <Image
+                    src="/pixentra-icon-dark.svg"
+                    alt="PIXENTRA"
+                    width={26}
+                    height={26}
+                    className="w-6.5 h-6.5 object-contain hidden dark:block"
                     priority
                   />
                 </div>
@@ -128,10 +136,18 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
                     alt="PIXENTRA"
                     width={150}
                     height={75}
-                    className="h-10 w-auto transition-transform group-hover:scale-[1.02]"
+                    className="h-10 w-auto transition-transform group-hover:scale-[1.02] block dark:hidden"
                     priority
                   />
-                  <span className="text-[10px] font-semibold text-slate-400 tracking-wider mt-1 pl-0.5">
+                  <Image
+                    src="/pixentra-logo-dark.svg"
+                    alt="PIXENTRA"
+                    width={150}
+                    height={75}
+                    className="h-10 w-auto transition-transform group-hover:scale-[1.02] hidden dark:block"
+                    priority
+                  />
+                  <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 tracking-wider mt-1 pl-0.5">
                     See Beyond the Pixels
                   </span>
                 </div>
@@ -142,7 +158,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             <button
               type="button"
               onClick={toggleSidebar}
-              className={`rounded-lg p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#1a7fc4] ${
+              className={`rounded-lg p-2 text-slate-400 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#1a7fc4] ${
                 isCollapsed ? "mt-1" : ""
               }`}
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -170,13 +186,15 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
                       : "px-3.5 py-2.5 gap-3 text-sm font-medium"
                   } ${
                     item.active
-                      ? "bg-[#eef6fc] text-[#1a7fc4] font-semibold shadow-2xs"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                      ? "bg-[#eef6fc] dark:bg-blue-950/40 text-[#1a7fc4] dark:text-[#5bb8f5] font-semibold shadow-2xs"
+                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
                   }`}
                 >
                   <Icon
                     className={`w-4.5 h-4.5 shrink-0 transition-colors ${
-                      item.active ? "text-[#1a7fc4]" : "text-slate-500 group-hover:text-slate-800"
+                      item.active
+                        ? "text-[#1a7fc4] dark:text-[#5bb8f5]"
+                        : "text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200"
                     }`}
                   />
 
@@ -187,9 +205,9 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
                   {/* Elegant Floating Tooltip in Collapsed State */}
                   {isCollapsed && (
-                    <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-all duration-150 z-50 translate-x-[-4px] group-hover:translate-x-0">
+                    <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-slate-900 dark:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-all duration-150 z-50 translate-x-[-4px] group-hover:translate-x-0 border border-slate-700/50">
                       <span>{item.name}</span>
-                      <div className="absolute -left-1 top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900" />
+                      <div className="absolute -left-1 top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900 dark:border-r-slate-800" />
                     </div>
                   )}
                 </Link>
@@ -199,7 +217,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
           {/* Separator */}
           <div className="px-4 my-1">
-            <div className="border-t border-slate-100" />
+            <div className="border-t border-slate-100 dark:border-slate-800/80" />
           </div>
 
           {/* Secondary Navigation Items (Settings) */}
@@ -216,13 +234,15 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
                       : "px-3.5 py-2.5 gap-3 text-sm font-medium"
                   } ${
                     item.active
-                      ? "bg-[#eef6fc] text-[#1a7fc4] font-semibold shadow-2xs"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                      ? "bg-[#eef6fc] dark:bg-blue-950/40 text-[#1a7fc4] dark:text-[#5bb8f5] font-semibold shadow-2xs"
+                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
                   }`}
                 >
                   <Icon
                     className={`w-4.5 h-4.5 shrink-0 transition-colors ${
-                      item.active ? "text-[#1a7fc4]" : "text-slate-500 group-hover:text-slate-800"
+                      item.active
+                        ? "text-[#1a7fc4] dark:text-[#5bb8f5]"
+                        : "text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200"
                     }`}
                   />
 
@@ -233,9 +253,9 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
                   {/* Elegant Floating Tooltip in Collapsed State */}
                   {isCollapsed && (
-                    <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-all duration-150 z-50 translate-x-[-4px] group-hover:translate-x-0">
+                    <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-slate-900 dark:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 transition-all duration-150 z-50 translate-x-[-4px] group-hover:translate-x-0 border border-slate-700/50">
                       <span>{item.name}</span>
-                      <div className="absolute -left-1 top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900" />
+                      <div className="absolute -left-1 top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900 dark:border-r-slate-800" />
                     </div>
                   )}
                 </Link>
@@ -248,21 +268,29 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       {/* ───────────────────────────────────────────────────────────── */}
       {/* Mobile Top Header (Responsive for < 1024px)                  */}
       {/* ───────────────────────────────────────────────────────────── */}
-      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200/80 sticky top-0 z-40 shadow-2xs w-full max-w-full">
+      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-[#121212] border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-40 shadow-2xs w-full max-w-full">
         <Link href="/dashboard" className="flex items-center gap-2" aria-label="PIXENTRA Dashboard">
           <Image
             src="/pixentra-logo.svg"
             alt="PIXENTRA"
             width={140}
             height={70}
-            className="h-8 sm:h-9 w-auto object-contain"
+            className="h-8 sm:h-9 w-auto object-contain block dark:hidden"
+            priority
+          />
+          <Image
+            src="/pixentra-logo-dark.svg"
+            alt="PIXENTRA"
+            width={140}
+            height={70}
+            className="h-8 sm:h-9 w-auto object-contain hidden dark:block"
             priority
           />
         </Link>
         <button
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 transition-colors shrink-0"
+          className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
           aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={mobileOpen}
         >
@@ -276,22 +304,29 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="relative flex flex-col w-[260px] max-w-[80vw] h-full bg-white shadow-2xl z-10">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+          <div className="relative flex flex-col w-[260px] max-w-[80vw] h-full bg-white dark:bg-[#121212] shadow-2xl z-10 border-r border-slate-200/80 dark:border-slate-800">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
               <Image
                 src="/pixentra-logo.svg"
                 alt="PIXENTRA"
                 width={130}
                 height={65}
-                className="h-8.5 w-auto"
+                className="h-8.5 w-auto block dark:hidden"
+              />
+              <Image
+                src="/pixentra-logo-dark.svg"
+                alt="PIXENTRA"
+                width={130}
+                height={65}
+                className="h-8.5 w-auto hidden dark:block"
               />
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                 aria-label="Close navigation menu"
               >
                 <X className="w-4 h-4" />
@@ -308,13 +343,13 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
                     onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                       item.active
-                        ? "bg-[#eef6fc] text-[#1a7fc4] font-semibold"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                        ? "bg-[#eef6fc] dark:bg-blue-950/40 text-[#1a7fc4] dark:text-[#5bb8f5] font-semibold"
+                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
                     }`}
                   >
                     <Icon
                       className={`w-4.5 h-4.5 ${
-                        item.active ? "text-[#1a7fc4]" : "text-slate-500"
+                        item.active ? "text-[#1a7fc4] dark:text-[#5bb8f5]" : "text-slate-500 dark:text-slate-400"
                       }`}
                     />
                     <span>{item.name}</span>

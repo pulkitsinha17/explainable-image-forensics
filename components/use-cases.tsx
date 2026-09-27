@@ -32,7 +32,7 @@ export function UseCases() {
   const prefersReducedMotion = useReducedMotion()
 
   return (
-    <section id="use-cases" className="py-24 bg-gradient-to-b from-blue-50/40 to-white" aria-label="Use cases">
+    <section id="use-cases" className="py-24 bg-gradient-to-b from-blue-50/40 to-white dark:from-[#121212] dark:to-[#0B0B0B] transition-colors duration-200" aria-label="Use cases">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -43,16 +43,16 @@ export function UseCases() {
           transition={{ duration: 0.5, ease: EASE_OUT }}
         >
           <div>
-            <p className="text-xs font-semibold text-[#1a7fc4] uppercase tracking-widest mb-3">
+            <p className="text-xs font-semibold text-[#1a7fc4] dark:text-[#5bb8f5] uppercase tracking-widest mb-3">
               Built for a More Trustworthy Digital World
             </p>
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
               Trusted Across Domains
             </h2>
           </div>
           <Link
             href="/sign-up"
-            className="text-sm font-semibold text-[#1a7fc4] hover:text-[#1565a8] flex items-center gap-1 transition-colors whitespace-nowrap"
+            className="text-sm font-semibold text-[#1a7fc4] dark:text-[#5bb8f5] hover:text-[#1565a8] dark:hover:text-[#88ccfa] flex items-center gap-1 transition-colors whitespace-nowrap"
           >
             Explore Use Cases →
           </Link>
@@ -80,10 +80,10 @@ export function UseCases() {
                     }
               }
               transition={SPRING_GENTLE}
-              className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm cursor-default overflow-hidden"
+              className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-gray-100 dark:border-slate-800 shadow-xs cursor-default overflow-hidden transition-colors duration-200"
             >
               {/* Image with subtle zoom on card hover */}
-              <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden mb-5 bg-gray-50">
+              <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden mb-5 bg-gray-50 dark:bg-slate-800">
                 <motion.div
                   className="absolute inset-0"
                   whileHover={prefersReducedMotion ? {} : { scale: 1.04 }}
@@ -98,8 +98,8 @@ export function UseCases() {
                   />
                 </motion.div>
               </div>
-              <h3 className="text-base font-bold text-gray-900 mb-2">{uc.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{uc.description}</p>
+              <h3 className="text-base font-bold text-gray-900 dark:text-white mb-2">{uc.title}</h3>
+              <p className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed">{uc.description}</p>
             </motion.div>
           ))}
         </motion.div>

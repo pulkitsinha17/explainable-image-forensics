@@ -20,75 +20,75 @@ export default function PrivacyPolicyPage() {
   const lastUpdated = "September 21, 2026";
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-[#0B0B0B] text-gray-900 dark:text-gray-100 flex flex-col">
       <Navbar />
 
       <main className="flex-1 pt-24 pb-20">
         {/* Hero Section */}
-        <section className="relative py-14 bg-gradient-to-b from-blue-50/60 via-white to-white border-b border-gray-100">
+        <section className="relative py-14 bg-gradient-to-b from-blue-50/60 via-white to-white dark:from-white/[0.02] dark:via-[#0B0B0B] dark:to-[#0B0B0B] border-b border-gray-100 dark:border-slate-800">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50 border border-blue-100 rounded-full mb-5">
-              <Shield className="w-3.5 h-3.5 text-[#1a7fc4]" />
-              <span className="text-xs font-semibold text-[#1a7fc4] tracking-wide uppercase">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/50 rounded-full mb-5">
+              <Shield className="w-3.5 h-3.5 text-[#1a7fc4] dark:text-[#5bb8f5]" />
+              <span className="text-xs font-semibold text-[#1a7fc4] dark:text-[#5bb8f5] tracking-wide uppercase">
                 Legal & Data Protection
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white tracking-tight mb-4">
               Privacy Policy
             </h1>
 
-            <p className="text-sm font-medium text-gray-500 mb-6">
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-6">
               Last updated: {lastUpdated}
             </p>
 
-            <div className="p-5 sm:p-6 bg-white rounded-2xl border border-blue-100 shadow-sm leading-relaxed text-gray-600 text-sm sm:text-base">
+            <div className="p-5 sm:p-6 bg-white dark:bg-slate-900 rounded-2xl border border-blue-100 dark:border-slate-800 shadow-sm leading-relaxed text-gray-600 dark:text-gray-300 text-sm sm:text-base">
               <p>
-                At <span className="font-semibold text-gray-900">PIXENTRA</span>, we respect your privacy and are committed to protecting your personal information and uploaded media. This Privacy Policy outlines how we collect, use, store, process, and safeguard your data when you interact with our website, cloud platform, and AI-assisted image forensics services.
+                At <span className="font-semibold text-gray-900 dark:text-white">PIXENTRA</span>, we respect your privacy and are committed to protecting your personal information and uploaded media. This Privacy Policy outlines how we collect, use, store, process, and safeguard your data when you interact with our website, cloud platform, and AI-assisted image forensics services.
               </p>
             </div>
           </div>
         </section>
 
         {/* Policy Content */}
-        <section className="py-12 bg-white">
+        <section className="py-12 bg-white dark:bg-[#0B0B0B]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="space-y-12">
               {/* Section 1 */}
               <div id="information-we-collect" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     1
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     Information We Collect
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
                   <p>
                     We collect only information necessary to deliver, maintain, secure, and enhance PIXENTRA&apos;s digital image forensics capabilities. The categories of data collected include:
                   </p>
-                  <ul className="list-disc pl-5 space-y-2 text-gray-600">
+                  <ul className="list-disc pl-5 space-y-2 text-gray-600 dark:text-gray-300">
                     <li>
-                      <strong className="text-gray-800">Account Information:</strong> When you register an account or sign in, we collect your name, email address, authentication credentials, and user profile information provided through our authentication service (Clerk).
+                      <strong className="text-gray-800 dark:text-gray-200">Account Information:</strong> When you register an account or sign in, we collect your name, email address, authentication credentials, and user profile information provided through our authentication service (Clerk).
                     </li>
                     <li>
-                      <strong className="text-gray-800">Uploaded Images for Forensic Analysis:</strong> Images you upload directly to the platform for forensic examination, tampering detection, and localization.
+                      <strong className="text-gray-800 dark:text-gray-200">Uploaded Images for Forensic Analysis:</strong> Images you upload directly to the platform for forensic examination, tampering detection, and localization.
                     </li>
                     <li>
-                      <strong className="text-gray-800">Forensic Analysis Results & Reports:</strong> Analytical artifacts generated during analysis sessions, including spatial localization heatmaps, confidence scores, multi-stream forensic metrics (noise, frequency, compression artifacts, metadata), explanations, and exported PDF reports.
+                      <strong className="text-gray-800 dark:text-gray-200">Forensic Analysis Results & Reports:</strong> Analytical artifacts generated during analysis sessions, including spatial localization heatmaps, confidence scores, multi-stream forensic metrics (noise, frequency, compression artifacts, metadata), explanations, and exported PDF reports.
                     </li>
                     <li>
-                      <strong className="text-gray-800">Usage & Subscription Data:</strong> Details regarding your service tier, number of analyses conducted, feature usage, and plan quotas.
+                      <strong className="text-gray-800 dark:text-gray-200">Usage & Subscription Data:</strong> Details regarding your service tier, number of analyses conducted, feature usage, and plan quotas.
                     </li>
                     <li>
-                      <strong className="text-gray-800">Technical & Device Information:</strong> Technical logs such as your Internet Protocol (IP) address, browser type and version, operating system, timestamp of requests, referring URLs, and diagnostic error logs.
+                      <strong className="text-gray-800 dark:text-gray-200">Technical & Device Information:</strong> Technical logs such as your Internet Protocol (IP) address, browser type and version, operating system, timestamp of requests, referring URLs, and diagnostic error logs.
                     </li>
                     <li>
-                      <strong className="text-gray-800">Cookies & Local Storage:</strong> Essential session cookies and browser storage tokens required for secure authentication, session management, and interface preferences.
+                      <strong className="text-gray-800 dark:text-gray-200">Cookies & Local Storage:</strong> Essential session cookies and browser storage tokens required for secure authentication, session management, and interface preferences.
                     </li>
                   </ul>
-                  <p className="text-xs text-gray-500 italic">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 italic">
                     Note: PIXENTRA does not collect unnecessary personal data or sensitive biometric identifiers beyond what is strictly required to execute image forensic operations.
                   </p>
                 </div>
@@ -97,18 +97,18 @@ export default function PrivacyPolicyPage() {
               {/* Section 2 */}
               <div id="how-we-use-information" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     2
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     How We Use Information
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
                   <p>
                     We process collected data for legitimate operational and technological purposes, including:
                   </p>
-                  <ul className="list-disc pl-5 space-y-2 text-gray-600">
+                  <ul className="list-disc pl-5 space-y-2 text-gray-600 dark:text-gray-300">
                     <li>
                       <strong>Platform Operation:</strong> Powering and executing image-forensics analysis, generating heatmaps, evaluating multi-evidence streams, and delivering explainable summaries.
                     </li>
@@ -134,17 +134,17 @@ export default function PrivacyPolicyPage() {
               {/* Section 3 */}
               <div id="image-and-analysis-data" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     3
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     Image and Analysis Data
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
-                  <div className="p-5 bg-blue-50/40 rounded-2xl border border-blue-100 text-gray-700">
-                    <p className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                      <Eye className="w-4 h-4 text-[#1a7fc4]" />
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                  <div className="p-5 bg-blue-50/40 dark:bg-blue-950/30 rounded-2xl border border-blue-100 dark:border-blue-900/50 text-gray-700 dark:text-gray-300">
+                    <p className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                       Forensic Processing & Data Handling
                     </p>
                     <p className="text-sm">
@@ -163,32 +163,32 @@ export default function PrivacyPolicyPage() {
               {/* Section 4 */}
               <div id="how-we-share-information" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     4
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     How We Share Information
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
                   <p>
                     PIXENTRA does not sell, rent, or trade your personal information or uploaded images to third parties for marketing or advertising purposes. We may disclose information only under the following limited circumstances:
                   </p>
-                  <ul className="list-disc pl-5 space-y-2 text-gray-600">
+                  <ul className="list-disc pl-5 space-y-2 text-gray-600 dark:text-gray-300">
                     <li>
-                      <strong className="text-gray-800">Essential Infrastructure Providers:</strong> With trusted cloud hosting, database, object storage (e.g. Supabase, AWS/GCP, or local server infrastructure), and technical compute providers that host and process our application services.
+                      <strong className="text-gray-800 dark:text-gray-200">Essential Infrastructure Providers:</strong> With trusted cloud hosting, database, object storage (e.g. Supabase, AWS/GCP, or local server infrastructure), and technical compute providers that host and process our application services.
                     </li>
                     <li>
-                      <strong className="text-gray-800">Authentication Services:</strong> With identity providers (Clerk) to securely manage user authentication and session security.
+                      <strong className="text-gray-800 dark:text-gray-200">Authentication Services:</strong> With identity providers (Clerk) to securely manage user authentication and session security.
                     </li>
                     <li>
-                      <strong className="text-gray-800">Payment Processors:</strong> With secure third-party payment gateways (e.g., Razorpay or Stripe).
+                      <strong className="text-gray-800 dark:text-gray-200">Payment Processors:</strong> With secure third-party payment gateways (e.g., Razorpay or Stripe).
                     </li>
                     <li>
-                      <strong className="text-gray-800">Legal Compliance:</strong> When disclosure is required by law, regulation, subpoena, or enforceable governmental order to protect against fraudulent, abusive, or unlawful activities.
+                      <strong className="text-gray-800 dark:text-gray-200">Legal Compliance:</strong> When disclosure is required by law, regulation, subpoena, or enforceable governmental order to protect against fraudulent, abusive, or unlawful activities.
                     </li>
                     <li>
-                      <strong className="text-gray-800">Corporate Transactions:</strong> In the event of a merger, acquisition, corporate reorganization, or sale of assets, subject to confidentiality commitments.
+                      <strong className="text-gray-800 dark:text-gray-200">Corporate Transactions:</strong> In the event of a merger, acquisition, corporate reorganization, or sale of assets, subject to confidentiality commitments.
                     </li>
                   </ul>
                 </div>
@@ -197,33 +197,33 @@ export default function PrivacyPolicyPage() {
               {/* Section 5 */}
               <div id="data-storage-and-security" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     5
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     Data Storage and Security
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
                   <p>
                     We implement standard technical and organizational measures designed to protect your information against unauthorized access, loss, misuse, or alteration:
                   </p>
                   <div className="grid sm:grid-cols-2 gap-4 my-3">
-                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                      <div className="flex items-center gap-2 font-semibold text-gray-900 text-sm mb-1">
-                        <Lock className="w-4 h-4 text-[#1a7fc4]" />
+                    <div className="p-4 bg-gray-50 dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
+                      <div className="flex items-center gap-2 font-semibold text-gray-900 dark:text-white text-sm mb-1">
+                        <Lock className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                         Encryption in Transit
                       </div>
-                      <p className="text-xs text-gray-500 leading-relaxed">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                         All communication between your browser and our servers is secured via modern TLS / HTTPS encryption.
                       </p>
                     </div>
-                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                      <div className="flex items-center gap-2 font-semibold text-gray-900 text-sm mb-1">
-                        <Database className="w-4 h-4 text-[#1a7fc4]" />
+                    <div className="p-4 bg-gray-50 dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
+                      <div className="flex items-center gap-2 font-semibold text-gray-900 dark:text-white text-sm mb-1">
+                        <Database className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                         Access Controls
                       </div>
-                      <p className="text-xs text-gray-500 leading-relaxed">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                         Data access is restricted through authenticated tokens and scoped permissions for authorized accounts only.
                       </p>
                     </div>
@@ -237,14 +237,14 @@ export default function PrivacyPolicyPage() {
               {/* Section 6 */}
               <div id="data-retention" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     6
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     Data Retention
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
                   <p>
                     We retain personal data and analysis records for as long as your account remains active and as necessary to fulfill the services requested, resolve disputes, maintain audit logs, and comply with applicable statutory or legal obligations.
                   </p>
@@ -257,18 +257,18 @@ export default function PrivacyPolicyPage() {
               {/* Section 7 */}
               <div id="cookies-and-tracking" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     7
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     Cookies and Tracking Technologies
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
                   <p>
                     PIXENTRA uses essential cookies and browser storage technologies primarily to:
                   </p>
-                  <ul className="list-disc pl-5 space-y-2 text-gray-600">
+                  <ul className="list-disc pl-5 space-y-2 text-gray-600 dark:text-gray-300">
                     <li>Authenticate user sessions and maintain secure logins across page visits.</li>
                     <li>Remember user interface settings, filters, and display preferences.</li>
                     <li>Protect against cross-site request forgery and other security threats.</li>
@@ -283,14 +283,14 @@ export default function PrivacyPolicyPage() {
               {/* Section 8 */}
               <div id="third-party-services" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     8
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     Third-Party Services
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
                   <p>
                     Our platform may integrate with or link to third-party services for specific features such as identity management, payment handling, and cloud storage. These third-party services operate independently and have their own distinct privacy policies governing how they handle data. We encourage users to review the privacy policies of any third-party services they interact with.
                   </p>
@@ -300,36 +300,36 @@ export default function PrivacyPolicyPage() {
               {/* Section 9 */}
               <div id="user-rights-and-choices" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     9
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     User Rights and Choices
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
                   <p>
                     Depending on your jurisdiction and applicable data protection legislation, you may have specific rights regarding your personal information, such as:
                   </p>
-                  <ul className="list-disc pl-5 space-y-2 text-gray-600">
+                  <ul className="list-disc pl-5 space-y-2 text-gray-600 dark:text-gray-300">
                     <li>
-                      <strong className="text-gray-800">Right to Access:</strong> Request a copy of the personal data we hold about you and review your forensic analysis history.
+                      <strong className="text-gray-800 dark:text-gray-200">Right to Access:</strong> Request a copy of the personal data we hold about you and review your forensic analysis history.
                     </li>
                     <li>
-                      <strong className="text-gray-800">Right to Rectification:</strong> Update or correct inaccurate account details directly from your settings page.
+                      <strong className="text-gray-800 dark:text-gray-200">Right to Rectification:</strong> Update or correct inaccurate account details directly from your settings page.
                     </li>
                     <li>
-                      <strong className="text-gray-800">Right to Deletion:</strong> Request the erasure of your account and associated analysis history where applicable.
+                      <strong className="text-gray-800 dark:text-gray-200">Right to Deletion:</strong> Request the erasure of your account and associated analysis history where applicable.
                     </li>
                     <li>
-                      <strong className="text-gray-800">Right to Withdraw Consent:</strong> Withdraw consent for non-essential processing activities where consent was the legal basis.
+                      <strong className="text-gray-800 dark:text-gray-200">Right to Withdraw Consent:</strong> Withdraw consent for non-essential processing activities where consent was the legal basis.
                     </li>
                   </ul>
                   <p>
                     To exercise any applicable rights, you may contact our team at{" "}
                     <a
                       href="mailto:privacy@pixentra.example"
-                      className="text-[#1a7fc4] font-medium hover:underline"
+                      className="text-[#1a7fc4] dark:text-[#5bb8f5] font-medium hover:underline"
                     >
                       privacy@pixentra.example
                     </a>
@@ -341,14 +341,14 @@ export default function PrivacyPolicyPage() {
               {/* Section 10 */}
               <div id="childrens-privacy" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     10
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     Children&apos;s Privacy
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
                   <p>
                     PIXENTRA is designed for professional, research, journalistic, academic, and general adult use. The platform is not directed to children under the age of 16 (or applicable legal age in your jurisdiction). We do not knowingly collect personal data from minors. If you believe that a minor has provided us with personal information without parental consent, please contact us immediately so we can remove the data.
                   </p>
@@ -358,14 +358,14 @@ export default function PrivacyPolicyPage() {
               {/* Section 11 */}
               <div id="international-transfers" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     11
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     International Data Transfers
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
                   <p>
                     Because PIXENTRA utilizes global cloud hosting, computing, and distribution services, your information and uploaded images may be transferred to, stored, and processed in jurisdictions other than your home country. By using the platform, you acknowledge and agree that your data may be transferred to facilities located in other regions where data protection regulations may differ from those in your jurisdiction.
                   </p>
@@ -375,14 +375,14 @@ export default function PrivacyPolicyPage() {
               {/* Section 12 */}
               <div id="changes-to-policy" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     12
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     Changes to This Privacy Policy
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
                   <p>
                     We may periodically update this Privacy Policy to reflect advancements in our technology, modifications to our forensic algorithms, operational changes, or new regulatory obligations. When changes occur, we will update the &ldquo;Last updated&rdquo; date at the top of this page. We encourage you to review this policy periodically to stay informed about how we protect your information.
                   </p>
@@ -392,33 +392,33 @@ export default function PrivacyPolicyPage() {
               {/* Section 13 */}
               <div id="contact-us" className="scroll-mt-28">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] font-bold text-sm flex items-center justify-center border border-blue-100">
+                  <span className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-sm flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                     13
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     Contact Us
                   </h2>
                 </div>
-                <div className="text-gray-600 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
+                <div className="text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed text-sm sm:text-base pl-11">
                   <p>
                     If you have questions, comments, or requests regarding this Privacy Policy or our data handling practices, please contact our team:
                   </p>
-                  <div className="p-6 bg-gray-50 rounded-2xl border border-gray-200">
-                    <p className="font-semibold text-gray-900 mb-2">PIXENTRA Data & Privacy Team</p>
-                    <p className="text-sm text-gray-600 mb-1">
+                  <div className="p-6 bg-gray-50 dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800">
+                    <p className="font-semibold text-gray-900 dark:text-white mb-2">PIXENTRA Data & Privacy Team</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
                       Email:{" "}
                       <a
                         href="mailto:privacy@pixentra.example"
-                        className="text-[#1a7fc4] font-medium hover:underline"
+                        className="text-[#1a7fc4] dark:text-[#5bb8f5] font-medium hover:underline"
                       >
                         privacy@pixentra.example
                       </a>
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                       General Support:{" "}
                       <a
                         href="mailto:support@pixentra.example"
-                        className="text-[#1a7fc4] font-medium hover:underline"
+                        className="text-[#1a7fc4] dark:text-[#5bb8f5] font-medium hover:underline"
                       >
                         support@pixentra.example
                       </a>
@@ -429,12 +429,12 @@ export default function PrivacyPolicyPage() {
             </div>
 
             {/* Quick Links Card */}
-            <div className="mt-16 p-8 bg-gradient-to-r from-blue-50/70 via-blue-50/40 to-white rounded-3xl border border-blue-100 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="mt-16 p-8 bg-gradient-to-r from-blue-50/70 via-blue-50/40 to-white dark:from-slate-900 dark:via-blue-950/30 dark:to-slate-900 rounded-3xl border border-blue-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-6">
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
                   Looking for our Terms of Service?
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Read the conditions governing use of PIXENTRA&apos;s image forensic platform and analytical reports.
                 </p>
               </div>

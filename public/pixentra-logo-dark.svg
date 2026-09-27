@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
+  <!-- Pixel scatter dots top-left of P -->
+  <rect x="32" y="18" width="8" height="8" fill="#f8fafc"/>
+  <rect x="24" y="28" width="8" height="8" fill="#f8fafc"/>
+  <rect x="36" y="32" width="6" height="6" fill="#5bb8f5"/>
+  <rect x="18" y="40" width="6" height="6" fill="#f8fafc"/>
+  <rect x="28" y="44" width="5" height="5" fill="#5bb8f5"/>
+  <rect x="22" y="54" width="4" height="4" fill="#f8fafc"/>
+  <rect x="34" y="50" width="4" height="4" fill="#5bb8f5"/>
+  <rect x="16" y="58" width="4" height="4" fill="#5bb8f5"/>
+
+  <!-- P letter vertical stem -->
+  <rect x="48" y="20" width="14" height="80" fill="#f8fafc"/>
+
+  <!-- P letter top horizontal -->
+  <rect x="48" y="20" width="40" height="14" fill="#f8fafc"/>
+
+  <!-- P letter middle horizontal -->
+  <rect x="48" y="60" width="38" height="14" fill="#f8fafc"/>
+
+  <!-- P letter right side arc top -->
+  <rect x="88" y="20" width="14" height="18" rx="0" fill="#f8fafc"/>
+
+  <!-- Eye circle in the P -->
+  <circle cx="90" cy="53" r="18" fill="#5bb8f5"/>
+  <circle cx="90" cy="53" r="10" fill="#0B0B0B"/>
+  <circle cx="90" cy="53" r="6" fill="#f8fafc"/>
+  <circle cx="93" cy="50" r="2" fill="#5bb8f5"/>
+  <!-- Eye shine ring -->
+  <circle cx="90" cy="53" r="18" fill="none" stroke="#5bb8f5" stroke-width="2" opacity="0.6"/>
+  <circle cx="90" cy="53" r="22" fill="none" stroke="#5bb8f5" stroke-width="1" opacity="0.3"/>
+
+  <!-- PIXENTRA wordmark -->
+  <!-- P -->
+  <text x="40" y="135" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="38" letter-spacing="3" fill="#f8fafc">PIXENTRA</text>
+
+  <!-- Blue horizontal lines in PIXENTRA text (accent) - simulating the logo's blue line accents under EN -->
+  <rect x="109" y="138" width="38" height="4" fill="#5bb8f5"/>
+  <rect x="109" y="130" width="38" height="3" fill="#5bb8f5" opacity="0.7"/>
+
+  <!-- Blue triangle accent under A at end -->
+  <polygon points="284,143 292,143 288,135" fill="#5bb8f5"/>
+
+  <!-- SEE BEYOND THE PIXELS tagline -->
+  <text x="112" y="160" font-family="Arial, sans-serif" font-weight="400" font-size="10" letter-spacing="4" fill="#94a3b8">SEE BEYOND THE PIXELS</text>
+</svg>

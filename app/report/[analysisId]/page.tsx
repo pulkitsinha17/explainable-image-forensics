@@ -33,7 +33,7 @@ export default async function ViewReportPage({
   const userImageUrl = user?.imageUrl;
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-gray-900 flex flex-col lg:flex-row antialiased">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0B0B0B] text-gray-900 dark:text-gray-100 flex flex-col lg:flex-row antialiased">
       {/* Desktop & Mobile Responsive Sidebar */}
       <DashboardSidebar
         user={{
@@ -46,7 +46,7 @@ export default async function ViewReportPage({
       {/* Main Content Area */}
       <div className="flex-1 min-w-0 flex flex-col">
         <main className="flex-1 p-4 sm:p-6 lg:p-7 max-w-7xl w-full mx-auto animate-fade-in">
-          <Suspense fallback={<div className="p-8 text-center text-gray-500 text-sm">Loading forensic report...</div>}>
+          <Suspense fallback={<div className="p-8 text-center text-gray-500 dark:text-slate-400 text-sm">Loading forensic report...</div>}>
             <ReportViewer analysisId={analysisId} />
           </Suspense>
         </main>

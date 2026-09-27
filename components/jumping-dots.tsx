@@ -22,7 +22,7 @@ const jumpDistances = {
 
 export function JumpingDots({
   size = 'md',
-  color = '#1565a8',
+  color,
   className = '',
 }: JumpingDotsProps) {
   const prefersReducedMotion = useReducedMotion()
@@ -38,8 +38,10 @@ export function JumpingDots({
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}
-          className={`${dotClass} rounded-full shadow-xs`}
-          style={{ backgroundColor: color }}
+          className={`${dotClass} rounded-full shadow-xs ${
+            color ? '' : 'bg-[#1565a8] dark:bg-[#5bb8f5]'
+          }`}
+          style={color ? { backgroundColor: color } : undefined}
           animate={
             prefersReducedMotion
               ? {

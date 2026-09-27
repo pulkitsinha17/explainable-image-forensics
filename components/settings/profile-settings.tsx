@@ -53,9 +53,9 @@ export function ProfileSettings() {
 
   if (!isLoaded || !user) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-xs flex items-center justify-center min-h-[320px]">
-        <div className="flex flex-col items-center gap-3 text-gray-500">
-          <Loader2 className="w-6 h-6 animate-spin text-[#1a7fc4]" />
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-8 shadow-xs flex items-center justify-center min-h-[320px]">
+        <div className="flex flex-col items-center gap-3 text-gray-500 dark:text-gray-400">
+          <Loader2 className="w-6 h-6 animate-spin text-[#1a7fc4] dark:text-[#5bb8f5]" />
           <span className="text-xs font-semibold tracking-wide">Loading profile information...</span>
         </div>
       </div>
@@ -192,10 +192,10 @@ export function ProfileSettings() {
       {/* 1. Main Profile Card */}
       <motion.div
         variants={fadeUpItem}
-        className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-6 transition-all"
+        className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-6 transition-all"
       >
         {/* Avatar & Header Info */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 pb-6 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 pb-6 border-b border-gray-100 dark:border-slate-800">
           <div className="flex items-center gap-5">
             {/* Avatar with Change Overlay */}
             <div className="relative group shrink-0">
@@ -207,15 +207,15 @@ export function ProfileSettings() {
                     width={80}
                     height={80}
                     unoptimized
-                    className="w-20 h-20 rounded-full object-cover ring-2 ring-gray-100 shadow-xs transition-transform duration-300 group-hover:scale-[1.02]"
+                    className="w-20 h-20 rounded-full object-cover ring-2 ring-gray-100 dark:ring-slate-700 shadow-xs transition-transform duration-300 group-hover:scale-[1.02]"
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-2xl ring-2 ring-gray-100 shadow-xs transition-transform duration-300 group-hover:scale-[1.02]">
+                  <div className="w-20 h-20 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-2xl ring-2 ring-gray-100 dark:ring-slate-700 shadow-xs transition-transform duration-300 group-hover:scale-[1.02]">
                     {firstLetter}
                   </div>
                 )}
                 {/* Active indicator dot */}
-                <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-white" />
+                <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
               </div>
 
               {/* Camera Hover Button */}
@@ -240,18 +240,18 @@ export function ProfileSettings() {
             {/* Display Info */}
             <div className="space-y-1 min-w-0">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <h2 className="text-xl font-bold text-gray-900 tracking-tight">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
                   {displayName}
                 </h2>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70 shadow-2xs">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800/50 shadow-2xs">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                   Active Account
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-gray-500 truncate">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
                 {primaryEmail}
               </p>
-              <p className="text-[11px] text-gray-400">
+              <p className="text-[11px] text-gray-400 dark:text-gray-500">
                 Member since {formattedCreated}
               </p>
             </div>
@@ -266,12 +266,12 @@ export function ProfileSettings() {
               transition={SPRING_PRESS}
               onClick={() => fileInputRef.current?.click()}
               disabled={avatarUploading}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-semibold transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-750 text-gray-700 dark:text-gray-200 text-xs font-semibold transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
             >
               {avatarUploading ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#1a7fc4]" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#1a7fc4] dark:text-[#5bb8f5]" />
               ) : (
-                <Camera className="w-3.5 h-3.5 text-gray-500" />
+                <Camera className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
               )}
               <span>{avatarUploading ? "Uploading..." : "Change Avatar"}</span>
             </motion.button>
@@ -283,9 +283,9 @@ export function ProfileSettings() {
               transition={SPRING_PRESS}
               onClick={handleRemoveAvatar}
               disabled={avatarUploading}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-rose-200 bg-rose-50/60 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-rose-200 dark:border-rose-800/60 bg-rose-50/60 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 text-xs font-semibold transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
             >
-              <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+              <Trash2 className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
               <span>Remove Avatar</span>
             </motion.button>
 
@@ -313,14 +313,14 @@ export function ProfileSettings() {
               transition={{ duration: 0.25, ease: EASE_OUT }}
               className={`p-3.5 rounded-xl text-xs flex items-center gap-2 overflow-hidden ${
                 avatarMessage.type === "success"
-                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                  : "bg-rose-50 text-rose-800 border border-rose-200"
+                  ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
+                  : "bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60"
               }`}
             >
               {avatarMessage.type === "success" ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               ) : (
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
               )}
               <span>{avatarMessage.text}</span>
             </motion.div>
@@ -329,42 +329,42 @@ export function ProfileSettings() {
 
         {/* Vertical Profile Attribute List */}
         <div className="space-y-3">
-          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors">
-            <div className="flex items-center gap-2.5 text-xs font-semibold text-gray-500">
-              <User className="w-4 h-4 text-[#1a7fc4]" />
+          <div className="p-4 rounded-xl bg-gray-50/80 dark:bg-slate-800/60 border border-gray-100/90 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+            <div className="flex items-center gap-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400">
+              <User className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
               <span>Full Name</span>
             </div>
-            <span className="text-sm font-bold text-gray-900">
+            <span className="text-sm font-bold text-gray-900 dark:text-white">
               {displayName}
             </span>
           </div>
 
-          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors">
-            <div className="flex items-center gap-2.5 text-xs font-semibold text-gray-500">
-              <Mail className="w-4 h-4 text-[#1a7fc4]" />
+          <div className="p-4 rounded-xl bg-gray-50/80 dark:bg-slate-800/60 border border-gray-100/90 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+            <div className="flex items-center gap-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400">
+              <Mail className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
               <span>Primary Email</span>
             </div>
-            <span className="text-sm font-semibold text-gray-900 truncate">
+            <span className="text-sm font-semibold text-gray-900 dark:text-white truncate">
               {primaryEmail}
             </span>
           </div>
 
-          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors">
-            <div className="flex items-center gap-2.5 text-xs font-semibold text-gray-500">
-              <KeyRound className="w-4 h-4 text-[#1a7fc4]" />
+          <div className="p-4 rounded-xl bg-gray-50/80 dark:bg-slate-800/60 border border-gray-100/90 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+            <div className="flex items-center gap-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400">
+              <KeyRound className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
               <span>User ID</span>
             </div>
-            <span className="text-xs font-mono font-medium text-gray-700 truncate">
+            <span className="text-xs font-mono font-medium text-gray-700 dark:text-gray-300 truncate">
               {user.id}
             </span>
           </div>
 
-          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors">
-            <div className="flex items-center gap-2.5 text-xs font-semibold text-gray-500">
-              <Calendar className="w-4 h-4 text-[#1a7fc4]" />
+          <div className="p-4 rounded-xl bg-gray-50/80 dark:bg-slate-800/60 border border-gray-100/90 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+            <div className="flex items-center gap-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400">
+              <Calendar className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
               <span>Account Created</span>
             </div>
-            <span className="text-xs font-semibold text-gray-800">
+            <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
               {formattedCreated}
             </span>
           </div>
@@ -374,23 +374,23 @@ export function ProfileSettings() {
       {/* 2. Account Actions */}
       <motion.div
         variants={fadeUpItem}
-        className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-4"
+        className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-4"
       >
         <div>
-          <h3 className="text-base font-bold text-gray-900">
+          <h3 className="text-base font-bold text-gray-900 dark:text-white">
             Account Session Actions
           </h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             Sign out of your active session on this device or terminate all active sign-ins across all browsers.
           </p>
         </div>
 
         <div className="space-y-3 pt-2">
           {/* Sign Out This Device */}
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
+          <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/60 border border-gray-100/90 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
             <div>
-              <p className="text-xs font-bold text-gray-900">Sign Out of PIXENTRA</p>
-              <p className="text-[11px] text-gray-500 mt-0.5">
+              <p className="text-xs font-bold text-gray-900 dark:text-white">Sign Out of PIXENTRA</p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
                 End your current session on this browser.
               </p>
             </div>
@@ -400,7 +400,7 @@ export function ProfileSettings() {
               whileTap={{ scale: 0.98 }}
               transition={SPRING_PRESS}
               onClick={() => setShowSignOutConfirm(true)}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-100 text-gray-700 text-xs font-semibold transition-colors shadow-2xs cursor-pointer self-start sm:self-auto"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 text-xs font-semibold transition-colors shadow-2xs cursor-pointer self-start sm:self-auto"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>
@@ -408,10 +408,10 @@ export function ProfileSettings() {
           </div>
 
           {/* Sign Out All Sessions */}
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
+          <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/60 border border-gray-100/90 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
             <div>
-              <p className="text-xs font-bold text-gray-900">Sign Out of All Sessions</p>
-              <p className="text-[11px] text-gray-500 mt-0.5">
+              <p className="text-xs font-bold text-gray-900 dark:text-white">Sign Out of All Sessions</p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
                 Revoke all active logins and require re-authentication on every device.
               </p>
             </div>
@@ -421,9 +421,9 @@ export function ProfileSettings() {
               whileTap={{ scale: 0.98 }}
               transition={SPRING_PRESS}
               onClick={() => setShowSignOutAllConfirm(true)}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-amber-200 bg-amber-50/60 hover:bg-amber-100 text-amber-800 text-xs font-semibold transition-colors shadow-2xs cursor-pointer self-start sm:self-auto"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-amber-200 dark:border-amber-800/60 bg-amber-50/60 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-semibold transition-colors shadow-2xs cursor-pointer self-start sm:self-auto"
             >
-              <ShieldAlert className="w-3.5 h-3.5 text-amber-700" />
+              <ShieldAlert className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
               <span>Sign Out All Sessions</span>
             </motion.button>
           </div>
@@ -446,52 +446,52 @@ export function ProfileSettings() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 10 }}
               transition={SPRING_PANEL}
-              className="relative z-10 bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-md w-full p-6 space-y-4"
+              className="relative z-10 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-2xl max-w-md w-full p-6 space-y-4"
             >
-              <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+              <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] flex items-center justify-center">
                     <Sparkles className="w-4 h-4" />
                   </div>
-                  <h3 className="text-base font-bold text-gray-900">Edit Profile Name</h3>
+                  <h3 className="text-base font-bold text-gray-900 dark:text-white">Edit Profile Name</h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsEditingName(false)}
-                  className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                  className="p-1 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {nameError && (
-                <div className="p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
                   <span>{nameError}</span>
                 </div>
               )}
 
               <form onSubmit={handleSaveName} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-700 block">First Name</label>
+                  <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block">First Name</label>
                   <input
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="First name"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
                     required
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-700 block">Last Name</label>
+                  <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block">Last Name</label>
                   <input
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Last name"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
                   />
                 </div>
 
@@ -500,7 +500,7 @@ export function ProfileSettings() {
                     type="button"
                     onClick={() => setIsEditingName(false)}
                     disabled={nameSaving}
-                    className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                   >
                     Cancel
                   </button>
@@ -538,14 +538,14 @@ export function ProfileSettings() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 10 }}
               transition={SPRING_PANEL}
-              className="relative z-10 bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-sm w-full p-6 space-y-4 text-center"
+              className="relative z-10 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-2xl max-w-sm w-full p-6 space-y-4 text-center"
             >
-              <div className="w-12 h-12 rounded-2xl bg-gray-100 text-gray-700 flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 flex items-center justify-center mx-auto">
                 <LogOut className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-gray-900">Sign Out?</h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">Sign Out?</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Are you sure you want to sign out of your PIXENTRA account on this device?
                 </p>
               </div>
@@ -554,7 +554,7 @@ export function ProfileSettings() {
                   type="button"
                   onClick={() => setShowSignOutConfirm(false)}
                   disabled={signingOut}
-                  className="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   Cancel
                 </button>
@@ -565,7 +565,7 @@ export function ProfileSettings() {
                   transition={SPRING_PRESS}
                   onClick={handleSignOutCurrent}
                   disabled={signingOut}
-                  className="w-full px-4 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold transition-colors disabled:opacity-60 shadow-2xs"
+                  className="w-full px-4 py-2 rounded-xl bg-gray-900 dark:bg-slate-100 hover:bg-gray-800 dark:hover:bg-white text-white dark:text-gray-900 text-xs font-semibold transition-colors disabled:opacity-60 shadow-2xs"
                 >
                   {signingOut ? "Signing Out..." : "Sign Out"}
                 </motion.button>
@@ -591,14 +591,14 @@ export function ProfileSettings() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 10 }}
               transition={SPRING_PANEL}
-              className="relative z-10 bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-sm w-full p-6 space-y-4 text-center"
+              className="relative z-10 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-2xl max-w-sm w-full p-6 space-y-4 text-center"
             >
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 flex items-center justify-center mx-auto">
                 <ShieldAlert className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-gray-900">Sign Out All Sessions?</h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">Sign Out All Sessions?</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   This will terminate all active sign-ins across all browsers and devices. You will need to sign in again.
                 </p>
               </div>
@@ -607,7 +607,7 @@ export function ProfileSettings() {
                   type="button"
                   onClick={() => setShowSignOutAllConfirm(false)}
                   disabled={signingOut}
-                  className="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   Cancel
                 </button>
@@ -630,3 +630,4 @@ export function ProfileSettings() {
     </motion.div>
   );
 }
+

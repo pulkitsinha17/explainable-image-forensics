@@ -25,20 +25,20 @@ export function AnalysisCTA() {
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-gradient-to-br from-blue-50/50 via-white to-slate-50/50 p-6 sm:p-8 shadow-xs hover:shadow-sm transition-shadow">
+    <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-br from-blue-50/50 via-white to-slate-50/50 dark:from-[#121212] dark:via-[#121212] dark:to-[#121212] p-6 sm:p-8 shadow-xs hover:shadow-sm transition-shadow">
       <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-center">
         {/* Left Action Area */}
         <div className="lg:col-span-5 space-y-4 z-10 relative">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#1a7fc4] text-xs font-semibold tracking-wide">
-            <Sparkles className="w-3.5 h-3.5 text-[#1a7fc4]" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-900/50 text-[#1a7fc4] dark:text-[#5bb8f5] text-xs font-semibold tracking-wide">
+            <Sparkles className="w-3.5 h-3.5 text-[#1a7fc4] dark:text-[#5bb8f5]" />
             <span>IMAGE FORENSICS</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
             Analyze an image
           </h2>
 
-          <p className="text-sm text-slate-600 leading-relaxed max-w-lg">
+          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg">
             Upload an image to detect possible manipulation and uncover the evidence behind it.
           </p>
 
@@ -52,7 +52,7 @@ export function AnalysisCTA() {
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
 
-            <span className="text-xs text-slate-400 sm:pl-2">
+            <span className="text-xs text-slate-400 dark:text-slate-400 sm:pl-2">
               JPG · JPEG · PNG · WEBP · Up to 10 MB
             </span>
           </div>
@@ -61,10 +61,10 @@ export function AnalysisCTA() {
         {/* Right Animated Stream of 6 Clean Images (Ending into the text) */}
         <div className="lg:col-span-7 relative w-full h-[200px] sm:h-[225px] flex items-center overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,rgba(0,0,0,0.8)_16%,black_35%,black_88%,transparent_100%)]">
           {/* Left blend fade adjacent to text */}
-          <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white via-white/40 to-transparent pointer-events-none z-20" />
+          <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white dark:from-[#121212] via-white/40 dark:via-[#121212]/40 to-transparent pointer-events-none z-20" />
           
           {/* Right edge fade */}
-          <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white via-white/40 to-transparent pointer-events-none z-20" />
+          <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white dark:from-[#121212] via-white/40 dark:via-[#121212]/40 to-transparent pointer-events-none z-20" />
 
           {/* Smooth Motion Ticker */}
           <motion.div
@@ -92,7 +92,7 @@ export function AnalysisCTA() {
             {TICKER_ITEMS.map((item, idx) => (
               <div
                 key={`${item.src}-${idx}`}
-                className="group relative w-[140px] sm:w-[160px] h-[180px] sm:h-[200px] rounded-2xl overflow-hidden shrink-0 border border-slate-200/90 shadow-2xs hover:shadow-md bg-slate-100 transition-all duration-300 hover:border-[#1a7fc4]/50"
+                className="group relative w-[140px] sm:w-[160px] h-[180px] sm:h-[200px] rounded-2xl overflow-hidden shrink-0 border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:shadow-md bg-slate-100 dark:bg-slate-800 transition-all duration-300 hover:border-[#1a7fc4]/50 dark:hover:border-[#5bb8f5]/50"
               >
                 <Image
                   src={item.src}

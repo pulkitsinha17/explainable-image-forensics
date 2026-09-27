@@ -31,32 +31,32 @@ const plans = [
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-[#0B0B0B] text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-200">
       {/* Shared Public Navbar */}
       <Navbar />
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative pt-28 pb-20 bg-gradient-to-br from-blue-50/60 via-white to-white overflow-hidden">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-50/40 rounded-full blur-3xl pointer-events-none" />
+        <section className="relative pt-28 pb-20 bg-gradient-to-br from-blue-50/60 via-white to-white dark:from-white/[0.02] dark:via-[#0B0B0B] dark:to-[#0B0B0B] overflow-hidden">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-50/40 dark:bg-white/[0.01] rounded-full blur-3xl pointer-events-none" />
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full mb-6">
-              <Zap className="w-3 h-3 text-[#1a7fc4]" />
-              <span className="text-xs font-semibold text-[#1a7fc4] tracking-wide uppercase">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-800/60 rounded-full mb-6">
+              <Zap className="w-3 h-3 text-[#1a7fc4] dark:text-[#5bb8f5]" />
+              <span className="text-xs font-semibold text-[#1a7fc4] dark:text-[#5bb8f5] tracking-wide uppercase">
                 Simple, Transparent Pricing
               </span>
             </div>
-            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white tracking-tight mb-4">
               Simple Plans for Smarter<br className="hidden sm:block" /> Image Forensics
             </h1>
-            <p className="text-lg text-gray-500 max-w-xl mx-auto">
+            <p className="text-lg text-gray-500 dark:text-slate-400 max-w-xl mx-auto">
               Choose the level of analysis that fits your needs.
             </p>
           </div>
         </section>
 
         {/* Pricing cards */}
-        <section className="py-16 bg-white">
+        <section className="py-16 bg-white dark:bg-[#0B0B0B]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
               {plans.map((plan) => (
@@ -64,9 +64,9 @@ export default function PricingPage() {
                   key={plan.id}
                   className={`relative rounded-3xl border flex flex-col transition-all duration-300 ${
                     plan.highlighted
-                      ? "border-[#1a7fc4] shadow-xl shadow-blue-100/60 scale-[1.02]"
-                      : "border-gray-200 shadow-sm hover:shadow-md hover:border-blue-200"
-                  } bg-white`}
+                      ? "border-[#1a7fc4] dark:border-[#5bb8f5] shadow-xl shadow-blue-100/60 dark:shadow-none scale-[1.02]"
+                      : "border-gray-200 dark:border-slate-800 shadow-xs hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800"
+                  } bg-white dark:bg-slate-900`}
                 >
                   {/* Badge */}
                   {plan.badge && (
@@ -74,8 +74,8 @@ export default function PricingPage() {
                       <span
                         className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold tracking-wider ${
                           plan.highlighted
-                            ? "bg-[#1a7fc4] text-white"
-                            : "bg-amber-400 text-amber-900"
+                            ? "bg-[#1a7fc4] dark:bg-[#1a7fc4] text-white"
+                            : "bg-amber-400 text-amber-900 dark:bg-amber-500 dark:text-amber-950"
                         }`}
                       >
                         {plan.highlighted && <Star className="w-3 h-3" />}
@@ -87,20 +87,20 @@ export default function PricingPage() {
                   <div className="p-8 flex flex-col flex-1">
                     {/* Plan name & tagline */}
                     <div className="mb-6">
-                      <h2 className="text-xl font-bold text-gray-900 mb-1">{plan.name}</h2>
-                      <p className="text-sm text-gray-500">{plan.tagline}</p>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{plan.name}</h2>
+                      <p className="text-sm text-gray-500 dark:text-slate-400">{plan.tagline}</p>
                     </div>
 
                     {/* Price */}
                     <div className="mb-8">
                       <div className="flex items-end gap-1">
-                        <span className="text-4xl font-black text-gray-900">{plan.price}</span>
+                        <span className="text-4xl font-black text-gray-900 dark:text-white">{plan.price}</span>
                         {plan.period && (
-                          <span className="text-sm text-gray-500 mb-1.5">{plan.period}</span>
+                          <span className="text-sm text-gray-500 dark:text-slate-400 mb-1.5">{plan.period}</span>
                         )}
                       </div>
                       {plan.savings && (
-                        <p className="text-xs text-emerald-600 font-semibold mt-1.5 flex items-center gap-1">
+                        <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-1.5 flex items-center gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
                           {plan.savings}
                         </p>
@@ -108,7 +108,7 @@ export default function PricingPage() {
                     </div>
 
                     {/* Divider */}
-                    <div className={`h-px mb-6 ${plan.highlighted ? "bg-blue-100" : "bg-gray-100"}`} />
+                    <div className={`h-px mb-6 ${plan.highlighted ? "bg-blue-100 dark:bg-blue-900/50" : "bg-gray-100 dark:bg-slate-800"}`} />
 
                     {/* Features */}
                     <ul className="space-y-3 flex-1 mb-8">
@@ -116,16 +116,16 @@ export default function PricingPage() {
                         <li key={feature} className="flex items-start gap-3">
                           <div
                             className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                              plan.highlighted ? "bg-[#1a7fc4]" : "bg-blue-50 border border-blue-100"
+                              plan.highlighted ? "bg-[#1a7fc4]" : "bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/40"
                             }`}
                           >
                             <Check
                               className={`w-3 h-3 ${
-                                plan.highlighted ? "text-white" : "text-[#1a7fc4]"
+                                plan.highlighted ? "text-white" : "text-[#1a7fc4] dark:text-[#5bb8f5]"
                               }`}
                             />
                           </div>
-                          <span className="text-sm text-gray-600">{feature}</span>
+                          <span className="text-sm text-gray-600 dark:text-slate-300">{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -135,7 +135,7 @@ export default function PricingPage() {
                       <Link
                         href={plan.ctaHref}
                         data-plan-id={plan.id}
-                        className={`block w-full py-3.5 rounded-2xl font-semibold text-sm text-center transition-all duration-200 bg-gray-900 text-white hover:bg-gray-800`}
+                        className="block w-full py-3.5 rounded-2xl font-semibold text-sm text-center transition-all duration-200 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-slate-200"
                       >
                         {plan.cta}
                       </Link>
@@ -149,7 +149,7 @@ export default function PricingPage() {
                         className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all duration-200 ${
                           plan.highlighted
                             ? "bg-[#1a7fc4] text-white opacity-70 cursor-not-allowed"
-                            : "bg-gray-100 text-gray-500 cursor-not-allowed"
+                            : "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 cursor-not-allowed"
                         }`}
                       >
                         Payments coming soon
@@ -157,7 +157,7 @@ export default function PricingPage() {
                     )}
 
                     {plan.id !== "free" && (
-                      <p className="text-center text-xs text-gray-400 mt-3">
+                      <p className="text-center text-xs text-gray-400 dark:text-slate-500 mt-3">
                         Payment integration coming soon
                       </p>
                     )}
@@ -168,7 +168,7 @@ export default function PricingPage() {
 
             {/* Note about pricing */}
             <div className="mt-12 text-center">
-              <p className="text-xs text-gray-400 max-w-lg mx-auto leading-relaxed">
+              <p className="text-xs text-gray-400 dark:text-slate-500 max-w-lg mx-auto leading-relaxed">
                 All prices are listed in Indian Rupees (₹). Paid plans are not yet active —
                 payment integration via Razorpay will be added soon. The Free plan is fully
                 functional and requires only a free account.
@@ -178,9 +178,9 @@ export default function PricingPage() {
         </section>
 
         {/* FAQ-style bottom section */}
-        <section className="py-16 bg-blue-50/40 border-t border-blue-100/50">
+        <section className="py-16 bg-blue-50/40 dark:bg-[#121212] border-t border-blue-100/50 dark:border-slate-800">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">Common Questions</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-10">Common Questions</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {[
                 {
@@ -200,9 +200,9 @@ export default function PricingPage() {
                   a: "No. PIXENTRA provides AI-assisted forensic indicators. Results are not legal determinations and should be interpreted as supporting evidence, not final conclusions.",
                 },
               ].map((item) => (
-                <div key={item.q} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                  <p className="text-sm font-semibold text-gray-900 mb-2">{item.q}</p>
-                  <p className="text-sm text-gray-500 leading-relaxed">{item.a}</p>
+                <div key={item.q} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-gray-100 dark:border-slate-800 shadow-xs">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white mb-2">{item.q}</p>
+                  <p className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed">{item.a}</p>
                 </div>
               ))}
             </div>

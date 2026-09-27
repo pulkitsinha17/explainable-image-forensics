@@ -146,10 +146,10 @@ function EvidenceBar({ label, val, color, delay }: {
   return (
     <div>
       <div className="flex justify-between mb-1">
-        <span className="text-[9px] text-gray-500 font-medium">{label}</span>
+        <span className="text-[9px] text-gray-500 dark:text-slate-400 font-medium">{label}</span>
         <span className="text-[9px] font-bold font-mono" style={{ color }}>{val}%</span>
       </div>
-      <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+      <div className="h-1 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
         <motion.div
           className="h-full rounded-full"
           style={{ background: color }}
@@ -349,12 +349,12 @@ export function Hero() {
     <section
       id="home"
       ref={containerRef}
-      className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-white max-w-full"
+      className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-white dark:bg-[#0B0B0B] max-w-full transition-colors duration-200"
     >
       {/* Background subtle gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-white to-white pointer-events-none" />
-      <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-blue-50/40 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-50/30 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-white to-white dark:from-white/[0.02] dark:via-[#0B0B0B] dark:to-[#0B0B0B] pointer-events-none" />
+      <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-blue-50/40 dark:bg-white/[0.015] rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-50/30 dark:bg-white/[0.01] rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -367,10 +367,10 @@ export function Hero() {
             {/* Eyebrow badge */}
             <motion.div
               variants={heroItemVariants}
-              className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full mb-6 shadow-xs"
+              className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-800/60 rounded-full mb-6 shadow-xs"
             >
-              <div className="w-1.5 h-1.5 rounded-full bg-[#1a7fc4] animate-pulse" />
-              <span className="text-xs font-semibold text-[#1a7fc4] tracking-wide uppercase">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#1a7fc4] dark:bg-[#5bb8f5] animate-pulse" />
+              <span className="text-xs font-semibold text-[#1a7fc4] dark:text-[#5bb8f5] tracking-wide uppercase">
                 AI-Powered • Explainable • Multi-Evidence Analysis
               </span>
             </motion.div>
@@ -378,7 +378,7 @@ export function Hero() {
             {/* Headline with animated 'Truth' */}
             <motion.h1
               variants={heroItemVariants}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6"
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-[1.1] tracking-tight mb-6"
             >
               Uncover the{' '}
               <span className="relative inline-block">
@@ -417,7 +417,7 @@ export function Hero() {
             {/* Supporting copy */}
             <motion.p
               variants={heroItemVariants}
-              className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl"
+              className="text-lg text-gray-600 dark:text-slate-300 leading-relaxed mb-8 max-w-xl"
             >
               PIXENTRA combines AI-powered forgery localization with multiple digital forensic signals to detect suspicious image regions and explain the evidence behind every result.
             </motion.p>
@@ -428,10 +428,10 @@ export function Hero() {
                 <motion.div
                   key={feat}
                   whileHover={prefersReducedMotion ? {} : { y: -2 }}
-                  className="flex items-center gap-2 px-3.5 py-1.5 bg-slate-50/90 hover:bg-blue-50/60 rounded-full border border-slate-200/70 hover:border-blue-200 shadow-2xs transition-all duration-200 cursor-default"
+                  className="flex items-center gap-2 px-3.5 py-1.5 bg-slate-50/90 dark:bg-slate-900/90 hover:bg-blue-50/60 dark:hover:bg-blue-950/40 rounded-full border border-slate-200/70 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-700 shadow-2xs transition-all duration-200 cursor-default"
                 >
-                  <CheckCircle2 className="w-4 h-4 text-[#1a7fc4]" />
-                  <span className="text-xs sm:text-sm font-medium text-gray-700">{feat}</span>
+                  <CheckCircle2 className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
+                  <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-200">{feat}</span>
                 </motion.div>
               ))}
             </motion.div>
@@ -439,7 +439,7 @@ export function Hero() {
             {/* CTAs */}
             <motion.div variants={heroItemVariants} className="relative flex flex-wrap gap-4 mb-6 items-center">
               {/* Subtle ambient backlight behind CTA buttons */}
-              <div className="absolute -inset-2 w-72 h-16 bg-[#1a7fc4]/10 rounded-full blur-2xl pointer-events-none -z-10" />
+              <div className="absolute -inset-2 w-72 h-16 bg-[#1a7fc4]/10 dark:bg-[#1a7fc4]/20 rounded-full blur-2xl pointer-events-none -z-10" />
 
               <div>
                 <Link
@@ -465,7 +465,7 @@ export function Hero() {
                   e.preventDefault()
                   document.querySelector('#how-it-works')?.scrollIntoView({ behavior: 'smooth' })
                 }}
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:border-[#1a7fc4] hover:text-[#1a7fc4] hover:shadow-xs transition-all duration-200 text-sm cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-200 font-semibold rounded-xl border border-gray-200 dark:border-slate-700 hover:border-[#1a7fc4] dark:hover:border-[#5bb8f5] hover:text-[#1a7fc4] dark:hover:text-[#5bb8f5] hover:shadow-xs transition-all duration-200 text-sm cursor-pointer"
                 id="hero-cta-how-it-works"
               >
                 Explore How It Works
@@ -473,12 +473,12 @@ export function Hero() {
             </motion.div>
 
             {/* Trust statement */}
-            <motion.div variants={heroItemVariants} className="flex items-center gap-2 text-xs text-gray-400">
-              <Shield className="w-3.5 h-3.5 text-[#1a7fc4]" />
+            <motion.div variants={heroItemVariants} className="flex items-center gap-2 text-xs text-gray-400 dark:text-slate-500">
+              <Shield className="w-3.5 h-3.5 text-[#1a7fc4] dark:text-[#5bb8f5]" />
               <span>Sign in required to analyze images</span>
-              <span className="text-gray-300">•</span>
+              <span className="text-gray-300 dark:text-slate-600">•</span>
               <span>Secure analysis</span>
-              <span className="text-gray-300">•</span>
+              <span className="text-gray-300 dark:text-slate-600">•</span>
               <span>Privacy focused</span>
             </motion.div>
           </motion.div>
@@ -497,7 +497,7 @@ export function Hero() {
             }
           >
             {/* Ambient Background Aura behind Image Window */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 bg-gradient-to-tr from-blue-400/20 via-[#1a7fc4]/15 to-indigo-400/15 rounded-full blur-3xl pointer-events-none -z-10" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 bg-gradient-to-tr from-blue-400/20 via-[#1a7fc4]/15 to-indigo-400/15 dark:from-blue-600/10 dark:via-[#1a7fc4]/10 dark:to-indigo-600/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
             {/* Continuous Floating Levitation Wrapper */}
             <motion.div
@@ -528,26 +528,26 @@ export function Hero() {
                         transformStyle: 'preserve-3d',
                       }
                 }
-                className="relative bg-white rounded-3xl border border-gray-200/90 shadow-[0_20px_50px_-12px_rgba(26,127,196,0.18),0_8px_24px_-6px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.04] overflow-hidden group transition-shadow duration-500 hover:shadow-[0_30px_70px_-15px_rgba(26,127,196,0.26),0_12px_32px_-8px_rgba(0,0,0,0.08)]"
+                className="relative bg-white dark:bg-slate-900 rounded-3xl border border-gray-200/90 dark:border-slate-800 shadow-[0_20px_50px_-12px_rgba(26,127,196,0.18),0_8px_24px_-6px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.04] dark:ring-white/[0.05] overflow-hidden group transition-shadow duration-500 hover:shadow-[0_30px_70px_-15px_rgba(26,127,196,0.26),0_12px_32px_-8px_rgba(0,0,0,0.08)]"
               >
                 {/* Top Specular Glaze Line */}
                 <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5bb8f5]/60 to-transparent pointer-events-none z-30" />
 
                 {/* Header bar above slider */}
-                <div className="bg-gray-50/95 backdrop-blur-md px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b border-gray-200/80 gap-2">
+                <div className="bg-gray-50/95 dark:bg-slate-800/95 backdrop-blur-md px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b border-gray-200/80 dark:border-slate-700/80 gap-2">
                   <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
                     <div className="flex gap-1.5 shrink-0">
                       <div className="w-2.5 h-2.5 rounded-full bg-red-400/90 border border-red-500/20" />
                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/90 border border-yellow-500/20" />
                       <div className="w-2.5 h-2.5 rounded-full bg-green-400/90 border border-green-500/20" />
                     </div>
-                    <span className="text-[10px] text-gray-500 font-mono ml-1 font-medium truncate max-w-[130px] sm:max-w-none">
+                    <span className="text-[10px] text-gray-500 dark:text-slate-400 font-mono ml-1 font-medium truncate max-w-[130px] sm:max-w-none">
                       mountain.jpg — Forensic Analysis
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full border border-green-200/60 shrink-0">
+                  <div className="flex items-center gap-1.5 bg-green-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-green-200/60 dark:border-emerald-800/60 shrink-0">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                    <span className="text-[9px] text-green-700 font-semibold tracking-wide uppercase">
+                    <span className="text-[9px] text-green-700 dark:text-emerald-400 font-semibold tracking-wide uppercase">
                       Analysis Complete
                     </span>
                   </div>
@@ -557,12 +557,12 @@ export function Hero() {
                 <ImageComparisonSlider />
 
                 {/* Evidence summary below slider — animated bars */}
-                <div className="bg-white px-5 py-3.5 border-t border-gray-100">
+                <div className="bg-white dark:bg-slate-900 px-5 py-3.5 border-t border-gray-100 dark:border-slate-800">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                       Evidence Summary
                     </span>
-                    <span className="text-[9px] text-gray-400 font-mono">3 Active Channels</span>
+                    <span className="text-[9px] text-gray-400 dark:text-slate-500 font-mono">3 Active Channels</span>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     {[
@@ -579,7 +579,7 @@ export function Hero() {
 
             {/* Dynamic Ground Contact Shadow */}
             <motion.div
-              className="w-3/4 h-7 bg-blue-900/15 rounded-[100%] mx-auto blur-xl -mt-2 -z-10 pointer-events-none"
+              className="w-3/4 h-7 bg-blue-900/15 dark:bg-blue-950/30 rounded-[100%] mx-auto blur-xl -mt-2 -z-10 pointer-events-none"
               animate={
                 prefersReducedMotion
                   ? {}

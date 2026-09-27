@@ -251,10 +251,10 @@ export function HistoryWorkspace({
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 pb-1"
       >
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
             Analysis History
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
             Review, search and export your historical multi-evidence forensic investigations.
           </p>
         </div>
@@ -283,7 +283,7 @@ export function HistoryWorkspace({
       )}
 
       {/* Search, Filter & View Mode Command Bar */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-2 sm:p-2.5 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-2 sm:p-2.5 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
         {/* Search Input Field */}
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -296,7 +296,7 @@ export function HistoryWorkspace({
               setCurrentPage(1);
             }}
             placeholder="Search by filename or analysis ID... (Press ⌘K)"
-            className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs"
+            className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-slate-50/60 dark:bg-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs"
           />
           {searchQuery && (
             <button
@@ -305,7 +305,7 @@ export function HistoryWorkspace({
                 setSearchQuery("");
                 setCurrentPage(1);
               }}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-md transition-colors cursor-pointer"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-0.5 rounded-md transition-colors cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -316,7 +316,7 @@ export function HistoryWorkspace({
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap justify-between md:justify-end">
           {/* Status filter */}
           <div className="relative shrink-0">
-            <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400 absolute left-3 top-1 pointer-events-none">
+            <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 absolute left-3 top-1 pointer-events-none">
               Status
             </div>
             <select
@@ -325,7 +325,7 @@ export function HistoryWorkspace({
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="appearance-none bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[105px]"
+              className="appearance-none bg-slate-50/60 dark:bg-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[105px]"
             >
               <option value="Completed">Completed</option>
               <option value="All Status">All Status</option>
@@ -335,7 +335,7 @@ export function HistoryWorkspace({
 
           {/* Verdicts filter */}
           <div className="relative shrink-0">
-            <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400 absolute left-3 top-1 pointer-events-none">
+            <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 absolute left-3 top-1 pointer-events-none">
               Verdict
             </div>
             <select
@@ -344,7 +344,7 @@ export function HistoryWorkspace({
                 setVerdictFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="appearance-none bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[135px]"
+              className="appearance-none bg-slate-50/60 dark:bg-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[135px]"
             >
               <option value="All Verdicts">All Verdicts</option>
               <option value="Manipulated">Manipulated</option>
@@ -356,7 +356,7 @@ export function HistoryWorkspace({
 
           {/* Sort By filter */}
           <div className="relative shrink-0">
-            <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400 absolute left-3 top-1 pointer-events-none">
+            <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 absolute left-3 top-1 pointer-events-none">
               Sort By
             </div>
             <select
@@ -365,7 +365,7 @@ export function HistoryWorkspace({
                 setSortBy(e.target.value);
                 setCurrentPage(1);
               }}
-              className="appearance-none bg-slate-50/60 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[145px]"
+              className="appearance-none bg-slate-50/60 dark:bg-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-xl pl-3 pr-8 pt-4 pb-1 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/20 focus:border-[#1a7fc4] transition-all shadow-2xs cursor-pointer min-w-[145px]"
             >
               <option value="Newest First">Newest First</option>
               <option value="Oldest First">Oldest First</option>
@@ -381,7 +381,7 @@ export function HistoryWorkspace({
               type="button"
               onClick={handleResetFilters}
               title="Reset all filters"
-              className="px-2.5 py-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer shrink-0 flex items-center gap-1 text-xs font-semibold"
+              className="px-2.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-2xs cursor-pointer shrink-0 flex items-center gap-1 text-xs font-semibold"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Reset</span>
@@ -389,15 +389,15 @@ export function HistoryWorkspace({
           )}
 
           {/* View Mode Toggle Button Group */}
-          <div className="hidden sm:flex items-center p-0.5 rounded-xl bg-slate-100 border border-slate-200/80 shrink-0">
+          <div className="hidden sm:flex items-center p-0.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shrink-0">
             <button
               type="button"
               onClick={() => setViewMode("cards")}
               title="Detailed Cards View"
               className={`p-1.5 rounded-lg transition-all cursor-pointer ${
                 viewMode === "cards"
-                  ? "bg-white text-slate-900 shadow-2xs font-semibold"
-                  : "text-slate-500 hover:text-slate-800"
+                  ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs font-semibold"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
               }`}
             >
               <LayoutGrid className="w-4 h-4" />
@@ -408,8 +408,8 @@ export function HistoryWorkspace({
               title="Compact Table View"
               className={`p-1.5 rounded-lg transition-all cursor-pointer ${
                 viewMode === "table"
-                  ? "bg-white text-slate-900 shadow-2xs font-semibold"
-                  : "text-slate-500 hover:text-slate-800"
+                  ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs font-semibold"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
               }`}
             >
               <List className="w-4 h-4" />
@@ -425,38 +425,38 @@ export function HistoryWorkspace({
           {[1, 2, 3, 4].map((n) => (
             <div
               key={n}
-              className="bg-white rounded-2xl border border-slate-200/70 p-4 sm:p-5 shadow-2xs animate-pulse flex flex-col md:flex-row md:items-center justify-between gap-4"
+              className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 dark:border-slate-800 p-4 sm:p-5 shadow-2xs animate-pulse flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
               <div className="flex items-center gap-4 flex-1">
-                <div className="w-24 h-16 sm:w-28 sm:h-18 rounded-xl bg-slate-100 shrink-0" />
+                <div className="w-24 h-16 sm:w-28 sm:h-18 rounded-xl bg-slate-100 dark:bg-slate-800 shrink-0" />
                 <div className="space-y-2 flex-1 max-w-sm">
-                  <div className="h-4 bg-slate-200/80 rounded-md w-3/4" />
-                  <div className="h-3 bg-slate-100 rounded-md w-1/2" />
-                  <div className="h-3 bg-slate-100 rounded-md w-1/3" />
+                  <div className="h-4 bg-slate-200/80 dark:bg-slate-700 rounded-md w-3/4" />
+                  <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded-md w-1/2" />
+                  <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded-md w-1/3" />
                 </div>
               </div>
               <div className="flex items-center gap-6 justify-between md:justify-end">
                 <div className="space-y-1.5 w-24">
-                  <div className="h-5 bg-slate-100 rounded-full w-20" />
-                  <div className="h-6 bg-slate-200/80 rounded-md w-16" />
+                  <div className="h-5 bg-slate-100 dark:bg-slate-800 rounded-full w-20" />
+                  <div className="h-6 bg-slate-200/80 dark:bg-slate-700 rounded-md w-16" />
                 </div>
-                <div className="w-28 h-9 bg-slate-100 rounded-xl" />
+                <div className="w-28 h-9 bg-slate-100 dark:bg-slate-800 rounded-xl" />
               </div>
             </div>
           ))}
         </div>
       ) : error ? (
         /* Error State */
-        <div className="bg-white rounded-2xl border border-red-200 p-8 sm:p-10 text-center shadow-xs space-y-3 max-w-md mx-auto">
-          <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto border border-red-100">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-red-200 dark:border-rose-900/50 p-8 sm:p-10 text-center shadow-xs space-y-3 max-w-md mx-auto">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-rose-950/50 text-red-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-red-100 dark:border-rose-900/50">
             <HistoryIcon className="w-6 h-6 stroke-[1.75]" />
           </div>
-          <h3 className="text-base font-bold text-slate-900">Unable to load history</h3>
-          <p className="text-xs text-red-600 leading-relaxed">{error}</p>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">Unable to load history</h3>
+          <p className="text-xs text-red-600 dark:text-rose-400 leading-relaxed">{error}</p>
           <button
             type="button"
             onClick={fetchHistory}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition-colors shadow-2xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition-colors shadow-2xs cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Try Again</span>
@@ -497,15 +497,15 @@ export function HistoryWorkspace({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="bg-white rounded-2xl border border-slate-200/80 p-10 sm:p-14 text-center shadow-2xs"
+              className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-10 sm:p-14 text-center shadow-2xs"
             >
-              <div className="w-13 h-13 rounded-2xl bg-blue-50 text-[#1a7fc4] flex items-center justify-center mx-auto mb-4 border border-blue-100/80">
+              <div className="w-13 h-13 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] flex items-center justify-center mx-auto mb-4 border border-blue-100/80 dark:border-blue-900/50">
                 <HistoryIcon className="w-6 h-6 stroke-[1.75]" />
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1">
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mb-1">
                 {isFiltered ? "No matching analyses found" : "No Past Analyses"}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-500 mb-6 max-w-sm mx-auto leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-6 max-w-sm mx-auto leading-relaxed">
                 {isFiltered
                   ? "Try adjusting your search terms or filter criteria to discover previous forensic records."
                   : "You have not performed any image forensic analyses yet. Analyze your first image to begin generating evidence records."}
@@ -514,7 +514,7 @@ export function HistoryWorkspace({
                 <button
                   type="button"
                   onClick={handleResetFilters}
-                  className="inline-flex items-center gap-2 px-4.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition-colors shadow-2xs cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4.5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-semibold rounded-xl transition-colors shadow-2xs cursor-pointer"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Reset All Filters</span>
@@ -535,10 +535,10 @@ export function HistoryWorkspace({
 
       {/* Bottom Pagination & Count Bar */}
       {!loading && !error && totalItems > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3.5 pt-2 pb-4 border-t border-slate-200/60">
-          <p className="text-xs text-slate-500 font-medium">
-            Showing <span className="font-semibold text-slate-900">{startRecord}–{endRecord}</span> of{" "}
-            <span className="font-semibold text-slate-900">{totalItems}</span> analyses
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3.5 pt-2 pb-4 border-t border-slate-200/60 dark:border-slate-800">
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            Showing <span className="font-semibold text-slate-900 dark:text-white">{startRecord}–{endRecord}</span> of{" "}
+            <span className="font-semibold text-slate-900 dark:text-white">{totalItems}</span> analyses
           </p>
 
           <div className="flex items-center gap-1.5">
@@ -547,7 +547,7 @@ export function HistoryWorkspace({
               type="button"
               onClick={() => handlePageChange(safeCurrentPage - 1)}
               disabled={safeCurrentPage <= 1}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs cursor-pointer"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
               <span>Previous</span>
@@ -564,7 +564,7 @@ export function HistoryWorkspace({
                   className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     isActive
                       ? "bg-[#1a7fc4] text-white shadow-xs font-bold"
-                      : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs"
+                      : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-2xs"
                   }`}
                 >
                   {page}
@@ -577,7 +577,7 @@ export function HistoryWorkspace({
               type="button"
               onClick={() => handlePageChange(safeCurrentPage + 1)}
               disabled={safeCurrentPage >= totalPages}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs cursor-pointer"
             >
               <span>Next</span>
               <ChevronRight className="w-3.5 h-3.5" />
@@ -585,6 +585,7 @@ export function HistoryWorkspace({
           </div>
         </div>
       )}
+
     </div>
   );
 }

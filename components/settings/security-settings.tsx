@@ -47,9 +47,9 @@ export function SecuritySettings() {
 
   if (!isLoaded || !user) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-xs flex items-center justify-center min-h-[320px]">
-        <div className="flex flex-col items-center gap-3 text-gray-500">
-          <Loader2 className="w-6 h-6 animate-spin text-[#1a7fc4]" />
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-8 shadow-xs flex items-center justify-center min-h-[320px]">
+        <div className="flex flex-col items-center gap-3 text-gray-500 dark:text-gray-400">
+          <Loader2 className="w-6 h-6 animate-spin text-[#1a7fc4] dark:text-[#5bb8f5]" />
           <span className="text-xs font-semibold tracking-wide">Loading security settings...</span>
         </div>
       </div>
@@ -137,17 +137,17 @@ export function SecuritySettings() {
       {/* 1. Account Security Status */}
       <motion.div
         variants={fadeUpItem}
-        className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-5"
+        className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-5"
       >
-        <div className="flex items-center gap-4 pb-5 border-b border-gray-100">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 shadow-2xs">
+        <div className="flex items-center gap-4 pb-5 border-b border-gray-100 dark:border-slate-800">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-2xs">
             <Shield className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900 tracking-tight">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
               Account Security Status
             </h2>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               Overview of your authentication credentials, session security, and account verification.
             </p>
           </div>
@@ -155,34 +155,34 @@ export function SecuritySettings() {
 
         {/* Vertically Stacked Security Overview Items */}
         <div className="space-y-3">
-          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors">
+          <div className="p-4 rounded-xl bg-gray-50/80 dark:bg-slate-800/60 border border-gray-100/90 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
             <div>
-              <p className="text-xs font-bold text-gray-900">Email Verification</p>
-              <p className="text-[11px] text-gray-500 mt-0.5">{primaryEmail}</p>
+              <p className="text-xs font-bold text-gray-900 dark:text-white">Email Verification</p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{primaryEmail}</p>
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70 shrink-0 self-start sm:self-auto shadow-2xs">
-              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800/50 shrink-0 self-start sm:self-auto shadow-2xs">
+              <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
               {emailVerified ? "Verified" : "Unverified"}
             </span>
           </div>
 
-          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors">
+          <div className="p-4 rounded-xl bg-gray-50/80 dark:bg-slate-800/60 border border-gray-100/90 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
             <div>
-              <p className="text-xs font-bold text-gray-900">Last Authenticated Session</p>
-              <p className="text-[11px] text-gray-500 mt-0.5">Most recent sign-in activity</p>
+              <p className="text-xs font-bold text-gray-900 dark:text-white">Last Authenticated Session</p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Most recent sign-in activity</p>
             </div>
-            <span className="text-xs font-semibold text-gray-800">
+            <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
               {formattedLastSignIn}
             </span>
           </div>
 
-          <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors">
+          <div className="p-4 rounded-xl bg-gray-50/80 dark:bg-slate-800/60 border border-gray-100/90 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
             <div>
-              <p className="text-xs font-bold text-gray-900">Two-Factor Authentication (2FA)</p>
-              <p className="text-[11px] text-gray-500 mt-0.5">Multi-factor sign-in security protection</p>
+              <p className="text-xs font-bold text-gray-900 dark:text-white">Two-Factor Authentication (2FA)</p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Multi-factor sign-in security protection</p>
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-700 shrink-0 self-start sm:self-auto">
-              <Smartphone className="w-3 h-3 text-gray-500" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 shrink-0 self-start sm:self-auto">
+              <Smartphone className="w-3 h-3 text-gray-500 dark:text-gray-400" />
               {user.twoFactorEnabled ? "Active" : "Standard"}
             </span>
           </div>
@@ -192,14 +192,14 @@ export function SecuritySettings() {
       {/* 2. Password & Authentication */}
       <motion.div
         variants={fadeUpItem}
-        className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-4"
+        className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-4"
       >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-slate-800">
           <div>
-            <h3 className="text-base font-bold text-gray-900">
+            <h3 className="text-base font-bold text-gray-900 dark:text-white">
               Password & Authentication
             </h3>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {hasPassword
                 ? "Your account is protected with a password."
                 : "Your account is authenticated via external SSO provider (Google)."}
@@ -223,26 +223,26 @@ export function SecuritySettings() {
           </motion.button>
         </div>
 
-        <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex items-center justify-between text-xs hover:bg-slate-50 transition-colors">
+        <div className="p-4 rounded-xl bg-gray-50/80 dark:bg-slate-800/60 border border-gray-100/90 dark:border-slate-800 flex items-center justify-between text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
           <div className="flex items-center gap-2.5">
-            <Lock className="w-4 h-4 text-[#1a7fc4]" />
-            <span className="font-semibold text-gray-800">
+            <Lock className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
+            <span className="font-semibold text-gray-800 dark:text-gray-200">
               {hasPassword ? "Password Protection Enabled" : "Single Sign-On (SSO) Active"}
             </span>
           </div>
-          <span className="text-[11px] text-gray-500 font-mono tracking-wider">••••••••••••</span>
+          <span className="text-[11px] text-gray-500 dark:text-gray-400 font-mono tracking-wider">••••••••••••</span>
         </div>
       </motion.div>
 
       {/* 3. Email Addresses */}
       <motion.div
         variants={fadeUpItem}
-        className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-4"
+        className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-4"
       >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-slate-800">
           <div>
-            <h3 className="text-base font-bold text-gray-900">Email Addresses</h3>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <h3 className="text-base font-bold text-gray-900 dark:text-white">Email Addresses</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               Email addresses associated with your account for sign-in and security notifications.
             </p>
           </div>
@@ -257,7 +257,7 @@ export function SecuritySettings() {
               setEmailError(null);
               setEmailSuccess(null);
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-semibold transition-colors shadow-2xs cursor-pointer self-start sm:self-auto"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-750 text-gray-700 dark:text-gray-200 text-xs font-semibold transition-colors shadow-2xs cursor-pointer self-start sm:self-auto"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Email</span>
@@ -272,15 +272,15 @@ export function SecuritySettings() {
             return (
               <div
                 key={emailObj.id}
-                className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs hover:bg-slate-50 transition-colors"
+                className="p-4 rounded-xl bg-gray-50/80 dark:bg-slate-800/60 border border-gray-100/90 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <Mail className="w-4 h-4 text-[#1a7fc4] shrink-0" />
-                  <span className="font-semibold text-gray-900 truncate">
+                  <Mail className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5] shrink-0" />
+                  <span className="font-semibold text-gray-900 dark:text-white truncate">
                     {emailObj.emailAddress}
                   </span>
                   {isPrimary && (
-                    <span className="px-2 py-0.5 rounded-md bg-blue-50 text-[#1a7fc4] font-bold text-[10px] uppercase tracking-wider shrink-0 border border-blue-100/80">
+                    <span className="px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] font-bold text-[10px] uppercase tracking-wider shrink-0 border border-blue-100/80 dark:border-blue-900/50">
                       Primary
                     </span>
                   )}
@@ -290,8 +290,8 @@ export function SecuritySettings() {
                   <span
                     className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold shadow-2xs ${
                       isVer
-                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                        : "bg-amber-50 text-amber-700 border border-amber-200"
+                        ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50"
+                        : "bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50"
                     }`}
                   >
                     {isVer ? "Verified" : "Pending Verification"}
@@ -306,11 +306,11 @@ export function SecuritySettings() {
       {/* 4. Connected Accounts */}
       <motion.div
         variants={fadeUpItem}
-        className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-4"
+        className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-4"
       >
         <div>
-          <h3 className="text-base font-bold text-gray-900">Connected Accounts</h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <h3 className="text-base font-bold text-gray-900 dark:text-white">Connected Accounts</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             External identity providers linked to your account for single sign-on access.
           </p>
         </div>
@@ -320,29 +320,29 @@ export function SecuritySettings() {
             {user.externalAccounts.map((acc, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-xl bg-gray-50/80 border border-gray-100/90 flex items-center justify-between gap-3 text-xs hover:bg-slate-50 transition-colors"
+                className="p-4 rounded-xl bg-gray-50/80 dark:bg-slate-800/60 border border-gray-100/90 dark:border-slate-800 flex items-center justify-between gap-3 text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <Globe className="w-4 h-4 text-[#1a7fc4]" />
+                  <Globe className="w-4 h-4 text-[#1a7fc4] dark:text-[#5bb8f5]" />
                   <div>
-                    <p className="font-bold text-gray-900 capitalize">
+                    <p className="font-bold text-gray-900 dark:text-white capitalize">
                       {acc.provider} SSO
                     </p>
                     {acc.emailAddress && (
-                      <p className="text-[11px] text-gray-500">{acc.emailAddress}</p>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400">{acc.emailAddress}</p>
                     )}
                   </div>
                 </div>
 
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 shadow-2xs">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                   Connected
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 text-xs text-gray-500">
+          <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/60 border border-gray-100 dark:border-slate-800 text-xs text-gray-500 dark:text-gray-400">
             No external OAuth accounts linked. Sign-in is handled via primary email credentials.
           </div>
         )}
@@ -364,36 +364,36 @@ export function SecuritySettings() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 10 }}
               transition={SPRING_PANEL}
-              className="relative z-10 bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-md w-full p-6 space-y-4"
+              className="relative z-10 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-2xl max-w-md w-full p-6 space-y-4"
             >
-              <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+              <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] flex items-center justify-center">
                     <KeyRound className="w-4 h-4" />
                   </div>
-                  <h3 className="text-base font-bold text-gray-900">
+                  <h3 className="text-base font-bold text-gray-900 dark:text-white">
                     {hasPassword ? "Change Password" : "Set New Password"}
                   </h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsChangingPassword(false)}
-                  className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                  className="p-1 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {passwordError && (
-                <div className="p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
                   <span>{passwordError}</span>
                 </div>
               )}
 
               {passwordSuccess && (
-                <div className="p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>{passwordSuccess}</span>
                 </div>
               )}
@@ -401,38 +401,38 @@ export function SecuritySettings() {
               <form onSubmit={handlePasswordSubmit} className="space-y-3.5">
                 {hasPassword && (
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-700 block">Current Password</label>
+                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block">Current Password</label>
                     <input
                       type="password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       placeholder="Enter current password"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
                       required
                     />
                   </div>
                 )}
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-700 block">New Password</label>
+                  <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block">New Password</label>
                   <input
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="At least 8 characters"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
                     required
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-700 block">Confirm New Password</label>
+                  <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block">Confirm New Password</label>
                   <input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-enter new password"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
                     required
                   />
                 </div>
@@ -442,7 +442,7 @@ export function SecuritySettings() {
                     type="button"
                     onClick={() => setIsChangingPassword(false)}
                     disabled={passwordSaving}
-                    className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                   >
                     Cancel
                   </button>
@@ -480,47 +480,47 @@ export function SecuritySettings() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 10 }}
               transition={SPRING_PANEL}
-              className="relative z-10 bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-md w-full p-6 space-y-4"
+              className="relative z-10 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-2xl max-w-md w-full p-6 space-y-4"
             >
-              <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+              <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#1a7fc4] flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] flex items-center justify-center">
                     <Plus className="w-4 h-4" />
                   </div>
-                  <h3 className="text-base font-bold text-gray-900">Add Email Address</h3>
+                  <h3 className="text-base font-bold text-gray-900 dark:text-white">Add Email Address</h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsAddingEmail(false)}
-                  className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                  className="p-1 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {emailError && (
-                <div className="p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
                   <span>{emailError}</span>
                 </div>
               )}
 
               {emailSuccess && (
-                <div className="p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>{emailSuccess}</span>
                 </div>
               )}
 
               <form onSubmit={handleAddEmailSubmit} className="space-y-3.5">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-700 block">Email Address</label>
+                  <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block">Email Address</label>
                   <input
                     type="email"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
                     placeholder="name@example.com"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7fc4]/30 focus:border-[#1a7fc4] transition-all"
                     required
                   />
                 </div>
@@ -530,7 +530,7 @@ export function SecuritySettings() {
                     type="button"
                     onClick={() => setIsAddingEmail(false)}
                     disabled={emailSaving}
-                    className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                   >
                     Cancel
                   </button>
@@ -554,3 +554,4 @@ export function SecuritySettings() {
     </motion.div>
   );
 }
+
