@@ -10,7 +10,7 @@ import {
   Lock,
   ChevronRight,
 } from "lucide-react";
-import { motion } from "motion/react";
+
 
 export const SETTINGS_TABS = [
   {

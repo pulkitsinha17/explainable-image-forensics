@@ -89,8 +89,10 @@ export function AnalysisResults({
       const blob = new Blob([reportContent], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
+      // eslint-disable-next-line react-hooks/purity -- Date.now() is safe here; this runs in an async event handler, not during render
+      const ts = Date.now();
       link.href = url;
-      link.download = `pixentra-forensic-report-${Date.now()}.txt`;
+      link.download = `pixentra-forensic-report-${ts}.txt`;
       link.click();
       URL.revokeObjectURL(url);
     } finally {
@@ -156,8 +158,6 @@ export function AnalysisResults({
 
   const forensicScore = results.forensicManipulationScore ?? results.forgeryRiskScore;
   const forensicAuthScore = results.forensicAuthenticityScore ?? Math.max(0, 100 - forensicScore);
-  const manipProb = results.manipulationProbability ?? results.forgeryRiskScore;
-  const authProb = results.authenticityProbability ?? Math.max(0, 100 - manipProb);
   const certVal = results.predictionCertainty ?? results.confidence;
 
   const isAuth = results.verdict === "authenticated" || results.verdict === "authentic" || results.verdictLabel === "Authentic";

@@ -141,7 +141,6 @@ export async function POST(req: NextRequest) {
 
   // 7. Build a unique, server-controlled S3 object key
   //    Format: users/{clerkUserId}/analyses/{uuid}/{sanitised-filename}
-  const ext = ALLOWED_MIME_TYPES[contentType]; // e.g. "jpg"
   const uuid = randomUUID();
   // Strip anything that isn't alphanumeric, hyphen, underscore, or dot
   const safeFilename = filename.replace(/[^a-zA-Z0-9._-]/g, "_");

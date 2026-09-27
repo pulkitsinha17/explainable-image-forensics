@@ -2,9 +2,9 @@
 
 import { useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Sparkles, ShieldCheck } from 'lucide-react'
-import { motion, useReducedMotion, useMotionValue, useSpring, useTransform } from 'motion/react'
-import { SPRING_PRESS, SPRING_GENTLE, containerVariants, fadeUpItem } from './motion-utils'
+import { ArrowRight, Sparkles } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
+import { containerVariants, fadeUpItem } from './motion-utils'
 
 export function CTA() {
   const prefersReducedMotion = useReducedMotion()

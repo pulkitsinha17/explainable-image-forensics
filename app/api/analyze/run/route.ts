@@ -21,7 +21,7 @@
  */
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { s3Client, S3_BUCKET_NAME } from "@/lib/s3";
 import { connectToDatabase } from "@/lib/mongodb";
 import Analysis from "@/models/Analysis";
@@ -52,6 +52,10 @@ interface MLAnalysis {
   localization: {
     mask_path: string | null;
     overlay_path: string | null;
+    mask_s3_key?: string | null;
+    overlay_s3_key?: string | null;
+    mask_base64?: string | null;
+    overlay_base64?: string | null;
     forgery_pixel_fraction: number;
   };
   evidence: {
@@ -162,6 +166,7 @@ export async function POST(req: NextRequest) {
     const blob = new Blob([new Uint8Array(imageBuffer)], { type: mimeType });
     formData.append("file", blob, record.originalFilename ?? "image.jpg");
     formData.append("analysis_id", analysisId);
+    formData.append("user_id", userId);
 
     const mlResponse = await fetch(`${ML_BACKEND_URL}/analyze`, {
       method: "POST",
@@ -209,8 +214,55 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 7. Persist results in MongoDB
-  //    overlayPath and maskPath are stored server-side ONLY — never returned to client.
+  // 7. Persist results in MongoDB & ensure localization assets are stored in S3
+  //    overlayS3Key and maskS3Key are stored server-side — never returned to client.
+  let finalOverlayS3Key = mlAnalysis.localization.overlay_s3_key ?? null;
+  let finalMaskS3Key = mlAnalysis.localization.mask_s3_key ?? null;
+
+  const userOverlayS3Key = `users/${userId}/analyses/${analysisId}/overlay.png`;
+  const userMaskS3Key = `users/${userId}/analyses/${analysisId}/mask.png`;
+
+  // If FastAPI didn't directly upload to S3, upload the base64 assets from Next.js server-side
+  if (!finalOverlayS3Key && mlAnalysis.localization.overlay_base64) {
+    try {
+      const overlayBuffer = Buffer.from(
+        mlAnalysis.localization.overlay_base64,
+        "base64"
+      );
+      await s3Client.send(
+        new PutObjectCommand({
+          Bucket: S3_BUCKET_NAME,
+          Key: userOverlayS3Key,
+          Body: overlayBuffer,
+          ContentType: "image/png",
+        })
+      );
+      finalOverlayS3Key = userOverlayS3Key;
+    } catch (uploadErr) {
+      console.error("[analyze/run] Failed to upload overlay to S3:", uploadErr);
+    }
+  }
+
+  if (!finalMaskS3Key && mlAnalysis.localization.mask_base64) {
+    try {
+      const maskBuffer = Buffer.from(
+        mlAnalysis.localization.mask_base64,
+        "base64"
+      );
+      await s3Client.send(
+        new PutObjectCommand({
+          Bucket: S3_BUCKET_NAME,
+          Key: userMaskS3Key,
+          Body: maskBuffer,
+          ContentType: "image/png",
+        })
+      );
+      finalMaskS3Key = userMaskS3Key;
+    } catch (uploadErr) {
+      console.error("[analyze/run] Failed to upload mask to S3:", uploadErr);
+    }
+  }
+
   try {
     const verdict = mlAnalysis.verdict;
     // Accept both V2 'manipulated' and legacy 'forged' verdict values
@@ -230,7 +282,10 @@ export async function POST(req: NextRequest) {
     record.localizationResult = {
       forgery_pixel_fraction: mlAnalysis.localization.forgery_pixel_fraction,
     };
-    // Store filesystem paths server-side — used by /api/analyze/mask/[id]
+    // Store S3 object keys — primary storage for decoupled Vercel deployment
+    record.overlayS3Key = finalOverlayS3Key ?? undefined;
+    record.maskS3Key = finalMaskS3Key ?? undefined;
+    // Store local filesystem paths for legacy/dev compat
     record.overlayPath = mlAnalysis.localization.overlay_path ?? undefined;
     record.maskPath = mlAnalysis.localization.mask_path ?? undefined;
     record.mlRawResult = mlAnalysis;
@@ -243,10 +298,14 @@ export async function POST(req: NextRequest) {
   // 8. Build a sanitised client response — NO filesystem paths
   //    The overlay image and binary mask are served via /api/analyze/mask/[analysisId]
   const hasOverlay = Boolean(
-    mlAnalysis.localization.overlay_path && record.overlayPath
+    record.overlayS3Key ||
+    finalOverlayS3Key ||
+    (mlAnalysis.localization.overlay_path && record.overlayPath)
   );
   const hasMask = Boolean(
-    mlAnalysis.localization.mask_path && record.maskPath
+    record.maskS3Key ||
+    finalMaskS3Key ||
+    (mlAnalysis.localization.mask_path && record.maskPath)
   );
 
   return NextResponse.json({

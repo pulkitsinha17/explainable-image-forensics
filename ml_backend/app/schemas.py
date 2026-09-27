@@ -20,8 +20,12 @@ class LocalizationOutput(BaseModel):
     Web-friendly localization results.
     Raw tensors are NOT returned; only derived artifacts and summary statistics.
     """
-    mask_path: Optional[str] = None       # path or URL to the binary mask PNG
-    overlay_path: Optional[str] = None   # path or URL to the heatmap overlay PNG
+    mask_path: Optional[str] = None       # Local path to the binary mask PNG (compat)
+    overlay_path: Optional[str] = None   # Local path to the heatmap overlay PNG (compat)
+    mask_s3_key: Optional[str] = None    # S3 object key for binary mask PNG
+    overlay_s3_key: Optional[str] = None # S3 object key for heatmap overlay PNG
+    mask_base64: Optional[str] = None    # Base64-encoded binary mask PNG
+    overlay_base64: Optional[str] = None # Base64-encoded heatmap overlay PNG
     forgery_pixel_fraction: float         # fraction of pixels predicted as forged
 
 

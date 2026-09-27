@@ -149,6 +149,10 @@ async def analyze(
         None,
         description="Optional analysis ID (MongoDB ObjectId hex string).",
     ),
+    user_id: Optional[str] = Form(
+        None,
+        description="Optional Clerk user ID for user-scoped S3 storage.",
+    ),
 ):
     """
     Run image forgery detection on the uploaded image.
@@ -194,6 +198,7 @@ async def analyze(
             img_rgb=img_rgb,
             models=_models,
             analysis_id=analysis_id,
+            user_id=user_id,
             raw_bytes=raw,
         )
     except RuntimeError as exc:

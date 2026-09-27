@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
@@ -29,6 +30,7 @@ export function Navbar() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null)
   const { isSignedIn, isLoaded } = useAuth()
   const prefersReducedMotion = useReducedMotion()
+  const router = useRouter()
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10)
@@ -44,7 +46,7 @@ export function Navbar() {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' })
       } else {
         e.preventDefault()
-        window.location.href = `/${href}`
+        router.push(`/${href}`)
       }
       setMobileOpen(false)
     } else {

@@ -4,9 +4,24 @@ All paths and settings are read from environment variables or project-relative d
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # ── Root of the ml_backend directory (one level up from this file's package) ──
 ML_BACKEND_ROOT = Path(__file__).resolve().parent.parent
+
+# Load environment variables (.env.local from project root or .env from ml_backend)
+_env_local = ML_BACKEND_ROOT.parent / ".env.local"
+if _env_local.is_file():
+    load_dotenv(_env_local)
+_env_backend = ML_BACKEND_ROOT / ".env"
+if _env_backend.is_file():
+    load_dotenv(_env_backend)
+
+# ── AWS S3 configuration ───────────────────────────────────────────────────────
+AWS_REGION: str = os.environ.get("AWS_REGION", "ap-south-1")
+AWS_ACCESS_KEY_ID: str = os.environ.get("AWS_ACCESS_KEY_ID", "")
+AWS_SECRET_ACCESS_KEY: str = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
+AWS_S3_BUCKET_NAME: str = os.environ.get("AWS_S3_BUCKET_NAME", "pixentra-image-storage-2026")
 
 # ── Model checkpoints ──────────────────────────────────────────────────────────
 MODELS_DIR = ML_BACKEND_ROOT / "models"

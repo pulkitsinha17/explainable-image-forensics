@@ -27,13 +27,23 @@ from __future__ import annotations
 import logging
 import uuid
 from pathlib import Path
+import base64
 from typing import Optional, Union
 
 import cv2
 import numpy as np
 import torch
 
-from app.config import CALIBRATED_IMAGE_THRESHOLD, FORGERY_THRESHOLD, MASKS_DIR, OVERLAYS_DIR
+from app.config import (
+    CALIBRATED_IMAGE_THRESHOLD,
+    FORGERY_THRESHOLD,
+    MASKS_DIR,
+    OVERLAYS_DIR,
+    AWS_REGION,
+    AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY,
+    AWS_S3_BUCKET_NAME,
+)
 from app.inference.model_arch import build_classifier_features
 from app.inference.model_loader import LoadedModels
 from app.inference.preprocessor import prepare_inference_inputs
@@ -44,6 +54,23 @@ logger = logging.getLogger(__name__)
 # Ensure output directories exist
 MASKS_DIR.mkdir(parents=True, exist_ok=True)
 OVERLAYS_DIR.mkdir(parents=True, exist_ok=True)
+
+# ── AWS S3 client setup for decoupled cloud storage ─────────────────────────
+_s3_client = None
+try:
+    import boto3
+    if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+        _s3_client = boto3.client(
+            "s3",
+            region_name=AWS_REGION or "ap-south-1",
+            aws_access_key_id=AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        )
+    elif AWS_S3_BUCKET_NAME:
+        _s3_client = boto3.client("s3", region_name=AWS_REGION or "ap-south-1")
+except Exception as _boto_err:
+    logger.info("[S3] boto3 S3 client not available in FastAPI: %s", _boto_err)
+    _s3_client = None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -350,6 +377,7 @@ def run_inference(
     models: LoadedModels,
     threshold: float = FORGERY_THRESHOLD,
     analysis_id: Optional[str] = None,
+    user_id: Optional[str] = None,
     raw_bytes: Optional[bytes] = None,
     img_path: Optional[Union[str, Path]] = None,
 ) -> AnalysisResult:
@@ -427,6 +455,52 @@ def run_inference(
 
     cv2.imwrite(str(mask_path), mask_arr)
     cv2.imwrite(str(overlay_path), overlay_arr)
+
+    # Encode mask and overlay PNG bytes for decoupled cloud storage
+    _, mask_png = cv2.imencode(".png", mask_arr)
+    _, overlay_png = cv2.imencode(".png", overlay_arr)
+    mask_bytes = mask_png.tobytes()
+    overlay_bytes = overlay_png.tobytes()
+
+    mask_b64 = base64.b64encode(mask_bytes).decode("ascii")
+    overlay_b64 = base64.b64encode(overlay_bytes).decode("ascii")
+
+    mask_s3_key: Optional[str] = None
+    overlay_s3_key: Optional[str] = None
+
+    if user_id:
+        import re as _re_loc
+        safe_user_id = _re_loc.sub(r"[^a-zA-Z0-9_-]", "_", user_id)
+        target_mask_key = f"users/{safe_user_id}/analyses/{analysis_id}/mask.png"
+        target_overlay_key = f"users/{safe_user_id}/analyses/{analysis_id}/overlay.png"
+
+        if _s3_client is not None and AWS_S3_BUCKET_NAME:
+            try:
+                _s3_client.put_object(
+                    Bucket=AWS_S3_BUCKET_NAME,
+                    Key=target_mask_key,
+                    Body=mask_bytes,
+                    ContentType="image/png",
+                )
+                mask_s3_key = target_mask_key
+
+                _s3_client.put_object(
+                    Bucket=AWS_S3_BUCKET_NAME,
+                    Key=target_overlay_key,
+                    Body=overlay_bytes,
+                    ContentType="image/png",
+                )
+                overlay_s3_key = target_overlay_key
+                logger.info(
+                    "[S3] Uploaded localization assets for user=%s analysis=%s",
+                    safe_user_id,
+                    analysis_id,
+                )
+            except Exception as s3_err:
+                logger.warning(
+                    "[S3] Direct S3 upload failed (Next.js will handle storage): %s",
+                    s3_err,
+                )
 
     forgery_pixel_fraction = float(np.mean(mask_arr > 0))
 
@@ -527,6 +601,10 @@ def run_inference(
     localization = LocalizationOutput(
         mask_path=str(mask_path),
         overlay_path=str(overlay_path),
+        mask_s3_key=mask_s3_key,
+        overlay_s3_key=overlay_s3_key,
+        mask_base64=mask_b64,
+        overlay_base64=overlay_b64,
         forgery_pixel_fraction=forgery_pixel_fraction,
     )
 

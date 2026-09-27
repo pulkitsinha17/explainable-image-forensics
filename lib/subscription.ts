@@ -3,7 +3,6 @@ import Analysis from "@/models/Analysis";
 import Subscription from "@/models/Subscription";
 import {
   PlanTier,
-  PlanDefinition,
   PLAN_DEFINITIONS,
   UserUsageInfo,
 } from "@/lib/plans";

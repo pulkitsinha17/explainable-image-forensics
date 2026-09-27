@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, useTransition } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, CheckCircle2, Shield } from 'lucide-react'
@@ -16,7 +16,6 @@ import {
 import {
   heroContainerVariants,
   heroItemVariants,
-  SPRING_PRESS,
   SPRING_GENTLE,
   EASE_OUT,
 } from './motion-utils'
@@ -175,10 +174,11 @@ function ScrambleTruth({
   prefersReducedMotion: boolean | null
 }) {
   const [displayText, setDisplayText] = useState(text)
+  const [, startTransition] = useTransition()
 
   useEffect(() => {
     if (prefersReducedMotion) {
-      setDisplayText(text)
+      startTransition(() => setDisplayText(text))
       return
     }
 
@@ -200,7 +200,7 @@ function ScrambleTruth({
     for (let i = 0; i < chars.length; i++) {
       currentChars[i] = SCRAMBLE_SYMBOLS[Math.floor(Math.random() * SCRAMBLE_SYMBOLS.length)]
     }
-    setDisplayText(currentChars.join(''))
+    startTransition(() => setDisplayText(currentChars.join('')))
 
     const tick = (now: number) => {
       const elapsed = now - startTime

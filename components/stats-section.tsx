@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { motion, useReducedMotion, animate } from 'motion/react'
 import { containerVariants, fadeUpItem, SPRING_GENTLE } from './motion-utils'
 
@@ -51,10 +51,11 @@ const stats = [
 function AnimatedNumber({ target, suffix }: { target: number; suffix: string }) {
   const [display, setDisplay] = useState(0)
   const prefersReducedMotion = useReducedMotion()
+  const [, startTransition] = useTransition()
 
   useEffect(() => {
     if (prefersReducedMotion) {
-      setDisplay(target)
+      startTransition(() => setDisplay(target))
       return
     }
     const controls = animate(0, target, {
@@ -65,7 +66,7 @@ function AnimatedNumber({ target, suffix }: { target: number; suffix: string }) 
       },
     })
     return controls.stop
-  }, [target, prefersReducedMotion])
+  }, [target, prefersReducedMotion, startTransition])
 
   return <>{display}{suffix}</>
 }

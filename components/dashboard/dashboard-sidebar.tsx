@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -24,26 +24,26 @@ interface DashboardSidebarProps {
   };
 }
 
-export function DashboardSidebar({ user }: DashboardSidebarProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- user prop is part of the public API but not consumed in this implementation
+export function DashboardSidebar({ user: _user }: DashboardSidebarProps) {
   const pathname = usePathname();
   const prefersReducedMotion = useReducedMotion();
 
   // Sidebar collapse state with localStorage persistence
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [, startTransition] = useTransition();
 
   useEffect(() => {
-    setIsMounted(true);
     try {
       const saved = localStorage.getItem("pixentra_sidebar_collapsed");
       if (saved !== null) {
-        setIsCollapsed(saved === "true");
+        startTransition(() => setIsCollapsed(saved === "true"));
       }
     } catch {
       // safe fallback
     }
-  }, []);
+  }, [startTransition]);
 
   const toggleSidebar = () => {
     setIsCollapsed((prev) => {

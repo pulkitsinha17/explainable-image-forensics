@@ -5,9 +5,6 @@ import {
   Cpu,
   Layers,
   Search,
-  CheckCircle2,
-  AlertTriangle,
-  FileCode2,
   Compass,
   Database,
   BarChart3,
@@ -25,7 +22,6 @@ import {
   FileSpreadsheet,
   ExternalLink,
   Table,
-  Sparkles,
 } from "lucide-react";
 import type { Metadata } from "next";
 

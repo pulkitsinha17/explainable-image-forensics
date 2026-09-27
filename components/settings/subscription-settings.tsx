@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Zap, Check, ArrowRight, Star, Clock, ShieldCheck, Sparkles } from "lucide-react";
+import { Zap, Check, ArrowRight, Star, Clock } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { EASE_OUT } from "@/components/motion-utils";
 import type { UserUsageInfo } from "@/lib/plans";

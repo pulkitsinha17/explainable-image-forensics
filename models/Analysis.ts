@@ -29,12 +29,22 @@ const AnalysisSchema = new Schema(
     /** Per-channel evidence scores from ML backend */
     evidenceResults: { type: Schema.Types.Mixed },
     /**
-     * Server-side filesystem path to the generated overlay PNG.
-     * NEVER sent to the browser — used only by /api/analyze/mask/[analysisId].
+     * S3 object key of the generated heatmap overlay PNG.
+     * Scoped to user: users/{userId}/analyses/{analysisId}/overlay.png
+     */
+    overlayS3Key: { type: String },
+    /**
+     * S3 object key of the generated binary mask PNG.
+     * Scoped to user: users/{userId}/analyses/{analysisId}/mask.png
+     */
+    maskS3Key: { type: String },
+    /**
+     * Server-side filesystem path to the generated overlay PNG (legacy/local dev compat).
+     * NEVER sent to the browser.
      */
     overlayPath: { type: String },
     /**
-     * Server-side filesystem path to the generated binary mask PNG.
+     * Server-side filesystem path to the generated binary mask PNG (legacy/local dev compat).
      * NEVER sent to the browser.
      */
     maskPath: { type: String },

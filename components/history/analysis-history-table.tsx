@@ -12,7 +12,6 @@ import {
   Copy,
   Check,
   Calendar,
-  ExternalLink,
 } from "lucide-react";
 import type { CompletedAnalysisRecord } from "./types";
 

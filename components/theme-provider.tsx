@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useTransition } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState, useTransition } from "react";
 
 type Theme = "light" | "dark";
 
@@ -13,37 +13,50 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+/**
+ * Applies the "dark" class to <html> immediately — safe to call during or after render.
+ * Defined at module level so it can be referenced before the component body executes.
+ */
+function applyThemeClass(newTheme: Theme) {
+  const root = document.documentElement;
+  if (newTheme === "dark") {
+    root.classList.add("dark");
+  } else {
+    root.classList.remove("dark");
+  }
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
+  // Track mount state via ref to avoid triggering setState-in-effect lint errors.
+  // isMounted is exposed as state so that consumers can re-render once hydrated.
   const [isMounted, setIsMounted] = useState(false);
+  const mountedRef = useRef(false);
   const [, startTransition] = useTransition();
 
   useEffect(() => {
-    setIsMounted(true);
+    if (mountedRef.current) return;
+    mountedRef.current = true;
+
+    let initial: Theme = "light";
     try {
-      const savedTheme = localStorage.getItem("pixentra-theme") as Theme | null;
-      if (savedTheme === "light" || savedTheme === "dark") {
-        setThemeState(savedTheme);
-        applyThemeClass(savedTheme);
-      } else {
-        // Default is light mode
-        setThemeState("light");
-        applyThemeClass("light");
+      const saved = localStorage.getItem("pixentra-theme") as Theme | null;
+      if (saved === "light" || saved === "dark") {
+        initial = saved;
       }
     } catch {
-      // Safe fallback
-      setThemeState("light");
+      // localStorage unavailable — keep default
     }
-  }, []);
 
-  const applyThemeClass = (newTheme: Theme) => {
-    const root = document.documentElement;
-    if (newTheme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  };
+    // Apply class synchronously before paint to avoid flash
+    applyThemeClass(initial);
+
+    // Batch both state updates in a single transition
+    startTransition(() => {
+      setThemeState(initial);
+      setIsMounted(true);
+    });
+  }, []);
 
   const setTheme = (newTheme: Theme) => {
     startTransition(() => {

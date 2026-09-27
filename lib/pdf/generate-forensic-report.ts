@@ -570,7 +570,7 @@ export async function buildForensicPdfDoc(
   const rowH = 7.5;
   const col1W = 48; // Evidence Channel Name (Light-Grey Highlighted)
   const col2W = 22; // Contribution Score
-  const col3W = contentWidth - col1W - col2W; // Description (120mm)
+  // col3 width = contentWidth - col1W - col2W (Description fills remaining space)
 
   resetCardStroke(doc);
   doc.setFillColor(COLORS.cardBg[0], COLORS.cardBg[1], COLORS.cardBg[2]);

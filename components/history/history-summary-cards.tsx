@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, CheckCircle2, AlertTriangle, AlertCircle, Sparkles } from "lucide-react";
+import { FileText, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { EASE_OUT } from "@/components/motion-utils";
 import type { HistorySummaryStats } from "./types";

@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     "ml_backend/**",
     ".venv/**",
     "scratch/**",
+    // Third-party agent skill libraries — not PIXENTRA source code
+    ".agents/**",
   ]),
 ]);
 

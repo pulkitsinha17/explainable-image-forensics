@@ -15,10 +15,8 @@ import {
   X,
   Globe,
   Smartphone,
-  Sparkles,
 } from "lucide-react";
 import {
-  EASE_OUT,
   SPRING_PANEL,
   SPRING_PRESS,
   containerVariantsFast,

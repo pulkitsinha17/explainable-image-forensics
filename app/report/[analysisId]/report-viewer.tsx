@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -20,6 +21,8 @@ import {
 
 export function ReportViewer({ analysisId }: { analysisId: string }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pdfBlobUrlRef = useRef<string | null>(null);
   const fromHistory = searchParams?.get("from") === "history";
   const backHref = fromHistory ? "/history" : `/analysis/${analysisId}`;
   const backLabel = fromHistory ? "Back to History" : "Back to Analysis";
@@ -43,7 +46,7 @@ export function ReportViewer({ analysisId }: { analysisId: string }) {
         const res = await fetch(`/api/analyze/${analysisId}`);
         if (!res.ok) {
           if (res.status === 401) {
-            window.location.href = `/sign-in?redirect_url=${encodeURIComponent(window.location.href)}`;
+            router.push(`/sign-in?redirect_url=${encodeURIComponent(window.location.href)}`);
             return;
           }
           const data = await res.json().catch(() => ({}));
@@ -65,6 +68,7 @@ export function ReportViewer({ analysisId }: { analysisId: string }) {
 
         if (!active) return;
         setPdfBlobUrl(blobUrl);
+        pdfBlobUrlRef.current = blobUrl;
       } catch (err) {
         if (!active) return;
         console.error("Failed to load report:", err);
@@ -78,11 +82,12 @@ export function ReportViewer({ analysisId }: { analysisId: string }) {
 
     return () => {
       active = false;
-      if (pdfBlobUrl) {
-        URL.revokeObjectURL(pdfBlobUrl);
+      if (pdfBlobUrlRef.current) {
+        URL.revokeObjectURL(pdfBlobUrlRef.current);
+        pdfBlobUrlRef.current = null;
       }
     };
-  }, [analysisId]);
+  }, [analysisId, router]);
 
   const handleShareClick = async () => {
     if (typeof window !== "undefined") {

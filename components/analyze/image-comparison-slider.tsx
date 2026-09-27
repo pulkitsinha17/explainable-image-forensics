@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, MouseEvent, TouchEvent } from "react";
 import Image from "next/image";
-import { ChevronsLeftRight, SplitSquareHorizontal, Layers, Image as ImageIcon } from "lucide-react";
+import { ChevronsLeftRight } from "lucide-react";
 
 interface ImageComparisonSliderProps {
   originalImage: string;
@@ -183,8 +183,6 @@ export function ImageComparisonSlider({
                 style={{
                   width: containerWidth > 0
                     ? `${containerWidth}px`
-                    : containerRef.current
-                    ? `${containerRef.current.clientWidth}px`
                     : "100%",
                 }}
               >

@@ -12,7 +12,6 @@ import {
   AlertCircle,
   Copy,
   Check,
-  FileText,
 } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { EASE_OUT } from "@/components/motion-utils";

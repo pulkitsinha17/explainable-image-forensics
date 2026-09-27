@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback, useTransition } from "react";
 import Link from "next/link";
 import {
   PlusCircle,
@@ -13,10 +13,8 @@ import {
   X,
   LayoutGrid,
   List,
-  Filter,
-  ArrowUpDown,
-  Layers,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { EASE_OUT } from "@/components/motion-utils";
 import { TopNavBar } from "@/components/analyze/top-nav-bar";
@@ -60,14 +58,19 @@ export function HistoryWorkspace({
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
 
   // Fetch real analysis records from the authenticated /api/history endpoint
-  const fetchHistory = async () => {
-    try {
+  const [, startTransition] = useTransition();
+  const router = useRouter();
+
+  const fetchHistory = useCallback(async () => {
+    startTransition(() => {
       setLoading(true);
       setError(null);
+    });
+    try {
       const res = await fetch("/api/history");
       if (!res.ok) {
         if (res.status === 401) {
-          window.location.href = `/sign-in?redirect_url=${encodeURIComponent(window.location.href)}`;
+          router.push(`/sign-in?redirect_url=${encodeURIComponent(window.location.href)}`);
           return;
         }
         const errData = await res.json().catch(() => ({}));
@@ -85,11 +88,13 @@ export function HistoryWorkspace({
     } finally {
       setLoading(false);
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    fetchHistory();
-  }, []);
+    const run = async () => { await fetchHistory(); };
+    void run();
+  }, [fetchHistory]);
 
   // Global keyboard shortcut to focus search with '/' or 'Cmd+K' / 'Ctrl+K'
   useEffect(() => {

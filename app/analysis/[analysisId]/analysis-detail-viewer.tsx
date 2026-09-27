@@ -24,7 +24,7 @@ export function AnalysisDetailViewer({ analysisId }: { analysisId: string }) {
         const res = await fetch(`/api/analyze/${analysisId}`);
         if (!res.ok) {
           if (res.status === 401) {
-            window.location.href = `/sign-in?redirect_url=${encodeURIComponent(window.location.href)}`;
+            router.push(`/sign-in?redirect_url=${encodeURIComponent(window.location.href)}`);
             return;
           }
           const errData = await res.json().catch(() => ({}));
@@ -52,7 +52,7 @@ export function AnalysisDetailViewer({ analysisId }: { analysisId: string }) {
     return () => {
       active = false;
     };
-  }, [analysisId]);
+  }, [analysisId, router]);
 
   if (loading) {
     return (

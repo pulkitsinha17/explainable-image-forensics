@@ -32,7 +32,7 @@ export default async function AnalysisDetailPage({
   const userImageUrl = user?.imageUrl;
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-gray-900 flex flex-col lg:flex-row antialiased">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0B0B0B] text-gray-900 dark:text-gray-100 flex flex-col lg:flex-row antialiased">
       {/* Desktop & Mobile Responsive Sidebar */}
       <DashboardSidebar
         user={{
