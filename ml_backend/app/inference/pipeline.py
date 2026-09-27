@@ -363,6 +363,15 @@ def run_inference(
         )
 
     analysis_id = analysis_id or str(uuid.uuid4())
+
+    # Sanitize analysis_id to prevent path traversal when used as filename prefix.
+    # Only allow alphanumeric characters, hyphens, and underscores.
+    import re as _re
+    safe_id = _re.sub(r'[^a-zA-Z0-9_-]', '_', analysis_id)
+    if not safe_id or len(safe_id) > 64:
+        safe_id = str(uuid.uuid4())
+    analysis_id = safe_id
+
     device = models.device
     original_shape = img_rgb.shape  # (H_orig, W_orig, 3)
 

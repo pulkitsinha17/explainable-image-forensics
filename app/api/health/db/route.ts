@@ -35,6 +35,8 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       database: PIXENTRA_DB_NAME,
+    }, {
+      headers: { "Cache-Control": "no-store" },
     });
   } catch {
     return NextResponse.json(

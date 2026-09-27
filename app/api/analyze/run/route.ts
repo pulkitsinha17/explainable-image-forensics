@@ -25,9 +25,13 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { s3Client, S3_BUCKET_NAME } from "@/lib/s3";
 import { connectToDatabase } from "@/lib/mongodb";
 import Analysis from "@/models/Analysis";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const ML_BACKEND_URL =
   process.env.ML_BACKEND_URL ?? "http://localhost:8001";
+
+/** Shared secret for Next.js → FastAPI inter-service authentication. */
+const ML_BACKEND_SECRET = process.env.ML_BACKEND_SECRET ?? "";
 
 /** Shape of the ML backend /analyze JSON response body (V2 + legacy compat) */
 interface MLAnalysis {
@@ -69,7 +73,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  // 2. Parse body
+  // 2. Rate limit: max 15 ML inference runs per minute per user
+  const rateLimit = checkRateLimit(`run:${userId}`, { maxRequests: 15, windowMs: 60_000 });
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many analysis requests. Please wait a moment before running another analysis." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.ceil(rateLimit.resetMs / 1000)),
+        },
+      }
+    );
+  }
+
+  // 3. Parse body
   let body: { analysisId?: unknown; s3Key?: unknown };
   try {
     body = await req.json();
@@ -147,6 +165,7 @@ export async function POST(req: NextRequest) {
 
     const mlResponse = await fetch(`${ML_BACKEND_URL}/analyze`, {
       method: "POST",
+      headers: ML_BACKEND_SECRET ? { "X-Internal-Secret": ML_BACKEND_SECRET } : undefined,
       body: formData,
       signal: AbortSignal.timeout(120_000), // 2-minute timeout
     });

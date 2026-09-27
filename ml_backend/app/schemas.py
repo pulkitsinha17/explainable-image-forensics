@@ -11,10 +11,8 @@ class HealthResponse(BaseModel):
     model_loaded: bool
     mpc_loaded: bool
     bundle_loaded: bool         # True when the full V2 classifier bundle is loaded
-    device: str
-    proposed_checkpoint: str
-    mpc_checkpoint: str
-    bundle_path: str
+    device: Optional[str] = None
+
 
 
 class LocalizationOutput(BaseModel):

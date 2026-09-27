@@ -106,9 +106,9 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
           >
             {/* Logo Link */}
             <Link
-              href="/dashboard"
+              href="/"
               className="group flex items-center outline-none focus-visible:ring-2 focus-visible:ring-[#1a7fc4] rounded-lg"
-              title="PIXENTRA Dashboard"
+              title="PIXENTRA Home"
             >
               {isCollapsed ? (
                 <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-center group-hover:border-blue-200 dark:group-hover:border-blue-800 group-hover:bg-blue-50/50 dark:group-hover:bg-blue-950/30 transition-colors shadow-2xs">
@@ -269,7 +269,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       {/* Mobile Top Header (Responsive for < 1024px)                  */}
       {/* ───────────────────────────────────────────────────────────── */}
       <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-[#121212] border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-40 shadow-2xs w-full max-w-full">
-        <Link href="/dashboard" className="flex items-center gap-2" aria-label="PIXENTRA Dashboard">
+        <Link href="/" className="flex items-center gap-2" aria-label="PIXENTRA Home">
           <Image
             src="/pixentra-logo.svg"
             alt="PIXENTRA"
@@ -309,20 +309,22 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
           />
           <div className="relative flex flex-col w-[260px] max-w-[80vw] h-full bg-white dark:bg-[#121212] shadow-2xl z-10 border-r border-slate-200/80 dark:border-slate-800">
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-              <Image
-                src="/pixentra-logo.svg"
-                alt="PIXENTRA"
-                width={130}
-                height={65}
-                className="h-8.5 w-auto block dark:hidden"
-              />
-              <Image
-                src="/pixentra-logo-dark.svg"
-                alt="PIXENTRA"
-                width={130}
-                height={65}
-                className="h-8.5 w-auto hidden dark:block"
-              />
+              <Link href="/" onClick={() => setMobileOpen(false)} aria-label="PIXENTRA Home">
+                <Image
+                  src="/pixentra-logo.svg"
+                  alt="PIXENTRA"
+                  width={130}
+                  height={65}
+                  className="h-8.5 w-auto block dark:hidden"
+                />
+                <Image
+                  src="/pixentra-logo-dark.svg"
+                  alt="PIXENTRA"
+                  width={130}
+                  height={65}
+                  className="h-8.5 w-auto hidden dark:block"
+                />
+              </Link>
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}

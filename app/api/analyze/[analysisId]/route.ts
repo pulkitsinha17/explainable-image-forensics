@@ -41,9 +41,10 @@ export async function GET(
     return NextResponse.json({ error: "Analysis not found." }, { status: 404 });
   }
 
-  // If pending or failed, only the owner can view
-  if (record.status !== "completed" && record.clerkUserId !== userId) {
-    return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+  // Only the owner may access their analysis, regardless of status
+  if (record.clerkUserId !== userId) {
+    // Return 404 instead of 403 to avoid leaking existence of other users' analyses
+    return NextResponse.json({ error: "Analysis not found." }, { status: 404 });
   }
 
   // 2. Generate pre-signed URL for original image if s3Key exists

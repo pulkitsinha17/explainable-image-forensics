@@ -10,11 +10,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Feedback from "@/models/Feedback";
 import Analysis from "@/models/Analysis";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  // Rate limit: max 30 feedback submissions per minute per user
+  const rateLimit = checkRateLimit(`feedback:${userId}`, { maxRequests: 30, windowMs: 60_000 });
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many feedback submissions. Please slow down." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.ceil(rateLimit.resetMs / 1000)),
+        },
+      }
+    );
   }
 
   let body: { analysisId?: unknown; rating?: unknown; comment?: unknown };
@@ -48,14 +63,16 @@ export async function POST(req: NextRequest) {
 
   await connectToDatabase();
 
-  // Validate that the analysis exists
+  // Validate that the analysis exists AND belongs to this user
   try {
-    const analysisExists = await Analysis.exists({ _id: analysisId });
-    if (!analysisExists) {
+    const analysis = await Analysis.findOne({ _id: analysisId, clerkUserId: userId }).select("_id").lean();
+    if (!analysis) {
+      // Return 404 regardless of whether analysis doesn't exist or belongs to another user
+      // to avoid leaking the existence of other users' analyses
       return NextResponse.json({ error: "Analysis not found." }, { status: 404 });
     }
   } catch {
-    // If analysisId is not a valid ObjectId or not found
+    // If analysisId is not a valid ObjectId
     return NextResponse.json({ error: "Invalid analysis ID." }, { status: 400 });
   }
 

@@ -10,6 +10,7 @@ import {
   MAX_UPLOAD_BYTES,
 } from "@/lib/s3";
 import { getUserUsageAndLimit } from "@/lib/subscription";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 /**
  * POST /api/analyze/presign
@@ -22,6 +23,7 @@ import { getUserUsageAndLimit } from "@/lib/subscription";
  *
  * Security:
  *   - Clerk authentication is enforced — unauthenticated requests are rejected.
+ *   - Sliding-window rate limiting applied per user.
  *   - Server-side usage quota/limit is verified before granting upload permissions.
  *   - Content-type and file size are validated server-side.
  *   - The S3 key is generated server-side from the authenticated userId;
@@ -39,7 +41,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 2. Check server-side analysis quota limit (bypassed in development mode)
+  // 2. Rate limit (20 presign requests per minute per user)
+  const rateLimit = checkRateLimit(`presign:${userId}`, { maxRequests: 20, windowMs: 60_000 });
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many upload requests. Please wait a moment and try again." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.ceil(rateLimit.resetMs / 1000)),
+        },
+      }
+    );
+  }
+
+  // 3. Check server-side analysis quota limit (bypassed in development mode)
   try {
     const isDev = process.env.NODE_ENV === "development";
     const usage = await getUserUsageAndLimit(userId);

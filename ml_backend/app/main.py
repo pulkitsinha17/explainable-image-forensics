@@ -53,6 +53,37 @@ async def lifespan(app: FastAPI):
 #  FastAPI app
 # ─────────────────────────────────────────────────────────────────────────────
 
+# ─────────────────────────────────────────────────────────────────────────────
+#  Inter-service authentication
+#  Set PIXENTRA_INTERNAL_SECRET in the FastAPI process environment.
+#  The Next.js side sends the same value in X-Internal-Secret header.
+#  In development, if not set, a warning is logged and auth is skipped.
+# ─────────────────────────────────────────────────────────────────────────────
+
+_INTERNAL_SECRET: Optional[str] = os.environ.get("PIXENTRA_INTERNAL_SECRET") or None
+
+if _INTERNAL_SECRET is None:
+    logger.warning(
+        "[SECURITY] PIXENTRA_INTERNAL_SECRET is not set. "
+        "/analyze has NO inter-service authentication. "
+        "Set this in production to prevent unauthorized access."
+    )
+
+
+def _verify_internal_secret(request: Request) -> None:
+    """Verify X-Internal-Secret header. Skips in dev when secret is unset."""
+    if _INTERNAL_SECRET is None:
+        return  # dev mode — skip
+    import hmac
+    provided = request.headers.get("X-Internal-Secret", "")
+    if not hmac.compare_digest(provided, _INTERNAL_SECRET):
+        logger.warning(
+            "[SECURITY] Rejected %s — invalid X-Internal-Secret",
+            request.url.path,
+        )
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+
 app = FastAPI(
     title="PIXENTRA ML Backend",
     version="1.0.0",
@@ -61,9 +92,12 @@ app = FastAPI(
         "Runs StrongMultiEvidenceNet (ResNet34 FPN + 5-channel evidence + MPC prior)."
     ),
     lifespan=lifespan,
+    # Disable Swagger/ReDoc in production
+    docs_url=None if os.environ.get("ENVIRONMENT") == "production" else "/docs",
+    redoc_url=None if os.environ.get("ENVIRONMENT") == "production" else "/redoc",
 )
 
-# CORS — allow the Next.js frontend to call this service
+# CORS — only the Next.js frontend origin(s); never "*" with credentials
 _allowed_origins = os.environ.get(
     "CORS_ORIGINS",
     "http://localhost:3000,http://127.0.0.1:3000",
@@ -72,9 +106,9 @@ _allowed_origins = os.environ.get(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[o.strip() for o in _allowed_origins],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["GET", "POST"],
-    allow_headers=["*"],
+    allow_headers=["Content-Type", "X-Internal-Secret"],
 )
 
 
@@ -84,10 +118,11 @@ app.add_middleware(
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
+    # Log full exception server-side — never expose internal details to client
     logger.error("Unhandled exception on %s: %s", request.url.path, exc, exc_info=True)
     return JSONResponse(
         status_code=500,
-        content=ErrorResponse(error=str(exc)).model_dump(),
+        content=ErrorResponse(error="An internal error occurred. Please try again.").model_dump(),
     )
 
 
@@ -95,30 +130,24 @@ async def global_exception_handler(request: Request, exc: Exception):
 #  Endpoints
 # ─────────────────────────────────────────────────────────────────────────────
 
-@app.get("/health", response_model=HealthResponse, tags=["health"])
+@app.get("/health", tags=["health"])
 async def health():
-    """Return service and model load status."""
-    import torch
-
-    device = _models.device if _models else "unknown"
-    return HealthResponse(
-        status="ok",
-        model_loaded=_models is not None and _models.proposed_loaded,
-        mpc_loaded=_models is not None and _models.mpc_loaded,
-        bundle_loaded=_models is not None and _models.bundle_loaded,
-        device=str(device),
-        proposed_checkpoint=str(PROPOSED_CHECKPOINT),
-        mpc_checkpoint=str(MPC_CHECKPOINT),
-        bundle_path=str(FORENSIC_BUNDLE_PATH),
-    )
+    """Return minimal liveness status. Does NOT expose internal paths or device info."""
+    return {
+        "status": "ok",
+        "model_loaded": _models is not None and _models.proposed_loaded,
+        "mpc_loaded": _models is not None and _models.mpc_loaded,
+        "bundle_loaded": _models is not None and _models.bundle_loaded,
+    }
 
 
 @app.post("/analyze", response_model=AnalysisResponse, tags=["inference"])
 async def analyze(
+    request: Request,
     file: UploadFile = File(..., description="Image file to analyse (JPEG / PNG / WebP)"),
     analysis_id: Optional[str] = Form(
         None,
-        description="Optional analysis ID (UUID). Matches the MongoDB document _id.",
+        description="Optional analysis ID (MongoDB ObjectId hex string).",
     ),
 ):
     """
@@ -127,14 +156,14 @@ async def analyze(
     Returns verdict, risk score, confidence, per-evidence scores, and
     paths to the binary mask and heatmap overlay.
     """
+    # ── Guard: inter-service authentication ───────────────────────────────────
+    _verify_internal_secret(request)
+
     # ── Guard: model must be loaded ───────────────────────────────────────────
     if _models is None or not _models.proposed_loaded:
         raise HTTPException(
             status_code=503,
-            detail=(
-                "Model not loaded. "
-                "Ensure pixentra_forensic_classifier_bundle.pth is present in ml_backend/models/."
-            ),
+            detail="Model not ready. Please try again later.",
         )
 
     # ── Content-type validation ────────────────────────────────────────────────
@@ -171,6 +200,6 @@ async def analyze(
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
         logger.error("Inference failed: %s", exc, exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Inference failed: {exc}") from exc
+        raise HTTPException(status_code=500, detail="Inference failed. Please try again.") from exc
 
     return AnalysisResponse(success=True, analysis=result)

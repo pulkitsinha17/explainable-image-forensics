@@ -55,12 +55,10 @@ export async function GET(
     return new NextResponse("Analysis not found", { status: 404 });
   }
 
-  // 4. Ensure the record is completed
-  if (record.status !== "completed") {
-    // If not completed yet, only the owner can check pending/processing
-    if (record.clerkUserId !== userId) {
-      return new NextResponse("Forbidden", { status: 403 });
-    }
+  // Only the owner may access their analysis assets, regardless of status
+  if (record.clerkUserId !== userId) {
+    // Return 404 to avoid leaking existence of other users' analyses
+    return new NextResponse("Analysis not found", { status: 404 });
   }
 
   // 5. Check requested asset (default: overlay; ?type=mask: binary mask)
