@@ -84,6 +84,22 @@ ALLOWED_CONTENT_TYPES = {
 }
 
 # ── Output directories ─────────────────────────────────────────────────────────
-OUTPUTS_DIR = ML_BACKEND_ROOT / "outputs"
+# In serverless environments (Vercel / AWS Lambda), the code directory (/var/task)
+# is strictly read-only. Writable temporary storage is mounted at /tmp.
+# In local development, default to project-relative ml_backend/outputs.
+_IS_SERVERLESS: bool = bool(
+    os.environ.get("VERCEL")
+    or os.environ.get("AWS_LAMBDA_FUNCTION_NAME")
+    or os.environ.get("LAMBDA_TASK_ROOT")
+    or str(ML_BACKEND_ROOT).startswith("/var/task")
+)
+
+if _IS_SERVERLESS:
+    OUTPUTS_DIR = Path(os.environ.get("OUTPUTS_DIR", "/tmp/pixentra_outputs"))
+else:
+    OUTPUTS_DIR = Path(
+        os.environ.get("OUTPUTS_DIR", str(ML_BACKEND_ROOT / "outputs"))
+    )
+
 MASKS_DIR = OUTPUTS_DIR / "masks"
 OVERLAYS_DIR = OUTPUTS_DIR / "overlays"

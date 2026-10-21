@@ -51,9 +51,20 @@ from app.schemas import AnalysisResult, EvidenceScores, LocalizationOutput
 
 logger = logging.getLogger(__name__)
 
-# Ensure output directories exist
-MASKS_DIR.mkdir(parents=True, exist_ok=True)
-OVERLAYS_DIR.mkdir(parents=True, exist_ok=True)
+# Ensure output directories exist safely without failing on read-only environments
+def _ensure_output_dirs() -> None:
+    try:
+        MASKS_DIR.mkdir(parents=True, exist_ok=True)
+        OVERLAYS_DIR.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        logger.warning(
+            "[Storage] Could not create output directories (%s, %s): %s",
+            MASKS_DIR,
+            OVERLAYS_DIR,
+            exc,
+        )
+
+_ensure_output_dirs()
 
 # ── AWS S3 client setup for decoupled cloud storage ─────────────────────────
 _s3_client = None
@@ -453,8 +464,17 @@ def run_inference(
     mask_path = MASKS_DIR / f"{analysis_id}_mask.png"
     overlay_path = OVERLAYS_DIR / f"{analysis_id}_overlay.png"
 
-    cv2.imwrite(str(mask_path), mask_arr)
-    cv2.imwrite(str(overlay_path), overlay_arr)
+    try:
+        _ensure_output_dirs()
+        cv2.imwrite(str(mask_path), mask_arr)
+        cv2.imwrite(str(overlay_path), overlay_arr)
+    except OSError as fs_err:
+        logger.warning(
+            "[Storage] Could not write local mask/overlay files (%s, %s): %s",
+            mask_path,
+            overlay_path,
+            fs_err,
+        )
 
     # Encode mask and overlay PNG bytes for decoupled cloud storage
     _, mask_png = cv2.imencode(".png", mask_arr)
