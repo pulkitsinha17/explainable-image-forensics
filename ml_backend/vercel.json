@@ -9,12 +9,10 @@
     "app/main.py": {
       "maxDuration": 60,
       "excludeFiles": "{train.py,test.py,mydatasets.py,losses.py,outputs/**,models/best_multi_evidence_stage1.pth,models/MPC_CATNet_stage2_weights.pth,models/mpc_stage1_best.pth}"
+    },
+    "main.py": {
+      "maxDuration": 60,
+      "excludeFiles": "{train.py,test.py,mydatasets.py,losses.py,outputs/**,models/best_multi_evidence_stage1.pth,models/MPC_CATNet_stage2_weights.pth,models/mpc_stage1_best.pth}"
     }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/app/main.py"
-    }
-  ]
+  }
 }

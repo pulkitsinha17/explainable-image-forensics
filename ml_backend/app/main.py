@@ -130,7 +130,11 @@ async def global_exception_handler(request: Request, exc: Exception):
 #  Endpoints
 # ─────────────────────────────────────────────────────────────────────────────
 
+@app.get("/", tags=["health"])
 @app.get("/health", tags=["health"])
+@app.get("/health/", include_in_schema=False)
+@app.get("/app/main.py", include_in_schema=False)
+@app.get("/app/main.py/health", include_in_schema=False)
 async def health():
     """Return minimal liveness status. Does NOT expose internal paths or device info."""
     return {
@@ -142,6 +146,7 @@ async def health():
 
 
 @app.post("/analyze", response_model=AnalysisResponse, tags=["inference"])
+@app.post("/app/main.py/analyze", response_model=AnalysisResponse, include_in_schema=False)
 async def analyze(
     request: Request,
     file: UploadFile = File(..., description="Image file to analyse (JPEG / PNG / WebP)"),
