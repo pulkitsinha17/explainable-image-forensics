@@ -1,0 +1,36 @@
+# Vercel deployment ignore rules
+# Exclude caches, test outputs, training scripts, and unused checkpoints
+
+# Node and Next.js caches
+node_modules/
+.next/
+
+# Python virtual environment and caches
+.venv/
+ml_backend/.venv/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# ML backend training, testing, and output artifacts
+ml_backend/train.py
+ml_backend/test.py
+ml_backend/mydatasets.py
+ml_backend/losses.py
+ml_backend/outputs/
+ml_backend/*.ipynb
+
+# Unused checkpoints (ONLY active production models preserved)
+# Active production models (DO NOT EXCLUDE):
+#   - ml_backend/models/pixentra_forensic_classifier_bundle.pth
+#   - ml_backend/models/MPC_CASIAv2_stage2_weights.pth
+ml_backend/models/best_multi_evidence_stage1.pth
+ml_backend/models/MPC_CATNet_stage2_weights.pth
+ml_backend/models/mpc_stage1_best.pth
+
+# Version control and editor
+.git/
+.github/
+.vscode/
+.DS_Store
+*.log

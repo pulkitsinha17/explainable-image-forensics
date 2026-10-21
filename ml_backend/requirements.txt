@@ -8,12 +8,15 @@ uvicorn[standard]>=0.30.0,<1.0.0
 python-multipart>=0.0.12         # required for FastAPI File/Form uploads
 
 # ── ML ─────────────────────────────────────────────────────────────────────────
-# Install the correct variant of torch for your hardware:
-#   CPU-only:  pip install torch torchvision
-#   CUDA 12.x: pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
-# This file lists CPU as the baseline; override with the CUDA wheels if available.
-torch>=2.2.0
-torchvision>=0.17.0
+# Install CPU-only variant of PyTorch for serverless / Vercel Linux deployment.
+# Using --extra-index-url ensures pip downloads lightweight CPU wheels without
+# pulling ~5 GB of NVIDIA CUDA 12 runtime dependencies (nvidia-*-cu12, triton).
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.4.1+cpu
+torchvision==0.19.1+cpu
+einops>=0.8.0
+timm>=1.0.0
+yacs>=0.1.8
 
 # ── Image processing ───────────────────────────────────────────────────────────
 opencv-python-headless>=4.9.0

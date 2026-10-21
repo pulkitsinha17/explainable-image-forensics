@@ -1,0 +1,35 @@
+# Vercel deployment exclusions for PIXENTRA ML Backend
+# Keep bundle within Vercel Large Function limits by excluding non-runtime files.
+
+# Virtual environment and caches
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Training, testing, and dataset preparation (inference-only runtime)
+train.py
+test.py
+mydatasets.py
+losses.py
+*.ipynb
+
+# Local test outputs and artifacts
+outputs/
+*.log
+
+# Unused model checkpoints (ONLY active production models must be included)
+# Active production models (DO NOT EXCLUDE):
+#   - models/pixentra_forensic_classifier_bundle.pth (309.8 MB)
+#   - models/MPC_CASIAv2_stage2_weights.pth (182.7 MB)
+models/best_multi_evidence_stage1.pth
+models/MPC_CATNet_stage2_weights.pth
+models/mpc_stage1_best.pth
+
+# Docs and version control metadata
+README.md
+.git/
+.github/
+.vscode/
+.DS_Store
