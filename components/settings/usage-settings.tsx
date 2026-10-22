@@ -17,8 +17,9 @@ interface UsageSettingsProps {
 
 export function UsageSettings({ usage }: UsageSettingsProps) {
   const shouldReduceMotion = useReducedMotion();
-  const isNearLimit = usage.percentage >= 80 && !usage.isLimitReached;
-  const isAtLimit = usage.isLimitReached;
+  const isDevUnlimited = Boolean(usage.isDeveloperUnlimited || usage.isDeveloper);
+  const isNearLimit = usage.percentage >= 80 && !usage.isLimitReached && !isDevUnlimited;
+  const isAtLimit = usage.isLimitReached && !isDevUnlimited;
 
   return (
     <motion.div
@@ -38,13 +39,19 @@ export function UsageSettings({ usage }: UsageSettingsProps) {
               <BarChart3 className="w-6 h-6" />
             </div>
             <div>
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 flex-wrap">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
                   Analysis Usage
                 </h2>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] border border-blue-100/80 dark:border-blue-800/50 shadow-2xs">
                   {usage.planName} Plan
                 </span>
+                {isDevUnlimited && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50 shadow-2xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Developer Access • Unlimited
+                  </span>
+                )}
               </div>
               <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                 Real-time forensic investigation capacity computed directly from your analyses.
@@ -74,13 +81,19 @@ export function UsageSettings({ usage }: UsageSettingsProps) {
 
           <div className="p-4 rounded-xl bg-gray-50/80 dark:bg-slate-800/50 border border-gray-100/90 dark:border-slate-700/60 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors">
             <span className="text-xs font-semibold text-gray-700 dark:text-slate-300">Analyses Used</span>
-            <span className="text-sm font-bold text-gray-900 dark:text-white">{usage.used} / {usage.limit} analyses used</span>
+            <span className="text-sm font-bold text-gray-900 dark:text-white">
+              {isDevUnlimited
+                ? `${usage.used} analyses used (Unlimited)`
+                : `${usage.used} / ${usage.limit} analyses used`}
+            </span>
           </div>
 
           <div className="p-4 rounded-xl bg-gray-50/80 dark:bg-slate-800/50 border border-gray-100/90 dark:border-slate-700/60 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors">
             <span className="text-xs font-semibold text-gray-700 dark:text-slate-300">Analyses Remaining</span>
-            <span className={`text-sm font-bold ${usage.remaining === 0 ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"}`}>
-              {usage.remaining} analyses remaining
+            <span className={`text-sm font-bold ${usage.remaining === 0 && !isDevUnlimited ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"}`}>
+              {isDevUnlimited
+                ? "Unlimited analyses"
+                : `${usage.remaining} analyses remaining`}
             </span>
           </div>
         </div>
@@ -89,16 +102,20 @@ export function UsageSettings({ usage }: UsageSettingsProps) {
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between text-xs font-semibold">
             <span className="text-gray-700 dark:text-slate-300">Usage Progress</span>
-            <span className="text-gray-900 dark:text-white font-bold">{usage.percentage}%</span>
+            <span className="text-gray-900 dark:text-white font-bold">
+              {isDevUnlimited ? "Unlimited" : `${usage.percentage}%`}
+            </span>
           </div>
 
           <div className="w-full bg-gray-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden p-0.5">
             <motion.div
               initial={shouldReduceMotion ? false : { width: 0 }}
-              animate={{ width: `${usage.percentage}%` }}
+              animate={{ width: isDevUnlimited ? "100%" : `${usage.percentage}%` }}
               transition={{ duration: 0.85, ease: EASE_OUT }}
               className={`h-full rounded-full ${
-                isAtLimit
+                isDevUnlimited
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[0_0_12px_rgba(16,185,129,0.35)]"
+                  : isAtLimit
                   ? "bg-rose-500 shadow-[0_0_12px_rgba(239,68,68,0.4)]"
                   : isNearLimit
                   ? "bg-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.4)]"
@@ -108,10 +125,26 @@ export function UsageSettings({ usage }: UsageSettingsProps) {
           </div>
 
           <p className="text-xs text-gray-500 dark:text-slate-400">
-            {usage.plan === "free"
+            {isDevUnlimited
+              ? "Developer account active: forensic analysis quota limits are waived."
+              : usage.plan === "free"
               ? "Your Free plan includes 5 analyses total."
               : `Your ${usage.planName} plan includes ${usage.limit} analyses ${usage.periodLabel.toLowerCase()}.`}
           </p>
+
+          {isDevUnlimited && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, ease: EASE_OUT }}
+              className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/50 flex items-center gap-3 text-xs text-emerald-800 dark:text-emerald-300"
+            >
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span>
+                Developer Account: You have unrestricted analysis access. Analysis limits and upgrade blocks do not apply to your account.
+              </span>
+            </motion.div>
+          )}
 
           {isAtLimit && (
             <motion.div

@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 import { AnalyzeWorkspace } from "@/components/analyze/analyze-workspace";
+import { getUserUsageAndLimit } from "@/lib/subscription";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,14 @@ export default async function AnalyzePage() {
   const userImageUrl = user?.imageUrl;
   const userInitial = (displayName?.[0] || "P").toUpperCase();
 
+  let isDeveloperUnlimited = false;
+  try {
+    const usage = await getUserUsageAndLimit(userId);
+    isDeveloperUnlimited = Boolean(usage.isDeveloperUnlimited);
+  } catch {
+    // Graceful fallback: do not crash page if DB query encounters temporary issue
+  }
+
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0B0B0B] text-gray-900 dark:text-gray-100 flex flex-col lg:flex-row antialiased">
       {/* Desktop & Mobile Responsive Sidebar */}
@@ -43,6 +52,7 @@ export default async function AnalyzePage() {
           <AnalyzeWorkspace
             userInitial={userInitial}
             userDisplayName={displayName}
+            isDeveloperUnlimited={isDeveloperUnlimited}
           />
         </main>
       </div>

@@ -6,6 +6,7 @@ import {
   PLAN_DEFINITIONS,
   UserUsageInfo,
 } from "@/lib/plans";
+import { isDeveloperUser } from "@/lib/developer-access";
 
 export * from "@/lib/plans";
 
@@ -38,9 +39,12 @@ export async function getUserUsageAndLimit(clerkUserId: string): Promise<UserUsa
     });
   }
 
+  // Developer quota exemption check (server-side, verified Clerk email)
+  const isDeveloperUnlimited = await isDeveloperUser(clerkUserId);
+
   const isDev = process.env.NODE_ENV === "development";
-  const remaining = Math.max(0, limit - used);
-  const isLimitReached = isDev ? false : used >= limit;
+  const remaining = isDeveloperUnlimited ? 999999 : Math.max(0, limit - used);
+  const isLimitReached = isDeveloperUnlimited ? false : isDev ? false : used >= limit;
   const percentage = Math.min(100, Math.round((used / limit) * 100));
 
   return {
@@ -60,5 +64,7 @@ export async function getUserUsageAndLimit(clerkUserId: string): Promise<UserUsa
     currentPeriodEnd: subscriptionDoc?.currentPeriodEnd
       ? new Date(subscriptionDoc.currentPeriodEnd).toISOString()
       : null,
+    isDeveloper: isDeveloperUnlimited,
+    isDeveloperUnlimited,
   };
 }

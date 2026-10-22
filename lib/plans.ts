@@ -95,4 +95,6 @@ export interface UserUsageInfo {
   percentage: number;
   currentPeriodStart: string | null;
   currentPeriodEnd: string | null;
+  isDeveloper?: boolean;
+  isDeveloperUnlimited?: boolean;
 }

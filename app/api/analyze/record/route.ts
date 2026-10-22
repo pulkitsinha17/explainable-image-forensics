@@ -16,6 +16,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Analysis from "@/models/Analysis";
 import { getUserUsageAndLimit } from "@/lib/subscription";
+import { isDeveloperUser } from "@/lib/developer-access";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
@@ -64,29 +65,26 @@ export async function POST(req: NextRequest) {
   // Strip directory traversal characters — only keep safe characters
   const filename = rawFilename.replace(/[/\\<>:"|?*\x00-\x1F]/g, "_");
 
-  const isDev = process.env.NODE_ENV === "development";
-
   await connectToDatabase();
 
   // Re-check usage limit atomically inside the DB block to minimize race window.
   // (True atomicity would require a MongoDB transaction, but this reduces the race
   // window to a single-digit millisecond range for the free tier limit enforcement.)
-  if (!isDev) {
-    try {
-      const usage = await getUserUsageAndLimit(userId);
-      if (usage.isLimitReached) {
-        return NextResponse.json(
-          {
-            error: `Analysis limit reached (${usage.used}/${usage.limit} on ${usage.planName} plan). Please upgrade your plan.`,
-            limitReached: true,
-          },
-          { status: 403 }
-        );
-      }
-    } catch (err) {
-      console.error("[analyze/record] Usage check error:", err);
-      // Don't block if DB check fails unexpectedly
+  try {
+    const usage = await getUserUsageAndLimit(userId);
+    const isDeveloper = usage.isDeveloper || usage.isDeveloperUnlimited || (await isDeveloperUser(userId));
+    if (usage.isLimitReached && !isDeveloper) {
+      return NextResponse.json(
+        {
+          error: `Analysis limit reached (${usage.used}/${usage.limit} on ${usage.planName} plan). Please upgrade your plan.`,
+          limitReached: true,
+        },
+        { status: 403 }
+      );
     }
+  } catch (err) {
+    console.error("[analyze/record] Usage check error:", err);
+    // Don't block if DB check fails unexpectedly
   }
 
   const record = await Analysis.create({

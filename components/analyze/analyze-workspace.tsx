@@ -18,6 +18,7 @@ import type {
 interface AnalyzeWorkspaceProps {
   userInitial?: string;
   userDisplayName?: string;
+  isDeveloperUnlimited?: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -202,6 +203,7 @@ function toForensicResult(
 export function AnalyzeWorkspace({
   userInitial = "P",
   userDisplayName = "Pulkit Sinha",
+  isDeveloperUnlimited = false,
 }: AnalyzeWorkspaceProps) {
   const [selectedImage, setSelectedImage] = useState<SelectedImageData | null>(null);
 
@@ -453,9 +455,17 @@ export function AnalyzeWorkspace({
       {/* Page Header (hidden when results card is active to preserve viewport height) */}
       {!forensicResult && (
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
-            Analyze an Image
-          </h1>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+              Analyze an Image
+            </h1>
+            {isDeveloperUnlimited && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Unlimited Developer Analyses
+              </span>
+            )}
+          </div>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 max-w-3xl">
             Upload an image to perform deep multi-evidence forensic analysis and uncover the truth behind its pixels.
           </p>

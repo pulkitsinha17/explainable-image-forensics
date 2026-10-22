@@ -10,6 +10,7 @@ import {
   MAX_UPLOAD_BYTES,
 } from "@/lib/s3";
 import { getUserUsageAndLimit } from "@/lib/subscription";
+import { isDeveloperUser } from "@/lib/developer-access";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 /**
@@ -55,11 +56,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 3. Check server-side analysis quota limit (bypassed in development mode)
+  // 3. Check server-side analysis quota limit (bypassed in development mode or for developer accounts)
   try {
-    const isDev = process.env.NODE_ENV === "development";
     const usage = await getUserUsageAndLimit(userId);
-    if (!isDev && usage.isLimitReached) {
+    const isDeveloper = usage.isDeveloper || usage.isDeveloperUnlimited || (await isDeveloperUser(userId));
+    if (usage.isLimitReached && !isDeveloper) {
       return NextResponse.json(
         {
           error: `Analysis limit reached (${usage.used}/${usage.limit} analyses on ${usage.planName} plan). Please upgrade your plan to continue analyzing images.`,

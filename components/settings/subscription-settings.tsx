@@ -13,8 +13,9 @@ interface SubscriptionSettingsProps {
 
 export function SubscriptionSettings({ usage }: SubscriptionSettingsProps) {
   const shouldReduceMotion = useReducedMotion();
+  const isDevUnlimited = Boolean(usage.isDeveloperUnlimited || usage.isDeveloper);
   const currentPlan = PLAN_DEFINITIONS[usage.plan] || PLAN_DEFINITIONS.free;
-  const progressPct = Math.min(100, Math.round((usage.used / usage.limit) * 100));
+  const progressPct = isDevUnlimited ? 100 : Math.min(100, Math.round((usage.used / usage.limit) * 100));
 
   const containerVariants = {
     hidden: {},
@@ -63,9 +64,15 @@ export function SubscriptionSettings({ usage }: SubscriptionSettingsProps) {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5" />
                   Active
                 </span>
+                {isDevUnlimited && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-[#1a7fc4] dark:text-[#5bb8f5] border border-blue-200/70 dark:border-blue-800/50">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1a7fc4] dark:bg-[#5bb8f5] animate-pulse" />
+                    Developer Access • Unlimited
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {currentPlan.price} {currentPlan.period} • {currentPlan.limit} analyses {currentPlan.periodLabel.toLowerCase()}
+                {currentPlan.price} {currentPlan.period} • {isDevUnlimited ? "Unlimited analyses (Developer Quota Exemption)" : `${currentPlan.limit} analyses ${currentPlan.periodLabel.toLowerCase()}`}
               </p>
             </div>
           </div>
@@ -84,7 +91,9 @@ export function SubscriptionSettings({ usage }: SubscriptionSettingsProps) {
           <div className="flex items-center justify-between text-xs sm:text-sm font-semibold">
             <span className="text-slate-700 dark:text-slate-300">Image Analyses Allowance</span>
             <span className="text-slate-900 dark:text-white font-bold">
-              {usage.used} / {usage.limit} used ({usage.remaining} remaining)
+              {isDevUnlimited
+                ? `${usage.used} used (Unlimited analyses)`
+                : `${usage.used} / ${usage.limit} used (${usage.remaining} remaining)`}
             </span>
           </div>
 
@@ -92,10 +101,12 @@ export function SubscriptionSettings({ usage }: SubscriptionSettingsProps) {
           <div className="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${progressPct}%` }}
+              animate={{ width: isDevUnlimited ? "100%" : `${progressPct}%` }}
               transition={{ duration: shouldReduceMotion ? 0.1 : 0.8, ease: EASE_OUT }}
               className={`h-full rounded-full ${
-                progressPct >= 100
+                isDevUnlimited
+                  ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]"
+                  : progressPct >= 100
                   ? "bg-rose-500"
                   : progressPct >= 80
                   ? "bg-amber-500"
