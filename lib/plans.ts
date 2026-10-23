@@ -54,7 +54,6 @@ export const PLAN_DEFINITIONS: Record<PlanTier, PlanDefinition> = {
       "Frequency, noise, ELA & statistical evidence",
       "Detailed PDF forensic report generation",
       "Analysis history access",
-      "Standard priority processing",
     ],
   },
   yearly: {

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Zap, Check, ArrowRight, Star, Clock } from "lucide-react";
+import { Zap, Check, ArrowRight, Star } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { EASE_OUT } from "@/components/motion-utils";
 import type { UserUsageInfo } from "@/lib/plans";
@@ -167,7 +167,7 @@ export function SubscriptionSettings({ usage }: SubscriptionSettingsProps) {
               <span className="font-semibold text-slate-800 dark:text-slate-200">25 analyses per month</span>
             </div>
             <span className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
-              <Clock className="w-3 h-3 text-slate-400 dark:text-slate-500" /> Razorpay integration coming soon
+              <Zap className="w-3 h-3 text-[#1a7fc4] dark:text-[#5bb8f5]" /> Razorpay secure checkout active
             </span>
           </div>
         </div>
@@ -208,7 +208,7 @@ export function SubscriptionSettings({ usage }: SubscriptionSettingsProps) {
               <span className="font-semibold text-slate-800 dark:text-slate-200">300 analyses per year</span>
             </div>
             <span className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
-              <Clock className="w-3 h-3 text-slate-400 dark:text-slate-500" /> Razorpay integration coming soon
+              <Zap className="w-3 h-3 text-[#1a7fc4] dark:text-[#5bb8f5]" /> Razorpay secure checkout active
             </span>
           </div>
         </div>
